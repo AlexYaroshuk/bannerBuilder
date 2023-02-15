@@ -8,9 +8,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.45"
+    "verte": "^0.0.12",
+    "vue": "^3.2.45",
+    "vue-color": "^2.8.1"
   },
   "devDependencies": {
+    "@types/vue-color": "^2.4.4",
     "@vitejs/plugin-vue": "^4.0.0",
     "vite": "^4.0.0"
   }

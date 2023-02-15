@@ -22,6 +22,7 @@ import TheWelcome from "./components/TheWelcome.vue"; */
 import Sidebar from "./components/Sidebar.vue";
 import Banner from "./components/Banner.vue"
 
+
 export default {
   components: {
     /*     HelloWorld,
