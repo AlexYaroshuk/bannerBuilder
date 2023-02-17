@@ -20,16 +20,16 @@
 /* import HelloWorld from "./components/HelloWorld.vue";
 import TheWelcome from "./components/TheWelcome.vue"; */
 import Sidebar from "./components/Sidebar.vue";
-import Banner from "./components/Banner.vue"
-
+import Banner from "./components/Banner.vue";
+import "@fortawesome/fontawesome-free/css/all.css";
 
 export default {
   components: {
     /*     HelloWorld,
         TheWelcome, */
     Sidebar,
-    Banner
-  }
+    Banner,
+  },
 };
 </script>
 
