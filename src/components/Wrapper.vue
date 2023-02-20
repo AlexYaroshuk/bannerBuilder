@@ -1,13 +1,14 @@
 <template>
   <div
     class="wrapper"
-    :style="{ backgroundColor: bannerColor }"
     @mouseover="showOptionsButton = true"
     @mouseout="showOptionsButton = false"
   >
-    <Container>
-      <text :received-text="text" @update:receivedText="text = $event" />
-    </Container>
+    <container
+      class="container"
+      :backgroundColor="backgroundColor"
+      :text="text"
+    />
     <options-button
       :is-active="showOptionsButton"
       @update-text="onBannerTextUpdate"
@@ -17,21 +18,20 @@
 </template>
 
 <script>
+import Container from "./Container.vue";
 import OptionsButton from "./OptionsButton.vue";
-import Text from "./Text.vue";
 
 export default {
   components: {
     OptionsButton,
-    Text,
+    Container,
   },
   data() {
     return {
-      text: "",
+      text: "Hello World!",
       showOptionsButton: false,
       showChangeTextPopup: false,
-      bannerText: "text",
-      bannerColor: "purple",
+      backgroundColor: "purple",
     };
   },
   methods: {
@@ -40,7 +40,7 @@ export default {
       this.showChangeTextPopup = false;
     },
     onUpdateColor(color) {
-      this.bannerColor = color;
+      this.backgroundColor = color;
     },
   },
 };
@@ -48,14 +48,8 @@ export default {
 
 <style scoped>
 .wrapper {
-  padding: 1rem;
-  background-color: purple;
-  opacity: 1;
-  color: white;
-  width: 600px;
-  height: 200px;
-  align-self: center;
-  position: relative;
-  /* Add this line to give the parent element a position */
+  display: inline-block;
+  border: 2px solid blue;
+  background-color: transparent;
 }
 </style>

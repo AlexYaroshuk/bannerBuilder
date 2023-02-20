@@ -9,10 +9,11 @@
     </header>
 
     <main>
+      <Wrapper></Wrapper>
       <Sidebar />
       <TheWelcome />
-      <Banner />
-      <Text />
+      <!--       <Banner />
+      <Text /> -->
     </main>
   </div>
 </template>
@@ -20,9 +21,10 @@
 <script>
 /* import HelloWorld from "./components/HelloWorld.vue";
 import TheWelcome from "./components/TheWelcome.vue"; */
+import Wrapper from "./components/Wrapper.vue";
 import Sidebar from "./components/Sidebar.vue";
-import Banner from "./components/Banner.vue";
-import Text from "./components/Text.vue";
+/* import Banner from "./components/Banner.vue";
+import Text from "./components/Text.vue"; */
 
 import "@fortawesome/fontawesome-free/css/all.css";
 
@@ -31,8 +33,9 @@ export default {
     /*     HelloWorld,
         TheWelcome, */
     Sidebar,
-    Banner,
-    Text,
+    /*     Banner,
+    Text, */
+    Wrapper,
   },
 };
 </script>

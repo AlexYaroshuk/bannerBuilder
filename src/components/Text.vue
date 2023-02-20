@@ -1,14 +1,14 @@
 <template>
   <div class="text">
     <h1>tet</h1>
-    <p>t{{ receivedText }}</p>
+    <p>t{{ text }}</p>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    receivedText: {
+    text: {
       type: String,
       default: "text",
     },
