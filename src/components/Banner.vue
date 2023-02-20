@@ -1,30 +1,33 @@
 <template>
-  <div>
-    <p
-      class="banner"
-      :style="{ backgroundColor: bannerColor }"
-      @mouseover="showOptionsButton = true"
-      @mouseout="showOptionsButton = false"
-    >
-      {{ bannerText }}
-      <options-button
-        :is-active="showOptionsButton"
-        @update-text="onBannerTextUpdate"
-        @update-color="onUpdateColor"
-      />
-    </p>
+  <div
+    class="wrapper"
+    :style="{ backgroundColor: bannerColor }"
+    @mouseover="showOptionsButton = true"
+    @mouseout="showOptionsButton = false"
+  >
+    <Container>
+      <text :received-text="text" @update:receivedText="text = $event" />
+    </Container>
+    <options-button
+      :is-active="showOptionsButton"
+      @update-text="onBannerTextUpdate"
+      @update-color="onUpdateColor"
+    />
   </div>
 </template>
 
 <script>
 import OptionsButton from "./OptionsButton.vue";
+import Text from "./Text.vue";
 
 export default {
   components: {
     OptionsButton,
+    Text,
   },
   data() {
     return {
+      text: "",
       showOptionsButton: false,
       showChangeTextPopup: false,
       bannerText: "text",
@@ -33,7 +36,7 @@ export default {
   },
   methods: {
     onBannerTextUpdate(value) {
-      this.bannerText = value;
+      this.text = value;
       this.showChangeTextPopup = false;
     },
     onUpdateColor(color) {
@@ -44,7 +47,7 @@ export default {
 </script>
 
 <style scoped>
-.banner {
+.wrapper {
   padding: 1rem;
   background-color: purple;
   opacity: 1;
