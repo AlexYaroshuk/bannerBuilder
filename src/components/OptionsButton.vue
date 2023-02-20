@@ -90,6 +90,7 @@ export default {
       this.showColorPicker = false;
     },
     updateBannerText() {
+      this.newText = this.newText;
       this.$emit("update-text", this.newText);
       this.hidePopup();
     },

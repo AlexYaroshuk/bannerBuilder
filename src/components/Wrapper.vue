@@ -4,7 +4,7 @@
     @mouseover="showOptionsButton = true"
     @mouseout="showOptionsButton = false"
   >
-    <container
+    <Container
       class="container"
       :backgroundColor="backgroundColor"
       :text="text"
@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      text: "Hello World!",
+      text: "This is some text",
       showOptionsButton: false,
       showChangeTextPopup: false,
       backgroundColor: "purple",
@@ -48,8 +48,10 @@ export default {
 
 <style scoped>
 .wrapper {
+  min-width: 600px;
   display: inline-block;
   border: 2px solid blue;
   background-color: transparent;
+  z-index: 2;
 }
 </style>

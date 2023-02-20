@@ -1,18 +1,19 @@
 <template>
-  <div class="btext">
+  <div class="link">
     <p>{{ text }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["text"],
+  props: ["link"],
 };
 </script>
 
 <style scoped>
-.btext {
-  color: white;
+.link {
+  color: rgb(60, 25, 255);
+  text-decoration: underline;
   font-size: large;
   position: absolute;
   z-index: 1;
