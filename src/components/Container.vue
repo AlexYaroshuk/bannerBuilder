@@ -1,5 +1,11 @@
 <template>
-  <div class="container" :style="{ backgroundColor: backgroundColor }">
+  <div
+    class="container"
+    :style="{
+      backgroundColor: backgroundColor,
+      borderRadius: borderRadius + 'px',
+    }"
+  >
     <div class="child">
       <Text :bannerText="bannerText" />
     </div>
@@ -22,6 +28,10 @@ export default {
     backgroundColor: {
       type: String,
       default: "green",
+    },
+    borderRadius: {
+      type: Number,
+      default: 80,
     },
     bannerText: {
       type: String,

@@ -8,11 +8,13 @@
       class="container"
       :backgroundColor="backgroundColor"
       :bannerText="bannerText"
+      :borderRadius="borderRadius"
     />
     <options-button
       :is-active="showOptionsButton"
       @update-text="onBannerTextUpdate"
       @update-color="onUpdateColor"
+      @update-border-radius="onUpdateBorderRadius"
     />
   </div>
 </template>
@@ -32,6 +34,7 @@ export default {
       showOptionsButton: false,
       showChangeTextPopup: false,
       backgroundColor: "purple",
+      borderRadius: 0,
     };
   },
   methods: {
@@ -41,6 +44,9 @@ export default {
     },
     onUpdateColor(color) {
       this.backgroundColor = color;
+    },
+    onUpdateBorderRadius(sliderValue) {
+      this.borderRadius = sliderValue;
     },
   },
 };

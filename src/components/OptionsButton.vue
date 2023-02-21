@@ -45,7 +45,7 @@
 
     <div class="popup" :class="{ show: currentPopup === 'container' }">
       <div class="popup-content">
-        <h3>Change Color</h3>
+        <h3>Background color</h3>
         <ColorPicker :color="color" @color-change="updateColor" />
 
         <div
@@ -55,6 +55,17 @@
             height: '100px',
           }"
         ></div>
+        <h3>Border radius</h3>
+        <div class="slider">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            v-model="borderRadius"
+            @input="updateValue"
+          />
+          <span class="value">{{ borderRadius }}</span>
+        </div>
         <div class="popup-buttons">
           <button @click="hidePopup">Cancel</button>
           <button @click="applyColor">OK</button>
@@ -96,6 +107,10 @@ export default {
       type: String,
       default: "Banner Text",
     },
+    sliderValue: {
+      type: Number,
+      default: 80,
+    },
   },
   data() {
     return {
@@ -104,6 +119,7 @@ export default {
       newText: this.bannerText,
       color: this.bannerColor,
       tempColor: this.bannerColor,
+      borderRadius: this.sliderValue,
     };
   },
   methods: {
@@ -133,9 +149,14 @@ export default {
       this.color = this.tempColor;
       this.$emit("update-color", this.color);
       this.currentPopup = null;
+      this.$emit("update-border-radius", this.sliderValue);
     },
     hideColors() {
       this.currentPopup = null;
+    },
+
+    updateValue(event) {
+      this.sliderValue = parseInt(event.target.value);
     },
   },
   updated() {
@@ -350,5 +371,18 @@ export default {
   height: 40px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.slider {
+  display: flex;
+  align-items: center;
+}
+
+.slider input {
+  flex: 1;
+}
+
+.slider .value {
+  margin-left: 10px;
 }
 </style>
