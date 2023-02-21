@@ -1,0 +1,21 @@
+Container (<div>)
+-set background color  
+-set background image
+-set border color
+-set border radius
+
+Image (<img>)
+-upload image file
+
+Hyperlink (<a>)
+-set font family
+-set font size
+-set font color
+-set background color
+-set hyperlink
+
+Text (<p>)
+-set font family
+-set font size
+-set font color
+-set background color
