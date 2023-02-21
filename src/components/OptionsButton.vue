@@ -9,13 +9,15 @@
     </div>
     <div class="dropdown" :class="{ show: showDropdown }">
       <ul>
-        <li @click="showPopup = true">Change text</li>
-        <li @click="showColorPicker = true">Change color</li>
+        <li @click="showContainerPopup">Customize container</li>
+        <li @click="showTextPopup">Customize text</li>
+        <li @click="showLinkPopup">Customize link</li>
+        <li @click="showFileUploader">Customize image</li>
       </ul>
     </div>
-    <div class="popup" :class="{ show: showPopup }">
+    <div class="popup" :class="{ show: isTextPopupVisible }">
       <div class="popup-content">
-        <h3>Change Text</h3>
+        <h3>Customize Text</h3>
         <div class="form-group">
           <label for="text-field">Text:</label>
           <input id="text-field" type="text" v-model="newText" />
@@ -26,7 +28,22 @@
         </div>
       </div>
     </div>
-    <div class="popup" :class="{ show: showColorPicker }">
+
+    <div class="popup" :class="{ show: isLinkPopupVisible }">
+      <div class="popup-content">
+        <h3>Customize Link</h3>
+        <div class="form-group">
+          <label for="text-field">Text:</label>
+          <input id="text-field" type="text" v-model="newText" />
+          <div class="popup-buttons">
+            <button @click="updateBannerText">OK</button>
+            <button @click="hidePopup">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup" :class="{ show: isContainerPopupVisible }">
       <div class="popup-content">
         <h3>Change Color</h3>
         <ColorPicker :color="color" @color-change="updateColor" />
@@ -44,15 +61,27 @@
         </div>
       </div>
     </div>
+    <div class="popup" :class="{ show: isFileUploaderVisible }">
+      <div class="popup-content">
+        <h3>Upload image</h3>
+        <div class="form-group">
+          <FIleUploader />
+          <button @click="updateBannerText">OK</button>
+          <button @click="hidePopup">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
+import FIleUploader from "./FIleUploader.vue";
 
 export default {
   components: {
     ColorPicker,
+    FIleUploader,
   },
   props: {
     isActive: {
@@ -71,14 +100,32 @@ export default {
   data() {
     return {
       showDropdown: false,
-      showPopup: false,
+      isTextPopupVisible: false,
+      isLinkPopupVisible: false,
+      isFileUploaderVisible: false,
       newText: this.bannerText,
-      showColorPicker: false,
+      isContainerPopupVisible: false,
       color: this.bannerColor,
       tempColor: this.bannerColor,
     };
   },
   methods: {
+    showTextPopup() {
+      this.showDropdown = false;
+      this.isTextPopupVisible = true;
+    },
+    showLinkPopup() {
+      this.showDropdown = false;
+      this.isLinkPopupVisible = true;
+    },
+    showContainerPopup() {
+      this.showDropdown = false;
+      this.isContainerPopupVisible = true;
+    },
+    showFileUploader() {
+      this.showDropdown = false;
+      this.isFileUploaderVisible = true;
+    },
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
@@ -86,8 +133,11 @@ export default {
       this.showDropdown = false;
     },
     hidePopup() {
-      this.showPopup = false;
-      this.showColorPicker = false;
+      this.isTextPopupVisible = false;
+      this.isContainerPopupVisible = false;
+      this.isLinkPopupVisible = false;
+      this.isFileUploaderVisible = false;
+      this.showDropdown = false;
     },
     updateBannerText() {
       this.newText = this.newText;
@@ -100,10 +150,10 @@ export default {
     applyColor() {
       this.color = this.tempColor;
       this.$emit("update-color", this.color);
-      this.showColorPicker = false;
+      this.isContainerPopupVisible = false;
     },
     hideColors() {
-      this.showColorPicker = false;
+      this.isContainerPopupVisible = false;
     },
   },
   updated() {
@@ -148,7 +198,7 @@ export default {
   border-radius: 4px;
   top: 100%;
   right: 0;
-  width: 128px;
+  width: 160px;
   background-color: white;
   color: black;
   transform: translateY(-10px);
@@ -166,6 +216,7 @@ export default {
   list-style: none;
   margin: 0;
   padding: 0;
+  text-align: left;
 }
 
 .dropdown li {

@@ -7,7 +7,7 @@
     <Container
       class="container"
       :backgroundColor="backgroundColor"
-      :text="text"
+      :bannerText="bannerText"
     />
     <options-button
       :is-active="showOptionsButton"
@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      text: "This is some text",
+      bannerText: "This is some text",
       showOptionsButton: false,
       showChangeTextPopup: false,
       backgroundColor: "purple",
@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     onBannerTextUpdate(value) {
-      this.text = value;
+      this.bannerText = value;
       this.showChangeTextPopup = false;
     },
     onUpdateColor(color) {
@@ -49,6 +49,7 @@ export default {
 <style scoped>
 .wrapper {
   min-width: 600px;
+  min-height: 200px;
   display: inline-block;
   border: 2px solid blue;
   background-color: transparent;

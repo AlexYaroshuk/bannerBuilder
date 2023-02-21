@@ -1,21 +1,18 @@
 <template>
-  <div class="btext">
-    <p>{{ bannerText }}</p>
-  </div>
+  <img class="img" :src="imgLink" />
 </template>
 
 <script>
 export default {
-  props: ["bannerText"],
+  props: ["imgLink"],
 };
 </script>
 
 <style scoped>
-.btext {
-  color: white;
-  font-size: large;
-
-  z-index: 1;
+.img {
+  width: 100%;
+  max-height: 48px;
+  object-fit: cover;
 
   /* Add this line to give the parent element a position */
 }
