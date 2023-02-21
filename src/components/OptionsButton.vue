@@ -9,13 +9,13 @@
     </div>
     <div class="dropdown" :class="{ show: showDropdown }">
       <ul>
-        <li @click="showContainerPopup">Customize container</li>
-        <li @click="showTextPopup">Customize text</li>
-        <li @click="showLinkPopup">Customize link</li>
-        <li @click="showFileUploader">Customize image</li>
+        <li @click="showPopup('container')">Customize container</li>
+        <li @click="showPopup('text')">Customize text</li>
+        <li @click="showPopup('link')">Customize link</li>
+        <li @click="showPopup('fileuploader')">Customize image</li>
       </ul>
     </div>
-    <div class="popup" :class="{ show: isTextPopupVisible }">
+    <div class="popup" :class="{ show: currentPopup === 'text' }">
       <div class="popup-content">
         <h3>Customize Text</h3>
         <div class="form-group">
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="popup" :class="{ show: isLinkPopupVisible }">
+    <div class="popup" :class="{ show: currentPopup === 'link' }">
       <div class="popup-content">
         <h3>Customize Link</h3>
         <div class="form-group">
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="popup" :class="{ show: isContainerPopupVisible }">
+    <div class="popup" :class="{ show: currentPopup === 'container' }">
       <div class="popup-content">
         <h3>Change Color</h3>
         <ColorPicker :color="color" @color-change="updateColor" />
@@ -56,12 +56,12 @@
           }"
         ></div>
         <div class="popup-buttons">
-          <button @click="hideColors">Cancel</button>
+          <button @click="hidePopup">Cancel</button>
           <button @click="applyColor">OK</button>
         </div>
       </div>
     </div>
-    <div class="popup" :class="{ show: isFileUploaderVisible }">
+    <div class="popup" :class="{ show: currentPopup === 'fileuploader' }">
       <div class="popup-content">
         <h3>Upload image</h3>
         <div class="form-group">
@@ -99,33 +99,19 @@ export default {
   },
   data() {
     return {
+      currentPopup: null,
       showDropdown: false,
-      isTextPopupVisible: false,
-      isLinkPopupVisible: false,
-      isFileUploaderVisible: false,
       newText: this.bannerText,
-      isContainerPopupVisible: false,
       color: this.bannerColor,
       tempColor: this.bannerColor,
     };
   },
   methods: {
-    showTextPopup() {
-      this.showDropdown = false;
-      this.isTextPopupVisible = true;
+    showPopup(popupType) {
+      this.hideDropdown();
+      this.currentPopup = popupType;
     },
-    showLinkPopup() {
-      this.showDropdown = false;
-      this.isLinkPopupVisible = true;
-    },
-    showContainerPopup() {
-      this.showDropdown = false;
-      this.isContainerPopupVisible = true;
-    },
-    showFileUploader() {
-      this.showDropdown = false;
-      this.isFileUploaderVisible = true;
-    },
+
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
@@ -133,11 +119,7 @@ export default {
       this.showDropdown = false;
     },
     hidePopup() {
-      this.isTextPopupVisible = false;
-      this.isContainerPopupVisible = false;
-      this.isLinkPopupVisible = false;
-      this.isFileUploaderVisible = false;
-      this.showDropdown = false;
+      (this.currentPopup = null), (this.showDropdown = false);
     },
     updateBannerText() {
       this.newText = this.newText;
@@ -150,10 +132,10 @@ export default {
     applyColor() {
       this.color = this.tempColor;
       this.$emit("update-color", this.color);
-      this.isContainerPopupVisible = false;
+      this.currentPopup = null;
     },
     hideColors() {
-      this.isContainerPopupVisible = false;
+      this.currentPopup = null;
     },
   },
   updated() {
@@ -161,6 +143,7 @@ export default {
       if (!this.$el.contains(event.target)) {
         this.hideDropdown();
         this.hidePopup();
+        this.currentPopup = null;
       }
     });
   },
