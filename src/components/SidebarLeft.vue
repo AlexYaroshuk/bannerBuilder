@@ -3,8 +3,8 @@
     <button @click="toggleVisibility">&gt; Show sidebar</button>
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
-    <h3>Sidebar</h3>
-    <p>This is the content of the sidebar</p>
+    <h2>Components</h2>
+    <p>This is the where you can see your components</p>
     <button @click="toggleVisibility">&lt; Hide</button>
   </aside>
 </template>
@@ -27,7 +27,7 @@ export default {
   color: black;
   background-color: #f5f5f5;
   padding: 1rem;
-  width: 25%;
+  width: 20%;
   float: left;
   transition: all 0.2s ease-in-out;
   height: 100vh;
@@ -37,7 +37,7 @@ export default {
 }
 
 .hidden {
-  left: -25%;
+  left: -20%;
 }
 
 .sidebar-button {

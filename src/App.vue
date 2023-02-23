@@ -8,7 +8,8 @@
 
     <main>
       <Wrapper></Wrapper>
-      <Sidebar />
+      <SidebarLeft />
+      <!--       <SidebarRight /> -->
 
       <!--       <Banner />
       <Text /> -->
@@ -20,7 +21,8 @@
 /* import HelloWorld from "./components/HelloWorld.vue";
 import TheWelcome from "./components/TheWelcome.vue"; */
 import Wrapper from "./components/Wrapper.vue";
-import Sidebar from "./components/Sidebar.vue";
+import SidebarLeft from "./components/SidebarLeft.vue";
+import SidebarRight from "./components/SidebarRight.vue";
 /* import Banner from "./components/Banner.vue";
 import Text from "./components/Text.vue"; */
 
@@ -30,7 +32,8 @@ export default {
   components: {
     /*     HelloWorld,
         TheWelcome, */
-    Sidebar,
+    SidebarLeft,
+    SidebarRight,
     /*     Banner,
     Text, */
     Wrapper,

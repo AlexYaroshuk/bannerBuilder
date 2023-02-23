@@ -4,6 +4,12 @@
     :style="{
       backgroundColor: backgroundColor,
       borderRadius: borderRadius + 'px',
+      borderWidth: borderWidth + 'px',
+      borderColor: borderColor,
+      backgroundImage: `url(${BGImage})`,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
     }"
   >
     <div class="child">
@@ -29,13 +35,21 @@ export default {
       type: String,
       default: "green",
     },
+    borderColor: {
+      type: String,
+      default: "green",
+    },
     borderRadius: {
       type: Number,
-      default: 80,
+      default: 0,
+    },
+    borderWidth: {
+      type: Number,
+      default: 0,
     },
     bannerText: {
       type: String,
-      default: "",
+      default: "This is some text",
     },
     linkLabel: {
       type: String,
@@ -54,26 +68,26 @@ export default {
       default:
         "https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/713db751-0cc0-4d18-b283-bd707824f201/smashingconf-front-end-sf-2023.png",
     },
+    BGImage: {
+      type: String,
+      default: "",
+    },
+  },
+
+  watch: {
+    BGImage: function (newVal) {
+      this.backgroundImage = newVal ? `url(${newVal})` : null;
+    },
   },
 
   components: {
     Text,
     Link,
     Image,
-    Image,
-  },
-
-  methods: {
-    onBannerTextUpdate(value) {
-      this.text = value;
-    },
-    onUpdateColor(color) {
-      this.backgroundColor = color;
-    },
   },
 };
 </script>
-
+r
 <style scoped>
 .container {
   flex-direction: column;
@@ -84,7 +98,13 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
+  border: 0px solid black;
+
   /* Add this line to give the parent element a position */
+}
+
+.container[data-has-image="true"] {
+  background-image: url(BGImage);
 }
 
 .child {

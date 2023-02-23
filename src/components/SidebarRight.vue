@@ -1,0 +1,230 @@
+<template>
+  <aside :class="['sidebar-button', { hidden: !isVisible }]">
+    <button @click="toggleVisibility">&lt; Show sidebar</button>
+  </aside>
+  <aside :class="['sidebar', { hidden: !isVisible }]">
+    <h2>Properties</h2>
+    <!--     <p>
+      This is where you can customize a property. Select an option to get
+      started
+    </p>
+    <button @click="toggleVisibility">&gt; Hide</button>
+ -->
+    <div>
+      <button @click="showSettings('container')">Container</button
+      ><button @click="showSettings('text')">Text</button
+      ><button @click="showSettings('link')">Link</button
+      ><button @click="showSettings('upload image')">Image</button>
+    </div>
+
+    <div class="popup-content" :class="popupContentClass">
+      <!-- container settings -->
+
+      <div class="popup-content" v-if="currentSettings === 'container'">
+        <h3>Customize Container</h3>
+        <h3>Background color/image</h3>
+        <ColorPicker :color="color" @color-change="updateColor" />
+        <div>
+          <h3>Image upload</h3>
+          <FIleUploader
+            v-model="BGImage"
+            @set-image-bg="setImageAsBG"
+            @clear-image-bg="clearImage"
+          />
+        </div>
+
+        <h3>Border settings</h3>
+        <h2>Border color</h2>
+        <ColorPicker :color="color" @color-change="updateBorderColor" />
+
+        <h2>Border width</h2>
+        <div class="slider">
+          <input
+            style="width: 100%"
+            type="range"
+            min="0"
+            max="100"
+            v-model="borderWidth"
+            @input="updateBorderWidth"
+          />
+          <span class="value">{{ borderWidth }}</span>
+
+          <h2>Border radius</h2>
+          <div class="slider">
+            <input
+              style="width: 100%"
+              type="range"
+              min="0"
+              max="100"
+              v-model="borderRadius"
+              @input="updateBorderRadius"
+            />
+            <span class="value">{{ borderRadius }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- text settings -->
+    <div v-if="currentSettings === 'text'">
+      <div class="form-group">
+        <h3>Customize Text</h3>
+
+        <label for="text-field">Text:</label>
+        <input
+          @input="updateText"
+          id="text-field"
+          type="text"
+          v-model="inputText"
+        />
+      </div>
+    </div>
+
+    <!-- link settings -->
+
+    <div v-if="currentSettings === 'link'">
+      <h3>Customize Link</h3>
+      <label for="text-field">Text:</label>
+      <input
+        style="width: 100%"
+        @input="updateLinkLabel"
+        id="link-label"
+        type="text"
+        v-model="inputLinkLabel"
+      />
+      <label for="text-field">URL:</label>
+      <input
+        style="width: 100%"
+        @input="updateLinkURL"
+        id="link-URL"
+        type="URL"
+        v-model="inputLinkURL"
+      />
+    </div>
+    <!-- upload settings -->
+    <FIleUploader
+      v-model="NestedImage"
+      @set-image-bg="setNestedImage"
+      @clear-image-bg="clearNestedImage"
+    />
+  </aside>
+</template>
+
+<script>
+import { ColorPicker } from "vue-accessible-color-picker";
+import FIleUploader from "./FIleUploader.vue";
+export default {
+  components: {
+    ColorPicker,
+    FIleUploader,
+  },
+  data() {
+    return {
+      currentSettings: "container",
+      isVisible: true,
+      displayText: "",
+      inputText: "",
+      inputLinkLabel: "",
+      inputLinkURL: "",
+      color: this.bannerColor,
+      borderColor: this.bannerBorderColor,
+      selectedColor: "",
+      borderRadius: 0,
+      borderWidth: 0,
+      BGImage: this.BGImage,
+      NestedImage: this.NestedImage,
+    };
+  },
+  emits: [
+    "set-text",
+    "set-color",
+    "set-border-radius",
+    "set-border-width",
+    "update-image-BG",
+    "set-border-color",
+    "set-link-label",
+    "update-image-nested",
+  ],
+  computed: {
+    popupContentClass() {
+      return {
+        show: this.currentSettings === !null,
+      };
+    },
+  },
+  methods: {
+    toggleVisibility() {
+      this.isVisible = !this.isVisible;
+    },
+    updateText() {
+      this.$emit("set-text", this.inputText);
+    },
+    updateLinkLabel() {
+      this.$emit("set-link-label", this.inputLinkLabel);
+    },
+    updateLinkURL() {
+      this.$emit("set-link-URL", this.inputLinkURL);
+    },
+    showSettings(settingsType) {
+      this.currentSettings = settingsType;
+    },
+    updateColor(eventData) {
+      this.$emit("set-color", eventData.cssColor);
+    },
+    updateBorderColor(eventData) {
+      this.$emit("set-border-color", eventData.cssColor);
+    },
+    updateBorderRadius(event) {
+      this.sliderValueRadius = parseInt(event.target.value);
+      this.$emit("set-border-radius", this.sliderValueRadius);
+    },
+    updateBorderWidth(event) {
+      this.sliderValueWidth = parseInt(event.target.value);
+      this.$emit("set-border-width", this.sliderValueWidth);
+    },
+    setImageAsBG(image) {
+      this.BGImage = image;
+      this.$emit("update-image-BG", this.BGImage);
+    },
+    clearImage() {
+      this.BGImage = null;
+      this.$emit("clear-image-BG");
+    },
+    setNestedImage(image) {
+      this.NestedImage = image;
+      this.$emit("update-image-nested", this.NestedImage);
+    },
+    clearNestedImage() {
+      this.NestedImage = null;
+      this.$emit("clear-image-nested");
+    },
+  },
+};
+</script>
+
+<style scoped>
+.sidebar {
+  color: black;
+  background-color: #f5f5f5;
+  padding: 1rem;
+  width: 20%;
+  float: right;
+  transition: all 0.2s ease-in-out;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+.hidden {
+  right: -20%;
+}
+
+.sidebar-button {
+  padding: 1rem;
+  float: right;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+</style>

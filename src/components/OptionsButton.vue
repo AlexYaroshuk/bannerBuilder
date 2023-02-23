@@ -13,6 +13,7 @@
         <li @click="showPopup('text')">Customize text</li>
         <li @click="showPopup('link')">Customize link</li>
         <li @click="showPopup('fileuploader')">Customize image</li>
+        <li @click="showSidebar('text')">Sidebar</li>
       </ul>
     </div>
     <div class="popup" :class="{ show: currentPopup === 'text' }">
@@ -20,7 +21,7 @@
         <h3>Customize Text</h3>
         <div class="form-group">
           <label for="text-field">Text:</label>
-          <input id="text-field" type="text" v-model="newText" />
+          <input id="text-field" />
           <div class="popup-buttons">
             <button @click="updateBannerText">OK</button>
             <button @click="hidePopup">Cancel</button>
@@ -115,6 +116,7 @@ export default {
   data() {
     return {
       currentPopup: null,
+      currentSidebar: null,
       showDropdown: false,
       newText: this.bannerText,
       color: this.bannerColor,
@@ -126,6 +128,11 @@ export default {
     showPopup(popupType) {
       this.hideDropdown();
       this.currentPopup = popupType;
+    },
+    showSidebar(popupType) {
+      this.hideDropdown();
+      this.currentSidebar = popupType;
+      this.$emit("show-sidebar", this.currentSidebar);
     },
 
     toggleDropdown() {
@@ -158,15 +165,6 @@ export default {
     updateValue(event) {
       this.sliderValue = parseInt(event.target.value);
     },
-  },
-  updated() {
-    document.addEventListener("click", (event) => {
-      if (!this.$el.contains(event.target)) {
-        this.hideDropdown();
-        this.hidePopup();
-        this.currentPopup = null;
-      }
-    });
   },
 };
 </script>
