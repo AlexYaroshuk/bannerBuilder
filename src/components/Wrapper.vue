@@ -1,29 +1,24 @@
 <template>
-  <div
-    class="wrapper"
-    @mouseover="showOptionsButton = true"
-    @mouseout="showOptionsButton = false"
-  >
+  <div class="wrapper">
     <Container
       class="container"
       :name="containerName"
       :backgroundColor="backgroundColor"
       :bannerText="bannerText"
+      :fontSize="textsize"
+      :fontFamily="textfamily"
       :borderRadius="borderRadius"
       :borderWidth="borderWidth"
       :color="color"
       :borderColor="borderColor"
       :linkLabel="linkLabel"
+      :linkFontSize="linktextsize"
+      :linkFontFamily="linkfamily"
       :linkURL="linkURL"
       :data-has-image="BGImage !== null"
       :imageLink="imageLink"
       :BGImage="BGImage"
     />
-    <!--     <options-button
-      :is-active="showOptionsButton"
-      @update-text="onBannerTextUpdate"
-      @update-color="onUpdateColor" -->
-    <!--     @update-border-radius="onUpdateBorderRadius" @set-sidebar="onSetSidebar" /> -->
   </div>
   <SidebarRight
     :color="backgroundColor"
@@ -32,7 +27,11 @@
     :displayText="bannerText"
     :linkLabel="linkLabel"
     @set-text="onBannerTextUpdate"
+    @text-font-size-changed="onTextSizeChanged"
+    @text-font-family-changed="onTextFamilyChanged"
     @set-link-label="onBannerLinkLabelUpdate"
+    @link-font-size-changed="onLinkSizeChanged"
+    @link-font-family-changed="onLinkFontChanged"
     @set-link-URL="onBannerURLUpdate"
     @set-color="onUpdateColor"
     @set-border-color="onUpdateBorderColor"
@@ -47,12 +46,10 @@
 
 <script>
 import Container from "./Container.vue";
-/* import OptionsButton from "./OptionsButton.vue"; */
 import SidebarRight from "./SidebarRight.vue";
 
 export default {
   components: {
-    /*     OptionsButton, */
     Container,
     SidebarRight,
   },
@@ -60,12 +57,14 @@ export default {
     return {
       containerName: "some text",
       bannerText: "This is some text",
+      textsize: "16",
+      textfamily: "Arial",
       linkLabel: "This is some link",
+      linkfamily: "Arial",
+      linktextsize: "14",
       linkURL: "https://www.npmjs.com/package/aicommits",
       imageLink: null,
-      showOptionsButton: false,
-      showChangeTextPopup: false,
-      backgroundColor: "transparent",
+      backgroundColor: "teal",
       borderColor: "yellow",
       borderRadius: 0,
       borderWidth: 2,
@@ -75,15 +74,24 @@ export default {
   methods: {
     onBannerTextUpdate(text) {
       this.bannerText = text;
-      this.showChangeTextPopup = false;
+    },
+    onTextSizeChanged(text) {
+      this.textsize = text;
+    },
+    onTextFamilyChanged(text) {
+      this.textfamily = text;
+    },
+    onLinkSizeChanged(text) {
+      this.linktextsize = text;
     },
     onBannerLinkLabelUpdate(text) {
       this.linkLabel = text;
-      this.showChangeTextPopup = false;
+    },
+    onLinkFontChanged(text) {
+      this.linkfamily = text;
     },
     onBannerURLUpdate(text) {
       this.linkURL = text;
-      this.showChangeTextPopup = false;
     },
 
     onUpdateColor(color) {

@@ -14,7 +14,7 @@ export default {
 
 <style scoped>
 .link {
-  font-size: large;
+  /*   font-size: large; */
 
   z-index: 1;
 

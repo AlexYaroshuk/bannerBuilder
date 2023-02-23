@@ -13,7 +13,7 @@ export default {
 <style scoped>
 .btext {
   color: white;
-  font-size: large;
+  /*   font-size: large; */
 
   z-index: 1;
 

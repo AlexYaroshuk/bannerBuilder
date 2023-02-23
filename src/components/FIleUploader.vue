@@ -2,7 +2,7 @@
   <div>
     <input type="file" @change="handleFileUpload" />
     <img v-if="imageSource" :src="imageSource" alt="Image" />
-    <button @click="setImageAsBG">Set as background</button>
+    <button @click="setImage">Set</button>
     <button @click="clearImage">Clear</button>
   </div>
 </template>
@@ -24,11 +24,11 @@ export default {
         this.imageSource = event.target.result;
       };
     },
-    setImageAsBG() {
-      this.$emit("set-image-bg", this.imageSource);
+    setImage() {
+      this.$emit("set-image", this.imageSource);
     },
     clearImage() {
-      this.$emit("clear-image-bg");
+      this.$emit("clear-image");
     },
   },
 };

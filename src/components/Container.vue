@@ -13,10 +13,18 @@
     }"
   >
     <div class="child">
-      <Text :bannerText="bannerText" />
+      <Text
+        :bannerText="bannerText"
+        :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily }"
+      />
     </div>
     <div class="child">
-      <Link :linkLabel="linkLabel" :linkURL="linkURL" :linkColor="linkColor" />
+      <Link
+        :linkLabel="linkLabel"
+        :linkURL="linkURL"
+        :linkColor="linkColor"
+        :style="{ fontSize: linkFontSize + 'px', fontFamily: linkFontFamily }"
+      />
     </div>
     <div class="child">
       <Image :imgLink="imgLink" />
@@ -51,10 +59,28 @@ export default {
       type: String,
       default: "This is some text",
     },
+    fontSize: {
+      type: String,
+      default: "16",
+    },
+    fontFamily: {
+      type: String,
+      default: "Arial",
+    },
+
     linkLabel: {
       type: String,
       default: "this is some link",
     },
+    linkFontSize: {
+      type: String,
+      default: "14",
+    },
+    linkFontFamily: {
+      type: String,
+      default: "Arial",
+    },
+
     linkURL: {
       type: String,
       default: "https://chat.openai.com/",

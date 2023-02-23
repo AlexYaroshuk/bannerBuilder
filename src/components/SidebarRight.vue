@@ -28,8 +28,8 @@
           <h3>Image upload</h3>
           <FIleUploader
             v-model="BGImage"
-            @set-image-bg="setImageAsBG"
-            @clear-image-bg="clearImage"
+            @set-image="setImageAsBG"
+            @clear-image="clearImage"
           />
         </div>
 
@@ -76,6 +76,33 @@
           type="text"
           v-model="inputText"
         />
+
+        <div>
+          <label for="fontSize">Select font size:</label>
+          <select
+            id="fontSize"
+            v-model="selectedTextSize"
+            @change="onSelectTextSize"
+          >
+            <option value="12">12px</option>
+            <option value="24">24px</option>
+            <option value="36">36px</option>
+            <option value="48">48px</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="text-font-family">Font Family:</label>
+          <select
+            id="text-font-family"
+            v-model="selectedTextFont"
+            @change="onChangeTextFont"
+          >
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Helvetica">Helvetica</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -91,6 +118,34 @@
         type="text"
         v-model="inputLinkLabel"
       />
+
+      <div>
+        <label for="linkFontSize">Select font size:</label>
+        <select
+          id="linkFontSize"
+          v-model="selectedLinkTextSize"
+          @change="onSelectLinkSize"
+        >
+          <option value="12">12px</option>
+          <option value="24">24px</option>
+          <option value="36">36px</option>
+          <option value="48">48px</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="text-font-family">Font Family:</label>
+        <select
+          id="link-font-family"
+          v-model="selectedLinkFont"
+          @change="onChangeLinkFont"
+        >
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Helvetica">Helvetica</option>
+        </select>
+      </div>
+
       <label for="text-field">URL:</label>
       <input
         style="width: 100%"
@@ -102,9 +157,10 @@
     </div>
     <!-- upload settings -->
     <FIleUploader
+      v-if="currentSettings === 'upload image'"
       v-model="NestedImage"
-      @set-image-bg="setNestedImage"
-      @clear-image-bg="clearNestedImage"
+      @set-image="setNestedImage"
+      @clear-image="clearNestedImage"
     />
   </aside>
 </template>
@@ -123,7 +179,11 @@ export default {
       isVisible: true,
       displayText: "",
       inputText: "",
+      selectedTextSize: "14",
+      selectedTextFont: "Arial",
       inputLinkLabel: "",
+      selectedLinkFont: "Arial",
+      selectedLinkTextSize: "14",
       inputLinkURL: "",
       color: this.bannerColor,
       borderColor: this.bannerBorderColor,
@@ -155,32 +215,46 @@ export default {
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
+
+    // text settings
     updateText() {
       this.$emit("set-text", this.inputText);
     },
+
+    onSelectTextSize() {
+      this.$emit("text-font-size-changed", this.selectedTextSize);
+    },
+    onChangeTextFont() {
+      this.$emit("text-font-family-changed", this.selectedTextFont);
+    },
+
+    // link settings
     updateLinkLabel() {
       this.$emit("set-link-label", this.inputLinkLabel);
+    },
+    onSelectLinkSize() {
+      this.$emit("link-font-size-changed", this.selectedLinkTextSize);
+    },
+    onChangeLinkFont() {
+      this.$emit("link-font-family-changed", this.selectedLinkFont);
     },
     updateLinkURL() {
       this.$emit("set-link-URL", this.inputLinkURL);
     },
+
+    //wip for expandable groups
     showSettings(settingsType) {
       this.currentSettings = settingsType;
     },
+
+    // bg settings
     updateColor(eventData) {
       this.$emit("set-color", eventData.cssColor);
     },
     updateBorderColor(eventData) {
       this.$emit("set-border-color", eventData.cssColor);
     },
-    updateBorderRadius(event) {
-      this.sliderValueRadius = parseInt(event.target.value);
-      this.$emit("set-border-radius", this.sliderValueRadius);
-    },
-    updateBorderWidth(event) {
-      this.sliderValueWidth = parseInt(event.target.value);
-      this.$emit("set-border-width", this.sliderValueWidth);
-    },
+
     setImageAsBG(image) {
       this.BGImage = image;
       this.$emit("update-image-BG", this.BGImage);
@@ -189,6 +263,18 @@ export default {
       this.BGImage = null;
       this.$emit("clear-image-BG");
     },
+
+    // border settings
+    updateBorderRadius(event) {
+      this.sliderValueRadius = parseInt(event.target.value);
+      this.$emit("set-border-radius", this.sliderValueRadius);
+    },
+    updateBorderWidth(event) {
+      this.sliderValueWidth = parseInt(event.target.value);
+      this.$emit("set-border-width", this.sliderValueWidth);
+    },
+
+    // image settings
     setNestedImage(image) {
       this.NestedImage = image;
       this.$emit("update-image-nested", this.NestedImage);
