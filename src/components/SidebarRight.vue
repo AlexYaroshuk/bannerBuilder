@@ -71,6 +71,7 @@
 
         <label for="text-field">Text:</label>
         <input
+          :placeholder="displayText"
           @input="updateText"
           id="text-field"
           type="text"
@@ -103,6 +104,10 @@
             <option value="Helvetica">Helvetica</option>
           </select>
         </div>
+        <h3>Customize Text Color</h3>
+        <ColorPicker :color="textColor" @color-change="updateTextColor" />
+        <h3>Customize Text BG Color</h3>
+        <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
       </div>
     </div>
 
@@ -154,7 +159,9 @@
         type="URL"
         v-model="inputLinkURL"
       />
+      <ColorPicker :color="linkColor" @color-change="updateLinkColor" />
     </div>
+
     <!-- upload settings -->
     <FIleUploader
       v-if="currentSettings === 'upload image'"
@@ -181,8 +188,11 @@ export default {
       inputText: "",
       selectedTextSize: "14",
       selectedTextFont: "Arial",
+      textColor: "black",
+      textBGColor: "transparent",
       inputLinkLabel: "",
       selectedLinkFont: "Arial",
+      linkColor: "black",
       selectedLinkTextSize: "14",
       inputLinkURL: "",
       color: this.bannerColor,
@@ -194,7 +204,7 @@ export default {
       NestedImage: this.NestedImage,
     };
   },
-  emits: [
+  /*   emits: [
     "set-text",
     "set-color",
     "set-border-radius",
@@ -203,7 +213,9 @@ export default {
     "set-border-color",
     "set-link-label",
     "update-image-nested",
-  ],
+    "text-color-changed",
+    "text-bg-color-changed",
+  ], */
   computed: {
     popupContentClass() {
       return {
@@ -228,6 +240,13 @@ export default {
       this.$emit("text-font-family-changed", this.selectedTextFont);
     },
 
+    updateTextColor(eventData) {
+      this.$emit("text-color-changed", eventData.cssColor);
+    },
+    updateTextBGColor(eventData) {
+      this.$emit("text-bg-color-changed", eventData.cssColor);
+    },
+
     // link settings
     updateLinkLabel() {
       this.$emit("set-link-label", this.inputLinkLabel);
@@ -240,6 +259,10 @@ export default {
     },
     updateLinkURL() {
       this.$emit("set-link-URL", this.inputLinkURL);
+    },
+
+    updateLinkColor(eventData) {
+      this.$emit("link-color-changed", eventData.cssColor);
     },
 
     //wip for expandable groups

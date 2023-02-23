@@ -1,18 +1,17 @@
 <template>
-  <div class="btext">
-    <p>{{ bannerText }}</p>
+  <div class="btext" :style="{ backgroundColor: 'textBGColor' }">
+    <p>{{ text }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["bannerText"],
+  props: ["text", "textBGColor"],
 };
 </script>
 
 <style scoped>
 .btext {
-  color: white;
   /*   font-size: large; */
 
   z-index: 1;

@@ -22,7 +22,7 @@
 import TheWelcome from "./components/TheWelcome.vue"; */
 import Wrapper from "./components/Wrapper.vue";
 import SidebarLeft from "./components/SidebarLeft.vue";
-import SidebarRight from "./components/SidebarRight.vue";
+/* import SidebarRight from "./components/SidebarRight.vue"; */
 /* import Banner from "./components/Banner.vue";
 import Text from "./components/Text.vue"; */
 
@@ -33,7 +33,7 @@ export default {
     /*     HelloWorld,
         TheWelcome, */
     SidebarLeft,
-    SidebarRight,
+    /*     SidebarRight, */
     /*     Banner,
     Text, */
     Wrapper,

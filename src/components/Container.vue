@@ -14,8 +14,13 @@
   >
     <div class="child">
       <Text
-        :bannerText="bannerText"
-        :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily }"
+        :text="text"
+        :textBGColor="textBGColor"
+        :style="{
+          fontSize: fontSize + 'px',
+          fontFamily: fontFamily,
+          color: textColor,
+        }"
       />
     </div>
     <div class="child">
@@ -23,7 +28,10 @@
         :linkLabel="linkLabel"
         :linkURL="linkURL"
         :linkColor="linkColor"
-        :style="{ fontSize: linkFontSize + 'px', fontFamily: linkFontFamily }"
+        :style="{
+          fontSize: linkFontSize + 'px',
+          fontFamily: linkFontFamily,
+        }"
       />
     </div>
     <div class="child">
@@ -55,7 +63,7 @@ export default {
       type: Number,
       default: 0,
     },
-    bannerText: {
+    text: {
       type: String,
       default: "This is some text",
     },
@@ -66,6 +74,14 @@ export default {
     fontFamily: {
       type: String,
       default: "Arial",
+    },
+    textColor: {
+      type: String,
+      default: "white",
+    },
+    textBGColor: {
+      type: String,
+      default: "white",
     },
 
     linkLabel: {
@@ -79,6 +95,10 @@ export default {
     linkFontFamily: {
       type: String,
       default: "Arial",
+    },
+    linkColor: {
+      type: String,
+      default: "yellow",
     },
 
     linkURL: {
