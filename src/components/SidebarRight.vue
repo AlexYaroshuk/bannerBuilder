@@ -10,22 +10,43 @@
     </p>
     <button @click="toggleVisibility">&gt; Hide</button>
  -->
-    <div>
-      <button @click="showSettings('container')">Container</button
-      ><button @click="showSettings('text')">Text</button
-      ><button @click="showSettings('link')">Link</button
-      ><button @click="showSettings('upload image')">Image</button>
+    <div class="button-group">
+      <button
+        class="button"
+        :class="{ active: currentSettings === 'container' }"
+        @click="showSettings('container')"
+      >
+        Container</button
+      ><button
+        class="button"
+        :class="{ active: currentSettings === 'text' }"
+        @click="showSettings('text')"
+      >
+        Text</button
+      ><button
+        class="button"
+        :class="{ active: currentSettings === 'link' }"
+        @click="showSettings('link')"
+      >
+        Link</button
+      ><button
+        class="button"
+        :class="{ active: currentSettings === 'upload image' }"
+        @click="showSettings('upload image')"
+      >
+        Image
+      </button>
     </div>
 
     <div class="popup-content" :class="popupContentClass">
       <!-- container settings -->
 
       <div class="popup-content" v-if="currentSettings === 'container'">
-        <h3>Customize Container</h3>
         <h3>Background color/image</h3>
         <ColorPicker :color="color" @color-change="updateColor" />
-        <div>
-          <h3>Image upload</h3>
+
+        <div style="margin-top: 16px">
+          <h4>Image upload</h4>
           <FIleUploader
             v-model="BGImage"
             @set-image="setImageAsBG"
@@ -33,33 +54,39 @@
           />
         </div>
 
+        <hr style="margin-top: 16px" />
+
         <h3>Border settings</h3>
-        <h2>Border color</h2>
+        <h4>Border color</h4>
         <ColorPicker :color="color" @color-change="updateBorderColor" />
 
-        <h2>Border width</h2>
-        <div class="slider">
-          <input
-            style="width: 100%"
-            type="range"
-            min="0"
-            max="100"
-            v-model="borderWidth"
-            @input="updateBorderWidth"
-          />
-          <span class="value">{{ borderWidth }}</span>
-
-          <h2>Border radius</h2>
+        <div style="margin-top: 16px">
+          <h4>Border width</h4>
           <div class="slider">
             <input
               style="width: 100%"
               type="range"
               min="0"
-              max="100"
-              v-model="borderRadius"
-              @input="updateBorderRadius"
+              max="32"
+              v-model="borderWidth"
+              @input="updateBorderWidth"
             />
-            <span class="value">{{ borderRadius }}</span>
+            <span class="value">{{ borderWidth }}</span>
+          </div>
+
+          <div style="margin-top: 16px">
+            <h4>Border radius</h4>
+            <div class="slider">
+              <input
+                style="width: 100%"
+                type="range"
+                min="0"
+                max="100"
+                v-model="borderRadius"
+                @input="updateBorderRadius"
+              />
+              <span class="value">{{ borderRadius }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -67,8 +94,6 @@
     <!-- text settings -->
     <div v-if="currentSettings === 'text'">
       <div class="form-group">
-        <h3>Customize Text</h3>
-
         <label for="text-field">Text:</label>
         <input
           :initial="text"
@@ -104,9 +129,9 @@
             <option value="Helvetica">Helvetica</option>
           </select>
         </div>
-        <h3>Customize Text Color</h3>
+        <h3>Text Color</h3>
         <ColorPicker :color="textColor" @color-change="updateTextColor" />
-        <h3>Customize Text BG Color</h3>
+        <h3>Text background color</h3>
         <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
       </div>
     </div>
@@ -114,8 +139,7 @@
     <!-- link settings -->
 
     <div v-if="currentSettings === 'link'">
-      <h3>Customize Link</h3>
-      <label for="text-field">Text:</label>
+      <label for="text-field">Link label:</label>
       <input
         style="width: 100%"
         @input="updateLinkLabel"
@@ -125,7 +149,7 @@
       />
 
       <div>
-        <label for="linkFontSize">Select font size:</label>
+        <label for="linkFontSize">Font size:</label>
         <select
           id="linkFontSize"
           v-model="selectedLinkTextSize"
@@ -159,15 +183,15 @@
         type="URL"
         v-model="inputLinkURL"
       />
-      <h3>Customize Link Color</h3>
+      <h3>Link color</h3>
       <ColorPicker :color="linkColor" @color-change="setLinkColor" />
-      <h3>Customize Link Background</h3>
+      <h3>Link background</h3>
       <ColorPicker :color="linkBGColor" @color-change="setLinkBGColor" />
     </div>
 
     <!-- upload settings -->
     <div v-if="currentSettings === 'upload image'">
-      <h3>Customize Image</h3>
+      <h3>Image</h3>
       <FIleUploader
         v-model="imageLink"
         @set-image="setNestedImage"
@@ -334,5 +358,21 @@ export default {
   position: fixed;
   top: 0;
   right: 0;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button {
+  width: 25%;
+}
+
+.active {
+  background-color: rgb(71, 71, 141);
+  color: white;
+  border: 2px solid black;
+  font-weight: bold;
 }
 </style>
