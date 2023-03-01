@@ -166,7 +166,7 @@
     </div>
 
     <!-- upload settings -->
-    <h3>Customize Link</h3>
+    <h3>Customize Image</h3>
     <FIleUploader
       v-if="currentSettings === 'upload image'"
       v-model="imageLink"
