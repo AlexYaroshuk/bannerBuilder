@@ -1,10 +1,10 @@
 <template>
-  <img class="img" :src="imgLink" />
+  <img class="img" :src="imageLink" />
 </template>
 
 <script>
 export default {
-  props: ["imgLink"],
+  props: ["imageLink"],
 };
 </script>
 

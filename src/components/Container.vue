@@ -28,6 +28,7 @@
         :linkLabel="linkLabel"
         :linkURL="linkURL"
         :linkColor="linkColor"
+        :linkBGColor="linkBGColor"
         :style="{
           fontSize: linkFontSize + 'px',
           fontFamily: linkFontFamily,
@@ -35,7 +36,7 @@
       />
     </div>
     <div class="child">
-      <Image :imgLink="imgLink" />
+      <Image :imageLink="imageLink" />
     </div>
   </div>
 </template>
@@ -49,11 +50,11 @@ export default {
   props: {
     backgroundColor: {
       type: String,
-      default: "green",
+      default: null,
     },
     borderColor: {
       type: String,
-      default: "green",
+      default: null,
     },
     borderRadius: {
       type: Number,
@@ -65,7 +66,7 @@ export default {
     },
     text: {
       type: String,
-      default: "This is some text",
+      default: null,
     },
     fontSize: {
       type: String,
@@ -77,16 +78,16 @@ export default {
     },
     textColor: {
       type: String,
-      default: "white",
+      default: null,
     },
     textBGColor: {
       type: String,
-      default: "white",
+      default: null,
     },
 
     linkLabel: {
       type: String,
-      default: "this is some link",
+      default: null,
     },
     linkFontSize: {
       type: String,
@@ -100,6 +101,10 @@ export default {
       type: String,
       default: "yellow",
     },
+    linkBGColor: {
+      type: String,
+      default: "",
+    },
 
     linkURL: {
       type: String,
@@ -109,7 +114,7 @@ export default {
       type: String,
       default: "yellow",
     },
-    imgLink: {
+    imageLink: {
       type: String,
       default:
         "https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/713db751-0cc0-4d18-b283-bd707824f201/smashingconf-front-end-sf-2023.png",
@@ -120,11 +125,11 @@ export default {
     },
   },
 
-  watch: {
+  /*   watch: {
     BGImage: function (newVal) {
       this.backgroundImage = newVal ? `url(${newVal})` : null;
     },
-  },
+  }, */
 
   components: {
     Text,

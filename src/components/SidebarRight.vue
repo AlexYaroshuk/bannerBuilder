@@ -71,7 +71,7 @@
 
         <label for="text-field">Text:</label>
         <input
-          :placeholder="displayText"
+          :initial="text"
           @input="updateText"
           id="text-field"
           type="text"
@@ -159,13 +159,17 @@
         type="URL"
         v-model="inputLinkURL"
       />
-      <ColorPicker :color="linkColor" @color-change="updateLinkColor" />
+      <h3>Customize Link Color</h3>
+      <ColorPicker :color="linkColor" @color-change="setLinkColor" />
+      <h3>Customize Link Background</h3>
+      <ColorPicker :color="linkBGColor" @color-change="setLinkBGColor" />
     </div>
 
     <!-- upload settings -->
+    <h3>Customize Link</h3>
     <FIleUploader
       v-if="currentSettings === 'upload image'"
-      v-model="NestedImage"
+      v-model="imageLink"
       @set-image="setNestedImage"
       @clear-image="clearNestedImage"
     />
@@ -184,15 +188,16 @@ export default {
     return {
       currentSettings: "container",
       isVisible: true,
-      displayText: "",
+      text: this.text,
       inputText: "",
       selectedTextSize: "14",
       selectedTextFont: "Arial",
       textColor: "black",
-      textBGColor: "transparent",
+      textBGColor: this.textBGColor,
       inputLinkLabel: "",
       selectedLinkFont: "Arial",
       linkColor: "black",
+      linkBGColor: this.linkBGColor,
       selectedLinkTextSize: "14",
       inputLinkURL: "",
       color: this.bannerColor,
@@ -201,21 +206,10 @@ export default {
       borderRadius: 0,
       borderWidth: 0,
       BGImage: this.BGImage,
-      NestedImage: this.NestedImage,
+      imageLink: this.imageLink,
     };
   },
-  /*   emits: [
-    "set-text",
-    "set-color",
-    "set-border-radius",
-    "set-border-width",
-    "update-image-BG",
-    "set-border-color",
-    "set-link-label",
-    "update-image-nested",
-    "text-color-changed",
-    "text-bg-color-changed",
-  ], */
+
   computed: {
     popupContentClass() {
       return {
@@ -261,8 +255,11 @@ export default {
       this.$emit("set-link-URL", this.inputLinkURL);
     },
 
-    updateLinkColor(eventData) {
+    setLinkColor(eventData) {
       this.$emit("link-color-changed", eventData.cssColor);
+    },
+    setLinkBGColor(eventData) {
+      this.$emit("link-bg-color-changed", eventData.cssColor);
     },
 
     //wip for expandable groups
@@ -272,7 +269,7 @@ export default {
 
     // bg settings
     updateColor(eventData) {
-      this.$emit("set-color", eventData.cssColor);
+      this.$emit("set-bg-color", eventData.cssColor);
     },
     updateBorderColor(eventData) {
       this.$emit("set-border-color", eventData.cssColor);
@@ -299,11 +296,11 @@ export default {
 
     // image settings
     setNestedImage(image) {
-      this.NestedImage = image;
-      this.$emit("update-image-nested", this.NestedImage);
+      this.imageLink = image;
+      this.$emit("update-image-nested", this.imageLink);
     },
     clearNestedImage() {
-      this.NestedImage = null;
+      this.imageLink = null;
       this.$emit("clear-image-nested");
     },
   },
@@ -322,6 +319,7 @@ export default {
   position: fixed;
   top: 0;
   right: 0;
+  overflow-y: scroll;
 }
 
 .hidden {

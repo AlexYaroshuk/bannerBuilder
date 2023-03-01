@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style="{ backgroundColor: linkBGColor }">
     <a class="link" :href="linkURL" :style="{ color: linkColor }">
       {{ linkLabel }}</a
     >
@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  props: ["linkURL", "linkLabel", "linkColor"],
+  props: ["linkURL", "linkLabel", "linkColor", "linkBGColor"],
 };
 </script>
 

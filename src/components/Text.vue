@@ -1,5 +1,5 @@
 <template>
-  <div class="btext" :style="{ backgroundColor: 'textBGColor' }">
+  <div class="btext" :style="{ backgroundColor: textBGColor }">
     <p>{{ text }}</p>
   </div>
 </template>

@@ -16,6 +16,7 @@
       :linkFontSize="linkTextSize"
       :linkFontFamily="linkFamily"
       :linkColor="linkColor"
+      :linkBGColor="linkBGColor"
       :linkURL="linkURL"
       :data-has-image="BGImage !== null"
       :imageLink="imageLink"
@@ -26,8 +27,10 @@
     :color="backgroundColor"
     :borderColor="borderColor"
     :borderWidth="borderWidth"
-    :displayText="text"
+    :text="text"
+    :textBGColor="textBGColor"
     :linkLabel="linkLabel"
+    :imageLink="imageLink"
     @set-text="onBannerTextUpdate"
     @text-font-size-changed="onTextSizeChanged"
     @text-font-family-changed="onTextFamilyChanged"
@@ -37,8 +40,9 @@
     @link-font-size-changed="onLinkSizeChanged"
     @link-font-family-changed="onLinkFontChanged"
     @link-color-changed="onLinkColorChanged"
+    @link-bg-color-changed="onLinkBGColorChanged"
     @set-link-URL="onBannerURLUpdate"
-    @set-color="onUpdateColor"
+    @set-bg-color="onUpdateBGColor"
     @set-border-color="onUpdateBorderColor"
     @set-border-radius="onUpdateBorderRadius"
     @set-border-width="onUpdateBorderWidth"
@@ -58,22 +62,24 @@ export default {
     Container,
     SidebarRight,
   },
+
   data() {
     return {
       containerName: "some text",
       text: "This is some text",
       textSize: "16",
       textFamily: "Arial",
-      textColor: "",
-      textBGColor: "",
+      textColor: "white",
+      textBGColor: "transparent",
       linkLabel: "This is some link",
       linkFamily: "Arial",
       linkTextSize: "14",
       linkColor: "yellow",
+      linkBGColor: this.linkBGColor,
       linkURL: "https://www.npmjs.com/package/aicommits",
-      imageLink: null,
-      backgroundColor: "teal",
-      borderColor: "yellow",
+      imageLink: this.imageLink,
+      backgroundColor: "purple",
+      borderColor: "violet",
       borderRadius: 0,
       borderWidth: 2,
       BGImage: null,
@@ -110,11 +116,14 @@ export default {
     onLinkColorChanged(color) {
       this.linkColor = color;
     },
+    onLinkBGColorChanged(color) {
+      this.linkBGColor = color;
+    },
     onBannerURLUpdate(text) {
       this.linkURL = text;
     },
 
-    onUpdateColor(color) {
+    onUpdateBGColor(color) {
       this.backgroundColor = color;
     },
     onUpdateBorderColor(color) {
