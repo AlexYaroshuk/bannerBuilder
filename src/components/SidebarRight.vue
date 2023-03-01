@@ -166,13 +166,14 @@
     </div>
 
     <!-- upload settings -->
-    <h3>Customize Image</h3>
-    <FIleUploader
-      v-if="currentSettings === 'upload image'"
-      v-model="imageLink"
-      @set-image="setNestedImage"
-      @clear-image="clearNestedImage"
-    />
+    <div v-if="currentSettings === 'upload image'">
+      <h3>Customize Image</h3>
+      <FIleUploader
+        v-model="imageLink"
+        @set-image="setNestedImage"
+        @clear-image="clearNestedImage"
+      />
+    </div>
   </aside>
 </template>
 
