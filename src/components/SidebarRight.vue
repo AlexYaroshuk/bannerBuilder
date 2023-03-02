@@ -4,41 +4,60 @@
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
     <h2>Properties</h2>
-    <!--     <p>
-      This is where you can customize a property. Select an option to get
-      started
-    </p>
     <button @click="toggleVisibility">&gt; Hide</button>
- -->
-    <div class="button-group">
+
+    <div class="button-group" style="margin-top: 16px">
       <button
         class="button"
         :class="{ active: currentSettings === 'container' }"
         @click="showSettings('container')"
       >
-        Container</button
-      ><button
+        <font-awesome-icon
+          :class="{ active: currentSettings === 'container' }"
+          icon="fa-regular fa-square"
+          style="width: 20px; height: 20px"
+        /><br />Container
+      </button>
+      <button
         class="button"
         :class="{ active: currentSettings === 'text' }"
         @click="showSettings('text')"
       >
-        Text</button
-      ><button
+        <font-awesome-icon
+          :class="{ active: currentSettings === 'text' }"
+          icon="fa-solid fa-font"
+          style="width: 20px; height: 20px"
+        /><br />Text
+      </button>
+      <button
         class="button"
         :class="{ active: currentSettings === 'link' }"
         @click="showSettings('link')"
       >
-        Link</button
-      ><button
+        <font-awesome-icon
+          :class="{ active: currentSettings === 'link' }"
+          icon="fa-solid fa-link"
+          style="width: 20px; height: 20px"
+        /><br />Link
+      </button>
+      <button
         class="button"
         :class="{ active: currentSettings === 'upload image' }"
         @click="showSettings('upload image')"
       >
-        Image
+        <font-awesome-icon
+          :class="{ active: currentSettings === 'upload image' }"
+          icon="fa-solid fa-image"
+          style="width: 20px; height: 20px"
+        /><br />Image
       </button>
     </div>
 
-    <div class="popup-content" :class="popupContentClass">
+    <div
+      class="popup-content"
+      :class="popupContentClass"
+      style="margin-top: 16px"
+    >
       <!-- container settings -->
 
       <div class="popup-content" v-if="currentSettings === 'container'">
@@ -367,12 +386,11 @@ export default {
 
 .button {
   width: 25%;
+  height: 48px;
 }
 
 .active {
   background-color: rgb(71, 71, 141);
   color: white;
-  border: 2px solid black;
-  font-weight: bold;
 }
 </style>
