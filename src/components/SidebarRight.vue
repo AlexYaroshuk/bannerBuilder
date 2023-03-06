@@ -4,6 +4,7 @@
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
     <h2>Properties</h2>
+    <h2>selected:{{ containerName }}</h2>
     <button @click="toggleVisibility">&gt; Hide</button>
 
     <div class="button-group" style="margin-top: 16px">
@@ -62,7 +63,10 @@
 
       <div class="popup-content" v-if="currentSettings === 'container'">
         <h3>Background color/image</h3>
-        <ColorPicker :color="color" @color-change="updateColor" />
+        <ColorPicker
+          :backgroundColor="backgroundColor"
+          @color-change="updateColor"
+        />
 
         <div style="margin-top: 16px">
           <h4>Image upload</h4>
@@ -228,6 +232,18 @@ export default {
     ColorPicker,
     FIleUploader,
   },
+  props: {
+    currentContainerIndex: {
+      type: Number,
+      required: true,
+    },
+    containerName: {
+      type: String,
+      default: null,
+    },
+    // other props...
+  },
+
   data() {
     return {
       currentSettings: "container",
@@ -244,7 +260,7 @@ export default {
       linkBGColor: this.linkBGColor,
       selectedLinkTextSize: this.selectedLinkTextSize,
       inputLinkURL: "",
-      color: this.bannerColor,
+      backgroundColor: this.backgroundColor,
       borderColor: this.bannerBorderColor,
       selectedColor: "",
       borderRadius: this.borderRadius,
@@ -313,8 +329,12 @@ export default {
 
     // bg settings
     updateColor(eventData) {
-      this.$emit("set-bg-color", eventData.cssColor);
+      this.$emit("set-bg-color", {
+        index: this.currentContainerIndex,
+        color: eventData.cssColor,
+      });
     },
+
     updateBorderColor(eventData) {
       this.$emit("set-border-color", eventData.cssColor);
     },

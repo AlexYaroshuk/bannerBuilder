@@ -1,6 +1,7 @@
 <template>
   <div
     class="container"
+    :class="{ 'container--selected': isSelected }"
     :style="{
       backgroundColor: backgroundColor,
       borderRadius: borderRadius + 'px',
@@ -12,6 +13,7 @@
       backgroundSize: 'cover',
     }"
   >
+    <div class="name" v-if="isSelected">{{ name }}</div>
     <div class="child">
       <Text
         :text="text"
@@ -48,10 +50,22 @@ import Image from "./Image.vue";
 
 export default {
   props: {
-    backgroundColor: {
-      type: String,
+    index: {
+      type: Number,
       default: null,
     },
+
+    isSelected: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    backgroundColor: {
+      type: [String, Object],
+      default: null,
+    },
+
     borderColor: {
       type: String,
       default: null,
@@ -62,8 +76,14 @@ export default {
     },
     borderWidth: {
       type: Number,
-      default: 0,
+      default: null,
     },
+
+    name: {
+      type: String,
+      default: null,
+    },
+
     text: {
       type: String,
       default: null,
@@ -125,12 +145,6 @@ export default {
     },
   },
 
-  /*   watch: {
-    BGImage: function (newVal) {
-      this.backgroundImage = newVal ? `url(${newVal})` : null;
-    },
-  }, */
-
   components: {
     Text,
     Link,
@@ -142,20 +156,36 @@ r
 <style scoped>
 .container {
   flex-direction: column;
+
   display: flex;
   justify-content: space-between;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  border: 0px solid black;
+  border: 2px solid transparent;
 
   /* Add this line to give the parent element a position */
 }
 
 .container[data-has-image="true"] {
   background-image: url(BGImage);
+}
+
+.container--selected {
+  border: 2px solid #1280ff;
+
+  /*   position: relative; */
+}
+
+.container--selected .name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #1280ff;
+  color: white;
+  padding: 0px 4px;
 }
 
 .child {
