@@ -28,7 +28,7 @@ a,
   }
 
   #app {
-    display: col;
+    display: inline-block;
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }

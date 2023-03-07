@@ -4,10 +4,17 @@
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
     <h2>Properties</h2>
-    <h2>selected:{{ containerName }}</h2>
+    <h2>selected container:{{ containerName }}</h2>
+    <div v-if="selectedChild && selectedChild.type === 'text'">
+      <p>selected text:</p>
+      <p>{{ selectedChild.value }}</p>
+      <p>selected text's parent</p>
+      <p>{{ selectedChild.containerName }}</p>
+    </div>
+
     <button @click="toggleVisibility">&gt; Hide</button>
 
-    <div class="button-group" style="margin-top: 16px">
+    <!-- <div class="button-group" style="margin-top: 16px">
       <button
         class="button"
         :class="{ active: currentSettings === 'container' }"
@@ -52,7 +59,7 @@
           style="width: 20px; height: 20px"
         /><br />Image
       </button>
-    </div>
+    </div> -->
 
     <div
       class="popup-content"
@@ -61,7 +68,7 @@
     >
       <!-- container settings -->
 
-      <div class="popup-content" v-if="currentSettings === 'container'">
+      <div class="popup-content" v-if="currentSelectionClass === 'container'">
         <h3>Background color/image</h3>
         <ColorPicker
           :backgroundColor="backgroundColor"
@@ -115,7 +122,7 @@
       </div>
     </div>
     <!-- text settings -->
-    <div v-if="currentSettings === 'text'">
+    <div v-if="currentSelectionClass === 'child-text'">
       <div class="form-group">
         <label for="text-field">Text:</label>
         <input
@@ -227,6 +234,7 @@
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
 import FIleUploader from "./FIleUploader.vue";
+
 export default {
   components: {
     ColorPicker,
@@ -235,9 +243,17 @@ export default {
   props: {
     currentContainerIndex: {
       type: Number,
-      required: true,
+      default: null,
     },
     containerName: {
+      type: String,
+      default: null,
+    },
+    selectedChild: {
+      type: Object,
+      default: null,
+    },
+    currentSelectionClass: {
       type: String,
       default: null,
     },
@@ -276,7 +292,22 @@ export default {
         show: this.currentSettings === !null,
       };
     },
+    selectedText() {
+      if (
+        this.selectedChild &&
+        this.selectedChild.type === "text" &&
+        this.$parent.selectedContainerIndex !== null
+      ) {
+        const container =
+          this.$parent.containers[this.$parent.selectedContainerIndex];
+        const text = container.texts[this.selectedChild.index];
+        return text ? text.value : "";
+      } else {
+        return "";
+      }
+    },
   },
+
   methods: {
     toggleVisibility() {
       this.isVisible = !this.isVisible;

@@ -14,16 +14,27 @@
     }"
   >
     <div class="name" v-if="isSelected">{{ name }}</div>
-    <div class="child">
-      <Text
-        :text="text"
-        :textBGColor="textBGColor"
-        :style="{
-          fontSize: fontSize + 'px',
-          fontFamily: fontFamily,
-          color: textColor,
-        }"
-      />
+    <div class="child" v-if="children && children.length">
+      <div
+        v-for="(child, index) in children"
+        :key="index"
+        class="child-item"
+        :class="{ 'child-item--selected': child.isSelected }"
+        @click="selectChild(child)"
+      >
+        <Text
+          @click="selectChild(child)"
+          v-if="child.type && child.type === 'text'"
+          :text="child.value"
+          :textBGColor="textBGColor"
+          :style="{
+            fontSize: fontSize + 'px',
+            fontFamily: fontFamily,
+            color: textColor,
+          }"
+          :containerName="name"
+        />
+      </div>
     </div>
     <div class="child">
       <Link
@@ -49,7 +60,18 @@ import Link from "./Link.vue";
 import Image from "./Image.vue";
 
 export default {
+  data() {
+    return {
+      currentContainerIndex: null,
+      defaultColors: ["purple", "blue"],
+    };
+  },
+
   props: {
+    children: {
+      type: Array,
+      default: [],
+    },
     index: {
       type: Number,
       default: null,
@@ -80,11 +102,6 @@ export default {
     },
 
     name: {
-      type: String,
-      default: null,
-    },
-
-    text: {
       type: String,
       default: null,
     },
@@ -143,6 +160,11 @@ export default {
       default: "",
     },
   },
+  methods: {
+    selectChild(child) {
+      this.$emit("select-child", child, { containerName: this.name });
+    },
+  },
 
   components: {
     Text,
@@ -151,7 +173,7 @@ export default {
   },
 };
 </script>
-r
+
 <style scoped>
 .container {
   flex-direction: column;
@@ -184,6 +206,7 @@ r
   position: absolute;
   top: 0;
   left: 0;
+  font-size: small;
   background-color: #1280ff;
   color: white;
   padding: 0px 4px;
@@ -195,5 +218,21 @@ r
   padding: 16px;
   flex: 1;
   /* Add this line to give the parent element a position */
+}
+.child-item {
+  display: flex;
+  z-index: 1;
+  border: 2px solid transparent;
+  /*   align-items: center;
+  padding: 16px;
+  flex: 1; */
+  /* Add this line to give the parent element a position */
+}
+.child-item--selected {
+  border: 2px solid #1280ff;
+  /* Add this line to give the parent element a position */
+}
+.child-item:not(.selected):hover {
+  border: 2px solid #1280ff;
 }
 </style>

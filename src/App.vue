@@ -1,10 +1,16 @@
 <template>
   <div>
-    <header>
-      <!--       <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" /> -->
+    <!--     <header>
+      <img
+        alt="Vue logo"
+        class="logo"
+        src="./assets/logo.svg"
+        width="125"
+        height="125"
+      />
 
       <div class="wrapper"></div>
-    </header>
+    </header> -->
 
     <main>
       <Wrapper></Wrapper>
@@ -70,7 +76,8 @@ header {
 }
 
 main {
-  display: block;
-  height: auto;
+  display: flex;
+  height: 100%;
+  width: 100%;
 }
 </style>

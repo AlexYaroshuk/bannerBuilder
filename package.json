@@ -18,7 +18,8 @@
     "verte": "^0.0.12",
     "vue": "^3.2.47",
     "vue-accessible-color-picker": "^4.1.2",
-    "vue-color": "^2.8.1"
+    "vue-color": "^2.8.1",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@types/vue-color": "^2.4.4",

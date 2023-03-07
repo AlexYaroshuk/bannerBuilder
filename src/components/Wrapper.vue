@@ -1,12 +1,15 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" @click="deselectContainer">
     <div v-for="(container, index) in containers" :key="index">
       <Container
         @click="selectContainer(index)"
+        :children="getChildrenForContainer(index)"
+        :index="index"
+        @select-child="handleSelectChild"
         class="container"
         :isSelected="index === selectedContainerIndex"
         :name="container.containerName"
-        :backgroundColor="containers[index].backgroundColor"
+        :backgroundColor="container.backgroundColor"
         :text="text"
         :fontSize="textSize"
         :fontFamily="textFamily"
@@ -27,9 +30,21 @@
       />
     </div>
     <SidebarRight
-      :currentContainerIndex="selectedContainerIndex"
-      :containerName="containers[selectedContainerIndex].containerName"
-      :backgroundColor="containers[selectedContainerIndex].backgroundColor"
+      :currentSelectionClass="currentSelectionClass"
+      :currentContainerIndex="
+        selectedContainerIndex !== null ? selectedContainerIndex : undefined
+      "
+      :containerName="
+        selectedContainerIndex !== null
+          ? containers[selectedContainerIndex].containerName
+          : ''
+      "
+      :backgroundColor="
+        selectedContainerIndex !== null
+          ? containers[selectedContainerIndex].backgroundColor
+          : ''
+      "
+      :selectedChild="selectedChild"
       :borderColor="borderColor"
       :borderWidth="borderWidth"
       :text="text"
@@ -74,6 +89,19 @@ export default {
       containers: [
         {
           containerName: "Container 1",
+
+          //children
+          children: [
+            {
+              value: "foo",
+              type: "text",
+            },
+            {
+              value: "bar",
+              type: "text",
+            },
+          ],
+
           text: "This is some text",
           textSize: "16",
           textFamily: "Arial",
@@ -87,7 +115,7 @@ export default {
           linkURL: "https://www.npmjs.com/package/aicommits",
           imageLink:
             "https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/713db751-0cc0-4d18-b283-bd707824f201/smashingconf-front-end-sf-2023.png",
-          backgroundColor: "grey",
+          backgroundColor: "white",
           borderColor: "violet",
           borderRadius: 0,
           borderWidth: 2,
@@ -95,6 +123,20 @@ export default {
         },
         {
           containerName: "Container 2",
+
+          // children
+          children: [
+            {
+              value: "baz",
+              type: "text",
+              isSelected: false,
+            },
+            {
+              value: "wee",
+              type: "text",
+              isSelected: false,
+            },
+          ],
           text: "This is some text",
           textSize: "16",
           textFamily: "Arial",
@@ -115,8 +157,10 @@ export default {
           BGImage: null,
         },
       ],
+      currentSelectionClass: null,
       currentContainerIndex: null,
       defaultColors: ["purple", "blue"],
+      selectedChild: null,
     };
   },
 
@@ -124,13 +168,44 @@ export default {
     selectedContainerIndex() {
       return this.currentContainerIndex !== null
         ? this.currentContainerIndex
-        : 0;
+        : null;
+    },
+    currentSelectionClass() {
+      return this.currentSelectionClass !== null
+        ? this.currentSelectionClass
+        : null;
     },
   },
+
   methods: {
     //control
     selectContainer(index) {
       this.currentContainerIndex = index;
+      this.currentSelectionClass = "container";
+    },
+
+    deselectContainer(event) {
+      const isClickedInsideContainer =
+        event.target.closest(".container") !== null;
+      if (!isClickedInsideContainer) {
+        this.currentContainerIndex = null;
+      }
+    },
+
+    handleSelectChild(child) {
+      this.selectedChild = child;
+      this.selectedChild.isSelected = true;
+      this.currentSelectionClass = "child-text";
+    },
+
+    getChildrenForContainer(index) {
+      if (index !== null && this.containers[index].children) {
+        return this.containers[index].children.filter(
+          (child) => child.type === "text"
+        );
+      } else {
+        return [];
+      }
     },
 
     // text settings
