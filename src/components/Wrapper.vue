@@ -22,7 +22,7 @@
         :linkBGColor="linkBGColor"
         :linkURL="linkURL"
         :data-has-image="BGImage !== null"
-        :imageLink="imageLink"
+        :imageLink="containers[index].imageLink"
         :BGImage="BGImage"
       />
     </div>
@@ -85,7 +85,8 @@ export default {
           linkColor: "yellow",
           linkBGColor: this.linkBGColor,
           linkURL: "https://www.npmjs.com/package/aicommits",
-          imageLink: this.imageLink,
+          imageLink:
+            "https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/713db751-0cc0-4d18-b283-bd707824f201/smashingconf-front-end-sf-2023.png",
           backgroundColor: "grey",
           borderColor: "violet",
           borderRadius: 0,
@@ -105,7 +106,8 @@ export default {
           linkColor: "yellow",
           linkBGColor: this.linkBGColor,
           linkURL: "https://www.npmjs.com/package/aicommits",
-          imageLink: this.imageLink,
+          imageLink:
+            "https://imgs.search.brave.com/jGVLyId8xm-5LEibe7k3viIX-7hIy8AsNBpAnqoBfjU/rs:fit:1888:225:1/g:ce/aHR0cHM6Ly90c2Ux/Lm1tLmJpbmcubmV0/L3RoP2lkPU9JUC5G/c3lTQ0tPYzRsamcy/aDBkczV0QmNBSGFC/MyZwaWQ9QXBp",
           backgroundColor: "violet",
           borderColor: "violet",
           borderRadius: 0,

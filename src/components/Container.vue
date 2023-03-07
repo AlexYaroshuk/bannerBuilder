@@ -136,8 +136,7 @@ export default {
     },
     imageLink: {
       type: String,
-      default:
-        "https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/713db751-0cc0-4d18-b283-bd707824f201/smashingconf-front-end-sf-2023.png",
+      default: null,
     },
     BGImage: {
       type: String,
@@ -178,7 +177,9 @@ r
 
   /*   position: relative; */
 }
-
+.container:not(.selected):hover {
+  border: 2px solid #1280ff;
+}
 .container--selected .name {
   position: absolute;
   top: 0;
