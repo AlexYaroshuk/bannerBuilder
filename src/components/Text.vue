@@ -1,6 +1,6 @@
 <template>
   <div class="btext" :style="{ backgroundColor: textBGColor }">
-    <p>{{ text }}</p>
+    <p class="">{{ text }}</p>
   </div>
 </template>
 
@@ -14,7 +14,9 @@ export default {
 .btext {
   /*   font-size: large; */
 
-  z-index: 1;
+  /*   z-index: 1; */
+  padding: 4px;
+  color: black;
 
   /* Add this line to give the parent element a position */
 }
