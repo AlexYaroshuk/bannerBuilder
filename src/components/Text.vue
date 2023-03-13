@@ -6,7 +6,20 @@
 
 <script>
 export default {
-  props: ["text", "textBGColor"],
+  props: {
+    text: String,
+    textBGColor: String,
+    value: String,
+    isSelected: Boolean,
+  },
+  computed: {
+    classes() {
+      return {
+        "child-text": true,
+        "child-text--selected": this.isSelected && this.value,
+      };
+    },
+  },
 };
 </script>
 

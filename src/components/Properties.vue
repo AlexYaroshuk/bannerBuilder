@@ -4,63 +4,12 @@
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
     <h2>Properties</h2>
-    <h2>selected container:{{ containerName }}</h2>
-    <div v-if="selectedChild && selectedChild.type === 'text'">
-      <p>selected text:</p>
-      <p>{{ selectedChild.value }}</p>
-      <p>selected text's parent</p>
-      <p>{{ selectedChild.containerName }}</p>
-    </div>
+    <h4 v-if="currentSelectionClass === null">nothing selected</h4>
+    <h2 v-if="currentSelectionClass != null">
+      selected:{{ currentSelectionClass }}
+    </h2>
 
     <button @click="toggleVisibility">&gt; Hide</button>
-
-    <!-- <div class="button-group" style="margin-top: 16px">
-      <button
-        class="button"
-        :class="{ active: currentSettings === 'container' }"
-        @click="showSettings('container')"
-      >
-        <font-awesome-icon
-          :class="{ active: currentSettings === 'container' }"
-          icon="fa-regular fa-square"
-          style="width: 20px; height: 20px"
-        /><br />Container
-      </button>
-      <button
-        class="button"
-        :class="{ active: currentSettings === 'text' }"
-        @click="showSettings('text')"
-      >
-        <font-awesome-icon
-          :class="{ active: currentSettings === 'text' }"
-          icon="fa-solid fa-font"
-          style="width: 20px; height: 20px"
-        /><br />Text
-      </button>
-      <button
-        class="button"
-        :class="{ active: currentSettings === 'link' }"
-        @click="showSettings('link')"
-      >
-        <font-awesome-icon
-          :class="{ active: currentSettings === 'link' }"
-          icon="fa-solid fa-link"
-          style="width: 20px; height: 20px"
-        /><br />Link
-      </button>
-      <button
-        class="button"
-        :class="{ active: currentSettings === 'upload image' }"
-        @click="showSettings('upload image')"
-      >
-        <font-awesome-icon
-          :class="{ active: currentSettings === 'upload image' }"
-          icon="fa-solid fa-image"
-          style="width: 20px; height: 20px"
-        /><br />Image
-      </button>
-    </div> -->
-
     <div
       class="popup-content"
       :class="popupContentClass"
@@ -68,7 +17,10 @@
     >
       <!-- container settings -->
 
-      <div class="popup-content" v-if="currentSelectionClass === 'container'">
+      <div
+        class="popup-content"
+        v-if="currentSelectionClass === 'container' && !selectedChild.value"
+      >
         <h3>Background color/image</h3>
         <ColorPicker
           :backgroundColor="backgroundColor"
@@ -122,12 +74,11 @@
       </div>
     </div>
     <!-- text settings -->
-    <div v-if="currentSelectionClass === 'child-text'">
+    <div v-if="selectedChild && selectedChild.type === 'text'">
       <div class="form-group">
         <label for="text-field">Text:</label>
         <input
-          :initial="text"
-          @input="updateText"
+          @input="updateChildText"
           id="text-field"
           type="text"
           v-model="inputText"
@@ -165,75 +116,13 @@
         <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
       </div>
     </div>
-
-    <!-- link settings -->
-
-    <div v-if="currentSettings === 'link'">
-      <label for="text-field">Link label:</label>
-      <input
-        style="width: 100%"
-        @input="updateLinkLabel"
-        id="link-label"
-        type="text"
-        v-model="inputLinkLabel"
-      />
-
-      <div>
-        <label for="linkFontSize">Font size:</label>
-        <select
-          id="linkFontSize"
-          v-model="selectedLinkTextSize"
-          @change="onSelectLinkSize"
-        >
-          <option value="12">12px</option>
-          <option value="24">24px</option>
-          <option value="36">36px</option>
-          <option value="48">48px</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="text-font-family">Font Family:</label>
-        <select
-          id="link-font-family"
-          v-model="selectedLinkFont"
-          @change="onChangeLinkFont"
-        >
-          <option value="Arial">Arial</option>
-          <option value="Times New Roman">Times New Roman</option>
-          <option value="Helvetica">Helvetica</option>
-        </select>
-      </div>
-
-      <label for="text-field">URL:</label>
-      <input
-        style="width: 100%"
-        @input="updateLinkURL"
-        id="link-URL"
-        type="URL"
-        v-model="inputLinkURL"
-      />
-      <h3>Link color</h3>
-      <ColorPicker :color="linkColor" @color-change="setLinkColor" />
-      <h3>Link background</h3>
-      <ColorPicker :color="linkBGColor" @color-change="setLinkBGColor" />
-    </div>
-
-    <!-- upload settings -->
-    <div v-if="currentSettings === 'upload image'">
-      <h3>Image</h3>
-      <FIleUploader
-        v-model="imageLink"
-        @set-image="setNestedImage"
-        @clear-image="clearNestedImage"
-      />
-    </div>
   </aside>
 </template>
 
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
 import FIleUploader from "./FIleUploader.vue";
+/* import { debounce } from "lodash"; */
 
 export default {
   components: {
@@ -241,6 +130,10 @@ export default {
     FIleUploader,
   },
   props: {
+    containers: {
+      type: Array,
+      default: [],
+    },
     currentContainerIndex: {
       type: Number,
       default: null,
@@ -285,6 +178,11 @@ export default {
       imageLink: this.imageLink,
     };
   },
+  watch: {
+    selectedChild: function (newValue) {
+      this.inputText = newValue.value;
+    },
+  },
 
   computed: {
     popupContentClass() {
@@ -314,8 +212,8 @@ export default {
     },
 
     // text settings
-    updateText() {
-      this.$emit("set-text", this.inputText);
+    updateChildText() {
+      this.$emit("set-text", this.inputText, this.selectedChild);
     },
 
     onSelectTextSize() {

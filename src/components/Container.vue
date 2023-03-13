@@ -12,18 +12,19 @@
       backgroundPosition: 'center',
       backgroundSize: 'cover',
     }"
+    @click="handleContainerClick"
   >
     <div class="name" v-if="isSelected">{{ name }}</div>
     <div class="child" v-if="children && children.length">
       <div
         v-for="(child, index) in children"
         :key="index"
-        class="child-item"
-        :class="{ 'child-item--selected': child.isSelected }"
-        @click="selectChild(child)"
+        @click.stop="selectChild(child, index)"
+        :data-key="index"
       >
         <Text
-          @click="selectChild(child)"
+          class="child-item"
+          :class="{ 'child-item--selected': child.isSelected }"
           v-if="child.type && child.type === 'text'"
           :text="child.value"
           :textBGColor="textBGColor"
@@ -32,11 +33,13 @@
             fontFamily: fontFamily,
             color: textColor,
           }"
+          :isSelected="child.isSelected"
           :containerName="name"
+          :key="'text-' + index"
         />
       </div>
     </div>
-    <div class="child">
+    <!-- <div class="child">
       <Link
         :linkLabel="linkLabel"
         :linkURL="linkURL"
@@ -50,7 +53,7 @@
     </div>
     <div class="child">
       <Image :imageLink="imageLink" />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -64,6 +67,7 @@ export default {
     return {
       currentContainerIndex: null,
       defaultColors: ["purple", "blue"],
+      /* selectedChild: {}, */
     };
   },
 
@@ -71,6 +75,11 @@ export default {
     children: {
       type: Array,
       default: [],
+    },
+
+    selectedChild: {
+      type: Object,
+      default: null,
     },
     index: {
       type: Number,
@@ -161,8 +170,21 @@ export default {
     },
   },
   methods: {
-    selectChild(child) {
-      this.$emit("select-child", child, { containerName: this.name });
+    selectChild(child, childIndex) {
+      this.$emit("select-child", child, childIndex, this.name);
+    },
+
+    handleContainerClick(event) {
+      let childItem = event.target.closest(".child-item");
+      if (childItem) {
+        let childIndex = parseInt(childItem.getAttribute("data-key"));
+        let child = this.children[childIndex];
+        this.selectChild(child);
+        this.$emit("select-container", this.index);
+      } else {
+        this.$emit("deselect-all");
+        this.$emit("select-container", this.index);
+      }
     },
   },
 
@@ -220,6 +242,7 @@ export default {
   /* Add this line to give the parent element a position */
 }
 .child-item {
+  position: relative;
   display: flex;
   z-index: 1;
   border: 2px solid transparent;
