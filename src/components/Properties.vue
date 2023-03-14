@@ -4,9 +4,12 @@
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
     <h2>Properties</h2>
-    <h4 v-if="currentSelectionClass === null">nothing selected</h4>
-    <h2 v-if="currentSelectionClass != null">
-      selected:{{ currentSelectionClass }}
+    <h4 v-if="!selectedChild & !selectedContainer">nothing selected</h4>
+    <h2 v-if="selectedChild && !selectedContainer">
+      selected:{{ selectedChild.type }}
+    </h2>
+    <h2 v-if="!selectedChild && selectedContainer">
+      selected:{{ selectedContainer.name }}
     </h2>
 
     <button @click="toggleVisibility">&gt; Hide</button>
@@ -17,10 +20,7 @@
     >
       <!-- container settings -->
 
-      <div
-        class="popup-content"
-        v-if="currentSelectionClass === 'container' && !selectedChild.value"
-      >
+      <div class="popup-content" v-if="selectedContainer">
         <h3>Background color/image</h3>
         <ColorPicker
           :backgroundColor="backgroundColor"
@@ -146,6 +146,10 @@ export default {
       type: Object,
       default: null,
     },
+    selectedContainer: {
+      type: Object,
+      default: null,
+    },
     currentSelectionClass: {
       type: String,
       default: null,
@@ -259,7 +263,7 @@ export default {
     // bg settings
     updateColor(eventData) {
       this.$emit("set-bg-color", {
-        index: this.currentContainerIndex,
+        container: this.selectedContainer,
         color: eventData.cssColor,
       });
     },

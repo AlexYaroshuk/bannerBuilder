@@ -1,7 +1,11 @@
 <template>
   <div
+    :container="container"
     class="container"
-    :class="{ 'container--selected': isSelected }"
+    :class="{
+      'container--selected': container.isSelected,
+      'container--hovered': container.isHovered,
+    }"
     :style="{
       backgroundColor: backgroundColor,
       borderRadius: borderRadius + 'px',
@@ -13,18 +17,24 @@
       backgroundSize: 'cover',
     }"
     @click="handleContainerClick"
+    @mouseover="handleContainerHover"
   >
-    <div class="name" v-if="isSelected">{{ name }}</div>
-    <div class="child" v-if="children && children.length">
+    <div class="name" v-if="container.isSelected">{{ name }}</div>
+    <div class="child" v-if="container.children && container.children.length">
       <div
-        v-for="(child, index) in children"
+        v-for="(child, index) in container.children"
         :key="index"
         @click.stop="selectChild(child, index)"
+        @mouseover="handleChildHover"
+        class="child-item"
+        :class="{
+          'child-item--selected': child.isSelected,
+          'child-item--hovered': child.isHovered,
+        }"
         :data-key="index"
       >
+        <!--         <div class="name" v-if="child.isSelected">{{ child.type }}</div> -->
         <Text
-          class="child-item"
-          :class="{ 'child-item--selected': child.isSelected }"
           v-if="child.type && child.type === 'text'"
           :text="child.value"
           :textBGColor="textBGColor"
@@ -33,9 +43,7 @@
             fontFamily: fontFamily,
             color: textColor,
           }"
-          :isSelected="child.isSelected"
           :containerName="name"
-          :key="'text-' + index"
         />
       </div>
     </div>
@@ -43,7 +51,6 @@
       <Link
         :linkLabel="linkLabel"
         :linkURL="linkURL"
-        :linkColor="linkColor"
         :linkBGColor="linkBGColor"
         :style="{
           fontSize: linkFontSize + 'px',
@@ -76,7 +83,10 @@ export default {
       type: Array,
       default: [],
     },
-
+    container: {
+      type: Object,
+      default: null,
+    },
     selectedChild: {
       type: Object,
       default: null,
@@ -86,11 +96,11 @@ export default {
       default: null,
     },
 
-    isSelected: {
+    /*    isSelected: {
       type: Boolean,
       required: true,
       default: false,
-    },
+    }, */
 
     backgroundColor: {
       type: [String, Object],
@@ -174,17 +184,15 @@ export default {
       this.$emit("select-child", child, childIndex, this.name);
     },
 
-    handleContainerClick(event) {
-      let childItem = event.target.closest(".child-item");
-      if (childItem) {
-        let childIndex = parseInt(childItem.getAttribute("data-key"));
-        let child = this.children[childIndex];
-        this.selectChild(child);
-        this.$emit("select-container", this.index);
-      } else {
-        this.$emit("deselect-all");
-        this.$emit("select-container", this.index);
-      }
+    handleContainerClick() {
+      this.$emit("select-container", this.container);
+    },
+
+    handleContainerHover() {
+      this.$emit("container-hover", this.container);
+    },
+    handleChildHover(child) {
+      this.$emit("child-hover", child);
     },
   },
 
@@ -221,7 +229,7 @@ export default {
 
   /*   position: relative; */
 }
-.container:not(.selected):hover {
+.container--hovered {
   border: 2px solid #1280ff;
 }
 .container--selected .name {
@@ -255,7 +263,17 @@ export default {
   border: 2px solid #1280ff;
   /* Add this line to give the parent element a position */
 }
-.child-item:not(.selected):hover {
-  border: 2px solid #1280ff;
+
+/* .child--selected .name {
+  position: relative;
+  top: 0;
+  left: 0;
+  font-size: 8px;
+  background-color: #1280ff;
+  color: white;
+  padding: 0px 2px;
+} */
+.child-item:not(.child-item--selected):hover {
+  border: 2px solid hsla(212, 100%, 54%, 0.5);
 }
 </style>

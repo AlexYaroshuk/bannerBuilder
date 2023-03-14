@@ -2,11 +2,13 @@
   <div class="wrapper">
     <div v-for="(container, index) in containers" :key="index">
       <Container
-        @select-container="selectContainer(index)"
-        :children="getChildrenForContainer(index)"
+        @select-container="selectContainer"
+        :container="container"
         :index="index"
         :selectedChild="selectedChild"
         @select-child="handleSelectChild"
+        @container-hover="handleContainerHover"
+        @child-hover="handleChildHover"
         @deselect-all="deselectAll"
         class="container"
         :isSelected="index === selectedContainerIndex"
@@ -33,21 +35,8 @@
     </div>
     <Properties
       :containers="containers"
-      :currentSelectionClass="currentSelectionClass"
-      :currentContainerIndex="
-        selectedContainerIndex !== null ? selectedContainerIndex : undefined
-      "
-      :containerName="
-        selectedContainerIndex !== null
-          ? containers[selectedContainerIndex].containerName
-          : ''
-      "
-      :backgroundColor="
-        selectedContainerIndex !== null
-          ? containers[selectedContainerIndex].backgroundColor
-          : ''
-      "
       :selectedChild="selectedChild"
+      :selectedContainer="selectedContainer"
       :borderColor="borderColor"
       :borderWidth="borderWidth"
       :text="text"
@@ -75,7 +64,13 @@
       @clear-image-nested="onClearNestedImage"
     />
 
-    <Tree :treeItems="treeItemsWithSelected" />
+    <Tree
+      :containers="containers"
+      :treeItems="treeItemsWithSelected"
+      :selected-item="selectedChild"
+      @select-child="handleSelectChild"
+      @select-container="selectContainer"
+    />
   </div>
 </template>
 
@@ -96,6 +91,8 @@ export default {
       containers: [
         {
           containerName: "Container 1",
+          isHovered: false,
+          isSelected: false,
 
           //children
           children: [
@@ -104,18 +101,24 @@ export default {
               value: "foo",
               type: "text",
               isSelected: false,
+              isHovered: false,
+              parentContainer: null,
             },
             {
               name: "Text 2",
               value: "bar",
               type: "text",
               isSelected: false,
+              isHovered: false,
+              parentContainer: null,
             },
             {
               name: "Text 3",
               value: "sac",
               type: "text",
               isSelected: false,
+              isHovered: false,
+              parentContainer: null,
             },
           ],
 
@@ -140,6 +143,8 @@ export default {
         },
         {
           containerName: "Container 2",
+          isHovered: false,
+          isSelected: false,
 
           // children
           children: [
@@ -148,12 +153,16 @@ export default {
               value: "baz",
               type: "text",
               isSelected: false,
+              isHovered: false,
+              parentContainer: null,
             },
             {
               name: "Text 4",
               value: "wee",
               type: "text",
               isSelected: false,
+              isHovered: false,
+              parentContainer: null,
             },
           ],
           text: "This is some text",
@@ -176,11 +185,12 @@ export default {
           BGImage: null,
         },
       ],
-      currentSelectionClass: null,
-      currentContainerIndex: null,
+      /*      currentSelectionClass: null,
+      currentContainerIndex: null, */
       name: `Container ${this.index}`,
       defaultColors: ["purple", "blue"],
-      selectedChild: {},
+      selectedChild: null,
+      selectedContainer: null,
     };
   },
 
@@ -203,9 +213,10 @@ export default {
               .filter((child) => child.type === "text")
               .map((child) => ({
                 ...child,
-                isSelected: this.selectedChild === child,
+                isSelected: this.selectedChild === child ? true : false,
               }))
           : [];
+
         container.isSelected =
           container.isSelected || children.some((child) => child.isSelected);
         return {
@@ -223,25 +234,10 @@ export default {
 
   methods: {
     //control
-    selectContainer(index) {
-      this.currentContainerIndex = index;
-      this.currentSelectionClass = "container";
-
-      this.containers.forEach((container, i) => {
-        container.isSelected = i === index;
-      });
-
-      this.containers[index].children.forEach((child) => {
-        child.isSelected = false;
-      });
-    },
-
-    deselectContainer(event) {
-      const isClickedInsideContainer =
-        event.target.closest(".container") !== null;
-      if (!isClickedInsideContainer) {
-        this.currentContainerIndex = null;
-      }
+    selectContainer(container) {
+      this.deselectAll();
+      container.isSelected = true;
+      this.selectedContainer = container;
     },
 
     deselectAll() {
@@ -253,7 +249,6 @@ export default {
           });
         }
       });
-      this.selectedChild = {};
     },
 
     handleWrapperClick(event) {
@@ -262,27 +257,32 @@ export default {
       }
     },
 
-    handleSelectChild(child, childIndex, containerName) {
-      // Update selectedChild prop
-      const container = this.containers.find(
-        (c) => c.containerName === containerName
-      );
-      this.selectedChild = container.children[childIndex];
-      // Emit select-child event
-      this.currentSelectionClass = this.selectedChild.type;
+    handleSelectChild(child) {
+      this.deselectAll();
+      child.isSelected = true;
+      this.selectedChild = child;
+      this.selectedContainer = null;
+    },
+    handleContainerHover(container) {
+      // Reset isHovered for all other containers
+      this.containers.forEach((c) => {
+        if (c !== container) {
+          c.isHovered = false;
+        }
+      });
+      container.isHovered = true;
     },
 
-    getChildrenForContainer(index) {
-      if (index !== null && this.containers[index].children) {
-        return this.containers[index].children
-          .filter((child) => child.type === "text")
-          .map((child) => ({
-            ...child,
-            isSelected: child.isSelected || false,
-          }));
-      } else {
-        return [];
-      }
+    handleChildHover(child) {
+      this.containers.forEach((container) => {
+        container.children.forEach((otherChild) => {
+          if (otherChild !== child) {
+            otherChild.isHovered = false;
+          }
+        });
+      });
+
+      child.isHovered = true;
     },
 
     // text settings
@@ -342,17 +342,12 @@ export default {
       this.linkURL = text;
     },
 
-    onUpdateBGColor({ index, color }) {
-      const updatedContainers = [...this.containers];
-      const container = updatedContainers[index];
-
+    onUpdateBGColor({ container, color }) {
       if (color === null) {
-        container.backgroundColor = this.defaultColors[index];
+        container.backgroundColor = this.defaultColors[container.index];
       } else {
         container.backgroundColor = color;
       }
-
-      this.containers = updatedContainers;
     },
 
     onUpdateBorderColor(color) {
