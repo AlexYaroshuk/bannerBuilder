@@ -3,7 +3,14 @@
     <button @click="toggleVisibility">&lt; Show sidebar</button>
   </aside>
   <aside :class="['sidebar', { hidden: !isVisible }]">
-    <h2>Properties</h2>
+    <button @click="toggleVisibility">&gt; Hide</button>
+    <div class="tab-bar">
+      <header v-for="(tab, index) in tabs" :key="index">
+        <i class="material-icons"> {{ tab.icon }}</i>
+        <span>{{ tab.label }}</span>
+        <div class="ripple"></div>
+      </header>
+    </div>
     <h4 v-if="!selectedChild & !selectedContainer">nothing selected</h4>
     <h2 v-if="selectedChild && !selectedContainer">
       selected:{{ selectedChild.type }}
@@ -12,7 +19,6 @@
       selected:{{ selectedContainer.name }}
     </h2>
 
-    <button @click="toggleVisibility">&gt; Hide</button>
     <div
       class="popup-content"
       :class="popupContentClass"
@@ -23,7 +29,7 @@
       <div class="popup-content" v-if="selectedContainer">
         <h3>Background color/image</h3>
         <ColorPicker
-          :backgroundColor="backgroundColor"
+          :color="selectedContainer.backgroundColor"
           @color-change="updateColor"
         />
 
@@ -159,6 +165,23 @@ export default {
 
   data() {
     return {
+      tabs: [
+        {
+          name: "properties",
+          label: "Properties",
+          icon: "tune",
+        },
+        /*        {
+          name: "assets",
+          label: "Assets",
+          icon: "folder",
+        }, */
+        /*         {
+          name: "elements",
+          label: "Elements",
+          icon: "widgets",
+        }, */
+      ],
       currentSettings: "container",
       isVisible: true,
       text: this.text,
@@ -330,20 +353,5 @@ export default {
   position: fixed;
   top: 0;
   right: 0;
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-}
-
-.button {
-  width: 25%;
-  height: 48px;
-}
-
-.active {
-  background-color: rgb(71, 71, 141);
-  color: white;
 }
 </style>

@@ -6,48 +6,32 @@
     <button @click="toggleVisibility">&lt; Hide</button>
     <div class="tab-bar">
       <button
-        class="tab"
-        :class="{ active: activeTab === 'layers' }"
-        @click="activateTab('layers')"
+        v-for="(tab, index) in tabs"
+        :key="index"
+        :class="{ active: activeTab === tab.name }"
+        @click="activeTab = tab.name"
       >
-        <i class="material-icons">layers</i>
-        <span>Layers</span>
-        <span
-          class="ripple"
-          v-if="activeTab === 'layers'"
-          :style="rippleStyle"
-        ></span>
+        <i class="material-icons"> {{ tab.icon }}</i>
+        <span>{{ tab.label }}</span>
+        <div class="ripple"></div>
       </button>
-      <button
-        class="tab"
-        :class="{ active: activeTab === 'elements' }"
-        @click="activateTab('elements')"
-      >
-        <i class="material-icons">view_module</i>
-        <span>Elements</span>
-        <span
-          class="ripple"
-          v-if="activeTab === 'elements'"
-          :style="rippleStyle"
-        ></span>
-      </button>
-      <button
-        class="tab"
-        :class="{ active: activeTab === 'assets' }"
-        @click="activateTab('assets')"
-      >
-        <i class="material-icons">folder_open</i>
-        <span>Assets</span>
-        <span
-          class="ripple"
-          v-if="activeTab === 'assets'"
-          :style="rippleStyle"
-        ></span>
-      </button>
-      <div
-        class="active-underline"
-        :style="{ transform: underlineTransform }"
-      ></div>
+    </div>
+
+    <div class="tab-content">
+      <div v-show="activeTab === 'layers'">Layers Tab</div>
+      <div v-show="activeTab === 'assets'">
+        <div class="elements-container">
+          <div
+            class="draggable-element"
+            draggable="true"
+            @dragstart="dragStart($event)"
+            @dragend="dragEnd"
+          >
+            <i class="material-icons icon">drag_indicator</i>
+            <span class="text">Drag Me</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
@@ -81,10 +65,9 @@
         </li>
       </ul>
     </div>
-    <div v-if="activeTab === 'elements'"></div>
-    <div v-if="activeTab === 'assets'">
-      <!-- Asset component goes here -->
-    </div>
+    <!-- <div v-if="activeTab === 'elements'">
+      <button @click="addText">add text</button>
+    </div> -->
   </aside>
 </template>
 <script>
@@ -107,13 +90,76 @@ export default {
     return {
       isVisible: true,
       activeTab: "layers",
-      tabLabels: ["Layers", "Elements", "Assets"],
+      tabs: [
+        {
+          name: "layers",
+          label: "Layers",
+          icon: "layers",
+        },
+        {
+          name: "assets",
+          label: "Assets",
+          icon: "folder",
+        },
+        /*         {
+          name: "elements",
+          label: "Elements",
+          icon: "widgets",
+        }, */
+      ],
       rippleActive: false,
+      draggableElement: null,
+      dragging: false,
+      offsetX: 0,
+      offsetY: 0,
     };
+  },
+  mounted() {
+    window.addEventListener("mousemove", this.moveElement);
+    window.addEventListener("mouseup", this.dragEnd);
+  },
+  beforeUnmount() {
+    window.removeEventListener("mousemove", this.moveElement);
+    window.removeEventListener("mouseup", this.dragEnd);
   },
 
   methods: {
     //control
+
+    dragStart(event) {
+      this.dragging = true;
+      this.draggableElement = event.target.closest(".draggable-element");
+      this.originalPosition = {
+        position: this.draggableElement.style.position,
+        zIndex: this.draggableElement.style.zIndex,
+      };
+      this.draggableElement.style.position = "absolute";
+      this.draggableElement.style.zIndex = "777"; // Set a high z-index value
+      this.offsetX =
+        event.clientX - this.draggableElement.getBoundingClientRect().left;
+      this.offsetY =
+        event.clientY - this.draggableElement.getBoundingClientRect().top;
+
+      this.$emit("element-drag-start", this.draggableElement);
+    },
+
+    dragEnd(event) {
+      this.dragging = false;
+      if (this.draggableElement) {
+        this.draggableElement.style.position = this.originalPosition.position;
+        this.draggableElement.style.zIndex = this.originalPosition.zIndex;
+        this.draggableElement = null;
+      }
+      this.$emit("element-drag-end");
+    },
+
+    removeDraggableClone() {
+      if (this.draggableClone) {
+        this.draggableClone.parentNode.removeChild(this.draggableClone);
+        this.draggableClone = null;
+      }
+    },
+
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
@@ -132,17 +178,19 @@ export default {
     handleContainerHover() {
       this.$emit("container-hover", this.container);
     },
+    addText() {
+      this.$emit("add-text"), this.selectContainer;
+    },
 
-    /*     updateSelection() {
-      this.treeItems.forEach((item) => {
-        item.isSelected = item === this.selectedItem.container;
-        if (item.children) {
-          item.children.forEach((c) => {
-            c.isSelected = c === this.selectedItem.child;
-          });
-        }
+    addChild(containerIndex, child) {
+      this.containers[containerIndex].children.push(child);
+    },
+
+    addChildToContainer(containerIndex) {
+      this.containers[containerIndex].children.push({
+        // Child object properties
       });
-    }, */
+    },
 
     //extra
     startRipple(event) {
@@ -214,53 +262,39 @@ export default {
   border: 2px solid #1280ff;
 }
 
-.tab-bar {
+.draggable-element {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+  cursor: grab;
+  padding: 10px;
+  user-select: none;
+  width: 100%; /* Set a fixed width for the draggable element */
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   align-items: center;
-  height: 48px;
-  margin-bottom: 1rem;
+  margin: 0 auto; /* Center the draggable element within the container */
 }
 
-.tab-bar button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  width: calc(100% / 3);
-  color: #555;
-  background-color: white;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: background-color 0.2s ease;
+/* The rest of your CSS remains unchanged */
+
+.draggable-element:active {
+  cursor: grabbing;
 }
 
-.tab-bar button span {
-  margin: 0 1rem;
-}
-
-.tab-bar button.active {
-  color: white;
-  background-color: #1280ff;
-  border-color: #1280ff;
-}
-
-.tab-bar button .ripple {
+.draggable-element::after {
+  content: "";
   position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  background-color: rgba(0, 0, 0, 0.2);
-  animation: ripple 0.5s linear;
-  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
 }
 
-@keyframes ripple {
-  to {
-    transform: scale(3);
-    opacity: 0;
-  }
+.draggable-element:active::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.8);
+  transition: none;
 }
 </style>

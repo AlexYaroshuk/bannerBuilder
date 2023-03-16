@@ -1,8 +1,23 @@
 <template>
   <div class="wrapper">
     <div v-for="(container, index) in containers" :key="index">
+      <div
+        v-if="index === 0"
+        class="dropzone"
+        :class="{
+          'dropzone--visible': dragging,
+          'dropzone--hovered': dragging && hoverIndex === index - 1,
+        }"
+        @dragover.stop.prevent="updateHoverIndex(index - 1)"
+        @drop="onDrop($event, index - 1, 'after')"
+      >
+        <i class="material-icons">add_circle_outline</i>
+      </div>
       <Container
+        @dragover="dragOverHandler"
+        @drop="onDrop($event, containerIndex)"
         @select-container="selectContainer"
+        @add-child="addChild"
         :container="container"
         :index="index"
         :selectedChild="selectedChild"
@@ -32,6 +47,17 @@
         :imageLink="containers[index].imageLink"
         :BGImage="BGImage"
       />
+      <div
+        class="dropzone"
+        :class="{
+          'dropzone--visible': dragging,
+          'dropzone--hovered': dragging && hoverIndex === index,
+        }"
+        @dragover.stop.prevent="updateHoverIndex(index)"
+        @drop="onDrop($event, index, 'after')"
+      >
+        <i class="material-icons">add_circle_outline</i>
+      </div>
     </div>
     <Properties
       :containers="containers"
@@ -65,6 +91,8 @@
     />
 
     <Tree
+      @element-drag-start="onElementDragStart"
+      @element-drag-end="onElementDragEnd"
       :containers="containers"
       :treeItems="treeItemsWithSelected"
       :selected-item="selectedChild"
@@ -191,6 +219,10 @@ export default {
       defaultColors: ["purple", "blue"],
       selectedChild: null,
       selectedContainer: null,
+      hoveredContainer: null,
+      draggedElement: null,
+      dragging: false,
+      hoverIndex: null,
     };
   },
 
@@ -228,12 +260,89 @@ export default {
     },
   },
 
-  /*   created() {
-    this.$root.$on("deselect-all", this.deselectAll);
-  }, */
+  mounted() {
+    document.addEventListener("mouseup", this.onElementDragEnd);
+  },
+
+  beforeUnmount() {
+    document.removeEventListener("mouseup", this.onElementDragEnd);
+  },
 
   methods: {
     //control
+    onDrop(event, containerIndex, position) {
+      event.preventDefault();
+      if (!this.draggedElement) return;
+
+      const totalContainers = this.containers.length;
+      const newContainerName = `Container ${totalContainers + 1}`;
+
+      // Function to generate a random color
+      const getRandomColor = () => {
+        const randomColor =
+          "#" + Math.floor(Math.random() * 16777215).toString(16);
+        return randomColor;
+      };
+
+      const newContainer = {
+        containerName: newContainerName,
+        isHovered: false,
+        isSelected: false,
+        backgroundColor: getRandomColor(), // Use random color
+        children: [
+          {
+            name: "Text 3",
+            value: "new",
+            type: "text",
+            isSelected: false,
+            isHovered: false,
+            parentContainer: null,
+          },
+          {
+            name: "Text 4",
+            value: "container",
+            type: "text",
+            isSelected: false,
+            isHovered: false,
+            parentContainer: null,
+          },
+        ],
+      };
+
+      if (position === "after") {
+        this.containers.splice(containerIndex + 1, 0, newContainer);
+      } else {
+        // 'inside'
+        this.containers[containerIndex].children.push({
+          name: this.draggedElement.innerText,
+          value: this.draggedElement.innerText,
+          type: "text",
+          isSelected: false,
+          isHovered: false,
+          parentContainer: null,
+        });
+      }
+
+      this.draggedElement = null;
+    },
+
+    updateHoverIndex(index) {
+      if (this.dragging) {
+        this.hoverIndex = index;
+      } else {
+        this.hoverIndex = null;
+      }
+    },
+
+    onElementDragStart(element) {
+      this.draggedElement = element;
+      this.dragging = true;
+    },
+    onElementDragEnd() {
+      this.draggedElement = null;
+      this.dragging = false;
+      this.hoverIndex = null;
+    },
     selectContainer(container) {
       this.deselectAll();
       container.isSelected = true;
@@ -249,6 +358,21 @@ export default {
           });
         }
       });
+    },
+
+    dragOverHandler(index) {
+      this.hoveredContainer = index;
+    },
+
+    onDropContainer(index) {
+      // add child to containers[index]
+      this.containers[index].children.push(this.newChild);
+      // reset hoveredContainer to null
+      this.hoveredContainer = null;
+    },
+
+    addChild(containerIndex, child) {
+      this.containers[containerIndex].children.push(child);
     },
 
     handleWrapperClick(event) {
@@ -387,5 +511,23 @@ export default {
 
   background-color: transparent;
   z-index: 2;
+}
+
+.dropzone {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  background-color: #80bbff;
+  transition: min-height 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzone--visible {
+  display: flex;
+}
+
+.dropzone--hovered {
+  min-height: 48px;
+  background-color: #1280ff;
 }
 </style>
