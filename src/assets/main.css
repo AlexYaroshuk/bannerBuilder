@@ -1,10 +1,13 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
+  width: 100vw;
+  /* Add this line */
+  height: 100vh;
+  /* Add this line */
+  margin: 0;
+  padding: 0;
+  /* Change from '2rem' to '0' */
   font-weight: normal;
 }
 
@@ -30,9 +33,11 @@ a,
   #app {
     display: inline-block;
     grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    padding: 0;
+    /* Change from '0 2rem' to '0' */
   }
 }
+
 
 .tab-bar {
   display: flex;
@@ -41,10 +46,17 @@ a,
   height: 48px;
   margin-bottom: 1rem;
   border-bottom: 1px solid #cecece;
+
+}
+
+.tab-text {
+  font-weight: 500;
+
 }
 
 .tab-bar button {
   display: flex;
+
   justify-content: center;
   align-items: center;
   height: 48px;

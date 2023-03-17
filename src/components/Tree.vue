@@ -12,13 +12,12 @@
         @click="activeTab = tab.name"
       >
         <i class="material-icons"> {{ tab.icon }}</i>
-        <span>{{ tab.label }}</span>
+        <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
       </button>
     </div>
 
     <div class="tab-content">
-      <div v-show="activeTab === 'layers'">Layers Tab</div>
       <div v-show="activeTab === 'assets'">
         <div class="elements-container">
           <div
@@ -33,7 +32,11 @@
         </div>
       </div>
     </div>
-
+    <div v-if="containers.length === 0 && activeTab === 'layers'">
+      <h3>No layers</h3>
+      <br />
+      When you add a component, you'll see it here.
+    </div>
     <div
       v-for="(container, index) in containers"
       :key="index"
@@ -46,11 +49,16 @@
           'tree-item--hovered': container.isHovered,
         }"
         @click="selectContainer(container)"
-        @mouseover="handleContainerHover"
+        @mouseover="handleContainerHover(container)"
       >
+        <span class="tree-item__icon-wrapper">
+          <!-- Add this wrapper -->
+          <span class="material-icons">check_box_outline_blank</span>
+          <!-- Change the icon to "filter_frames" -->
+        </span>
         {{ container.containerName }}
       </li>
-      <ul v-if="container.children">
+      <div v-if="container.children">
         <li
           v-for="(child, index) in container.children"
           :key="index"
@@ -60,11 +68,17 @@
             'tree-item--hovered': child.isHovered,
           }"
           @click="selectChild(child)"
+          @mouseover.stop="handleChildHover(child, container)"
         >
+          <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
+            <!-- Add this wrapper -->
+            <span class="material-icons">text_format</span>
+          </span>
           {{ child.value }}
         </li>
-      </ul>
+      </div>
     </div>
+
     <!-- <div v-if="activeTab === 'elements'">
       <button @click="addText">add text</button>
     </div> -->
@@ -114,6 +128,7 @@ export default {
       offsetY: 0,
     };
   },
+
   mounted() {
     window.addEventListener("mousemove", this.moveElement);
     window.addEventListener("mouseup", this.dragEnd);
@@ -153,13 +168,6 @@ export default {
       this.$emit("element-drag-end");
     },
 
-    removeDraggableClone() {
-      if (this.draggableClone) {
-        this.draggableClone.parentNode.removeChild(this.draggableClone);
-        this.draggableClone = null;
-      }
-    },
-
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
@@ -168,16 +176,21 @@ export default {
       this.activeTab = tab;
     },
     //emits
-    selectChild(child, childIndex) {
-      this.$emit("select-child", { child, childIndex });
+    selectChild(child) {
+      this.$emit("select-child", child);
     },
     selectContainer(container) {
-      this.$emit("select-container", { container });
+      this.$emit("select-container", container);
     },
 
-    handleContainerHover() {
-      this.$emit("container-hover", this.container);
+    handleContainerHover(container) {
+      this.$emit("container-hover", container);
     },
+
+    handleChildHover(child, container) {
+      this.$emit("child-hover", child, container);
+    },
+
     addText() {
       this.$emit("add-text"), this.selectContainer;
     },
@@ -239,14 +252,18 @@ export default {
 }
 
 .tree-item {
-  list-style: none;
-  width: 100%;
-  padding: 8px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  color: #555;
   border: 2px solid transparent;
-  /*   border-left: 2px solid transparent;
-  border-right: 2px solid transparent;
-  border-top: 2px solid transparent;
-  border-bottom: 2px solid lightgrey; */
+  font-size: small;
+}
+
+.tree-item__icon-wrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 5px;
 }
 
 .tree-item--selected {
@@ -255,11 +272,17 @@ export default {
 }
 
 .tree-item--hovered {
-  border: 2px solid #1280ff;
+  border: 2px solid hsl(212, 100%, 54%);
 }
 
 .tree-item:not(.selected):hover {
-  border: 2px solid #1280ff;
+  border: 2px solid hsl(212, 100%, 54%);
+}
+
+.elements-container {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .draggable-element {
@@ -273,10 +296,13 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 auto; /* Center the draggable element within the container */
+  margin: 0 auto;
+  transition: background-color 0.2s ease; /* Center the draggable element within the container */
 }
-
-/* The rest of your CSS remains unchanged */
+.draggable-element:hover {
+  background-color: #ededed;
+  /* Center the draggable element within the container */
+}
 
 .draggable-element:active {
   cursor: grabbing;

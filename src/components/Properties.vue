@@ -7,11 +7,15 @@
     <div class="tab-bar">
       <header v-for="(tab, index) in tabs" :key="index">
         <i class="material-icons"> {{ tab.icon }}</i>
-        <span>{{ tab.label }}</span>
+        <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
       </header>
     </div>
-    <h4 v-if="!selectedChild & !selectedContainer">nothing selected</h4>
+    <div v-if="!selectedChild & !selectedContainer">
+      <h3>Nothing selected</h3>
+      <br />
+      When you select an element, you'll see its properties here.
+    </div>
     <h2 v-if="selectedChild && !selectedContainer">
       selected:{{ selectedChild.type }}
     </h2>

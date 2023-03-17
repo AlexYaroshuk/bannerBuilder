@@ -1,5 +1,28 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" ref="wrapper">
+    <div
+      v-if="containers.length === 0"
+      style="text-align: center; color: white"
+    >
+      <h1>
+        ¯\_(ツ)_/¯
+        <br />
+        Well, nothing here.
+      </h1>
+      <br />➡️ Add something from Assets to get started.
+    </div>
+    <div
+      v-if="containers.length === 0"
+      class="dropzone"
+      :class="{
+        'dropzone--visible': dragging,
+        'dropzone--hovered': dragging && hoverIndex === index - 1,
+      }"
+      @dragover.stop.prevent="updateHoverIndex(index - 1)"
+      @drop="onDrop($event, index - 1)"
+    >
+      <i class="material-icons">add_circle_outline</i>
+    </div>
     <div v-for="(container, index) in containers" :key="index">
       <div
         v-if="index === 0"
@@ -9,11 +32,13 @@
           'dropzone--hovered': dragging && hoverIndex === index - 1,
         }"
         @dragover.stop.prevent="updateHoverIndex(index - 1)"
-        @drop="onDrop($event, index - 1, 'after')"
+        @drop="onDrop($event, index - 1)"
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
       <Container
+        @contextmenu.prevent="showContextMenu($event, container)"
+        :bannerStyle="container.bannerStyle"
         @dragover="dragOverHandler"
         @drop="onDrop($event, containerIndex)"
         @select-container="selectContainer"
@@ -23,9 +48,9 @@
         :selectedChild="selectedChild"
         @select-child="handleSelectChild"
         @container-hover="handleContainerHover"
-        @child-hover="handleChildHover"
+        @container-child-hover="handleChildHover"
         @deselect-all="deselectAll"
-        class="container"
+        :class="containerClass(container.bannerStyle)"
         :isSelected="index === selectedContainerIndex"
         :name="container.containerName"
         :backgroundColor="container.backgroundColor"
@@ -47,6 +72,7 @@
         :imageLink="containers[index].imageLink"
         :BGImage="BGImage"
       />
+
       <div
         class="dropzone"
         :class="{
@@ -54,7 +80,7 @@
           'dropzone--hovered': dragging && hoverIndex === index,
         }"
         @dragover.stop.prevent="updateHoverIndex(index)"
-        @drop="onDrop($event, index, 'after')"
+        @drop="onDrop($event, index)"
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
@@ -98,7 +124,21 @@
       :selected-item="selectedChild"
       @select-child="handleSelectChild"
       @select-container="selectContainer"
+      @container-hover="handleContainerHover"
+      @child-hover="handleChildHover"
     />
+  </div>
+  <div
+    class="context-menu"
+    :style="{
+      top: contextMenu.top,
+      left: contextMenu.left,
+      display: contextMenu.visible ? 'block' : 'none',
+    }"
+  >
+    <ul>
+      <li @click="deleteContainer">Delete</li>
+    </ul>
   </div>
 </template>
 
@@ -223,6 +263,13 @@ export default {
       draggedElement: null,
       dragging: false,
       hoverIndex: null,
+      //context
+      contextMenu: {
+        visible: false,
+        top: 0,
+        left: 0,
+        container: null,
+      },
     };
   },
 
@@ -237,40 +284,65 @@ export default {
         ? this.currentSelectionClass
         : null;
     },
-
-    treeItemsWithSelected() {
-      return this.containers.map((container) => {
-        const children = container.children
-          ? container.children
-              .filter((child) => child.type === "text")
-              .map((child) => ({
-                ...child,
-                isSelected: this.selectedChild === child ? true : false,
-              }))
-          : [];
-
-        container.isSelected =
-          container.isSelected || children.some((child) => child.isSelected);
-        return {
-          containerName: container.containerName,
-          isSelected: container.isSelected,
-          children,
-        };
-      });
-    },
   },
-
+  created() {
+    document.addEventListener("keyup", this.handleKeyUp);
+    document.addEventListener("mousedown", this.handleClickOutside);
+  },
   mounted() {
     document.addEventListener("mouseup", this.onElementDragEnd);
+    window.addEventListener("keydown", this.handleDeleteKeyPress);
   },
 
   beforeUnmount() {
     document.removeEventListener("mouseup", this.onElementDragEnd);
+    document.removeEventListener("mousedown", this.handleClickOutside);
+    document.removeEventListener("keyup", this.handleKeyUp);
   },
 
   methods: {
-    //control
-    onDrop(event, containerIndex, position) {
+    ///////////////////////control
+    showContextMenu(event, container) {
+      event.preventDefault();
+
+      this.contextMenu.visible = true;
+      this.contextMenu.top = event.clientY + "px";
+      this.contextMenu.left = event.clientX + "px";
+      this.contextMenu.container = container;
+
+      this.selectContainer(container);
+    },
+
+    handleClickOutside(event) {
+      const wrapper = this.$refs.wrapper;
+      if (
+        this.contextMenu.visible &&
+        !event.target.closest(".context-menu") &&
+        wrapper.contains(event.target)
+      ) {
+        this.contextMenu.visible = false;
+      }
+    },
+    //delete
+    handleKeyUp(event) {
+      if (event.key === "Delete") {
+        this.deleteSelectedContainer();
+      }
+    },
+    deleteSelectedContainer() {
+      this.containers = this.containers.filter(
+        (container) => !container.isSelected
+      );
+    },
+    deleteContainer() {
+      const index = this.containers.indexOf(this.contextMenu.container);
+      if (index > -1) {
+        this.containers.splice(index, 1);
+      }
+      this.contextMenu.visible = false;
+    },
+    //drag
+    onDrop(event, containerIndex) {
       event.preventDefault();
       if (!this.draggedElement) return;
 
@@ -309,21 +381,20 @@ export default {
         ],
       };
 
-      if (position === "after") {
-        this.containers.splice(containerIndex + 1, 0, newContainer);
-      } else {
-        // 'inside'
-        this.containers[containerIndex].children.push({
-          name: this.draggedElement.innerText,
-          value: this.draggedElement.innerText,
-          type: "text",
-          isSelected: false,
-          isHovered: false,
-          parentContainer: null,
-        });
-      }
+      this.containers.splice(containerIndex + 1, 0, newContainer);
 
       this.draggedElement = null;
+    },
+
+    dragOverHandler(index) {
+      this.hoveredContainer = index;
+    },
+
+    onDropContainer(index) {
+      // add child to containers[index]
+      this.containers[index].children.push(this.newChild);
+      // reset hoveredContainer to null
+      this.hoveredContainer = null;
     },
 
     updateHoverIndex(index) {
@@ -343,12 +414,17 @@ export default {
       this.dragging = false;
       this.hoverIndex = null;
     },
-    selectContainer(container) {
-      this.deselectAll();
-      container.isSelected = true;
-      this.selectedContainer = container;
+    //class
+    containerClass(bannerStyle) {
+      let classes = ["container"];
+      if (bannerStyle === "style1") {
+        classes.push("container--style1");
+      } else if (bannerStyle === "style2") {
+        classes.push("container--style2");
+      }
+      return classes;
     },
-
+    //select
     deselectAll() {
       this.containers.forEach((container) => {
         container.isSelected = false;
@@ -358,22 +434,34 @@ export default {
           });
         }
       });
+      this.selectedContainer = null;
+    },
+    dehoverAll() {
+      this.containers.forEach((container) => {
+        container.isHovered = false;
+        if (container.children) {
+          container.children.forEach((child) => {
+            child.isHovered = false;
+          });
+        }
+      });
     },
 
-    dragOverHandler(index) {
-      this.hoveredContainer = index;
+    selectContainer(container) {
+      this.deselectAll();
+      container.isSelected = true;
+      this.selectedContainer = container;
     },
 
-    onDropContainer(index) {
-      // add child to containers[index]
-      this.containers[index].children.push(this.newChild);
-      // reset hoveredContainer to null
-      this.hoveredContainer = null;
+    handleSelectChild(child) {
+      this.deselectAll();
+      child.isSelected = true;
+      this.selectedChild = child;
     },
 
-    addChild(containerIndex, child) {
+    /*     addChild(containerIndex, child) {
       this.containers[containerIndex].children.push(child);
-    },
+    }, */
 
     handleWrapperClick(event) {
       if (!event.target.closest(".container")) {
@@ -381,30 +469,17 @@ export default {
       }
     },
 
-    handleSelectChild(child) {
-      this.deselectAll();
-      child.isSelected = true;
-      this.selectedChild = child;
-      this.selectedContainer = null;
-    },
     handleContainerHover(container) {
       // Reset isHovered for all other containers
-      this.containers.forEach((c) => {
-        if (c !== container) {
-          c.isHovered = false;
-        }
-      });
+      this.dehoverAll();
       container.isHovered = true;
     },
 
-    handleChildHover(child) {
-      this.containers.forEach((container) => {
-        container.children.forEach((otherChild) => {
-          if (otherChild !== child) {
-            otherChild.isHovered = false;
-          }
-        });
-      });
+    handleChildHover(child, container) {
+      this.dehoverAll();
+
+      // Dehover the parent container of the child
+      container.isHovered = false;
 
       child.isHovered = true;
     },
@@ -504,20 +579,24 @@ export default {
 
 <style scoped>
 .wrapper {
-  min-width: 600px;
-  min-height: 200px;
-  display: grid;
-  /*   gap: 8px; */
-
+  display: flex;
+  flex-direction: column; /* Change from 'grid' to 'flex' */
+  justify-content: center; /* Add this line */
+  align-items: center; /* Add this line */
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   background-color: transparent;
   z-index: 2;
 }
 
 .dropzone {
+  min-width: 520px;
   display: none;
   align-items: center;
   justify-content: center;
   min-height: 24px;
+  color: white;
   background-color: #80bbff;
   transition: min-height 0.2s ease, background-color 0.2s ease;
 }
@@ -529,5 +608,32 @@ export default {
 .dropzone--hovered {
   min-height: 48px;
   background-color: #1280ff;
+}
+.context-menu {
+  color: #555;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.context-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 80px;
+}
+
+.context-menu li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.context-menu li:hover {
+  background-color: #ededed;
+  transition: background-color 0.2s ease;
 }
 </style>

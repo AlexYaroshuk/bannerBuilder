@@ -4,10 +4,10 @@
     class="container"
     :class="{
       'container--selected': container.isSelected,
-      'container--hovered': container.isHovered,
+      'container--hovered': container.isHovered && !container.isSelected, //not sure why, but need the second condition here. TODO: check the diff w/ children
     }"
     :style="{
-      backgroundColor: backgroundColor,
+      backgroundColor: !bannerStyle ? container.backgroundColor : undefined,
       borderRadius: borderRadius + 'px',
       borderWidth: borderWidth + 'px',
       borderColor: borderColor,
@@ -25,7 +25,7 @@
         v-for="(child, index) in container.children"
         :key="index"
         @click.stop="selectChild(child, index)"
-        @mouseover="handleChildHover"
+        @mouseover.stop="handleContainerChildHover(child, this.container)"
         class="child-item"
         :class="{
           'child-item--selected': child.isSelected,
@@ -79,6 +79,10 @@ export default {
   },
 
   props: {
+    bannerStyle: {
+      type: String,
+      default: "",
+    },
     children: {
       type: Array,
       default: [],
@@ -191,8 +195,9 @@ export default {
     handleContainerHover() {
       this.$emit("container-hover", this.container);
     },
-    handleChildHover(child) {
-      this.$emit("child-hover", child);
+
+    handleContainerChildHover(child, container) {
+      this.$emit("container-child-hover", child, container);
     },
   },
 
@@ -207,6 +212,8 @@ export default {
 <style scoped>
 .container {
   flex-direction: column;
+  width: 520px;
+  height: 96px;
 
   display: flex;
   justify-content: space-between;
@@ -230,7 +237,7 @@ export default {
   /*   position: relative; */
 }
 .container--hovered {
-  border: 2px solid #1280ff;
+  border: 2px solid #1482ff80;
 }
 .container--selected .name {
   position: absolute;
@@ -249,6 +256,7 @@ export default {
   flex: 1;
   /* Add this line to give the parent element a position */
 }
+
 .child-item {
   position: relative;
   display: flex;
@@ -259,8 +267,12 @@ export default {
   flex: 1; */
   /* Add this line to give the parent element a position */
 }
+.child-item--hovered {
+  border: 2px solid #1482ff80;
+}
+
 .child-item--selected {
-  border: 2px solid #1280ff;
+  border: 2px solid #1482ff;
   /* Add this line to give the parent element a position */
 }
 
@@ -273,7 +285,4 @@ export default {
   color: white;
   padding: 0px 2px;
 } */
-.child-item:not(.child-item--selected):hover {
-  border: 2px solid hsla(212, 100%, 54%, 0.5);
-}
 </style>

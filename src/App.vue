@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <!--     <header>
+  <!--     <header>
       <img
         alt="Vue logo"
         class="logo"
@@ -12,15 +11,14 @@
       <div class="wrapper"></div>
     </header> -->
 
-    <main>
-      <Wrapper></Wrapper>
-      <!--       <SidebarLeft /> -->
-      <!--       <SidebarRight /> -->
+  <main>
+    <Wrapper></Wrapper>
+    <!--       <SidebarLeft /> -->
+    <!--       <SidebarRight /> -->
 
-      <!--       <Banner />
+    <!--       <Banner />
       <Text /> -->
-    </main>
-  </div>
+  </main>
 </template>
 
 <script>
