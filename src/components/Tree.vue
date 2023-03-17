@@ -2,7 +2,11 @@
   <aside :class="['sidebar-button', { hidden: !isVisible }]">
     <button @click="toggleVisibility">&gt; Show sidebar</button>
   </aside>
-  <aside :class="['sidebar', { hidden: !isVisible }]" :containers="containers">
+  <aside
+    @click.stop
+    :class="['sidebar', { hidden: !isVisible }]"
+    :containers="containers"
+  >
     <button @click="toggleVisibility">&lt; Hide</button>
     <div class="tab-bar">
       <button
@@ -48,7 +52,7 @@
           'tree-item--selected': container.isSelected,
           'tree-item--hovered': container.isHovered,
         }"
-        @click="selectContainer(container)"
+        @click.stop="selectContainer(container)"
         @mouseover="handleContainerHover(container)"
       >
         <span class="tree-item__icon-wrapper">
@@ -67,7 +71,7 @@
             'tree-item--selected': child.isSelected,
             'tree-item--hovered': child.isHovered,
           }"
-          @click="selectChild(child)"
+          @click.stop="selectChild(child)"
           @mouseover.stop="handleChildHover(child, container)"
         >
           <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
@@ -236,6 +240,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
+  overflow-y: scroll;
+  z-index: 2;
 }
 
 .hidden {

@@ -86,6 +86,7 @@
       </div>
     </div>
     <Properties
+      ref="properties"
       :containers="containers"
       :selectedChild="selectedChild"
       :selectedContainer="selectedContainer"
@@ -117,6 +118,7 @@
     />
 
     <Tree
+      ref="tree"
       @element-drag-start="onElementDragStart"
       @element-drag-end="onElementDragEnd"
       :containers="containers"
@@ -285,18 +287,19 @@ export default {
         : null;
     },
   },
-  created() {
+  /*   created() {
     document.addEventListener("keyup", this.handleKeyUp);
     document.addEventListener("mousedown", this.handleClickOutside);
-  },
+  }, */
   mounted() {
     document.addEventListener("mouseup", this.onElementDragEnd);
     window.addEventListener("keydown", this.handleDeleteKeyPress);
+    document.addEventListener("click", this.handleClickOutside);
   },
 
   beforeUnmount() {
     document.removeEventListener("mouseup", this.onElementDragEnd);
-    document.removeEventListener("mousedown", this.handleClickOutside);
+    document.removeEventListener("click", this.handleClickOutside);
     document.removeEventListener("keyup", this.handleKeyUp);
   },
 
@@ -315,12 +318,23 @@ export default {
 
     handleClickOutside(event) {
       const wrapper = this.$refs.wrapper;
+      const tree = this.$refs.tree; // Add this line
+      const properties = this.$refs.properties; // Add this line
+
       if (
         this.contextMenu.visible &&
         !event.target.closest(".context-menu") &&
         wrapper.contains(event.target)
       ) {
         this.contextMenu.visible = false;
+      }
+
+      // Check if the click event is not inside Tree or Properties components
+      if (
+        !tree.$el.contains(event.target) &&
+        !properties.$el.contains(event.target)
+      ) {
+        this.deselectAll();
       }
     },
     //delete

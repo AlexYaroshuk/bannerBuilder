@@ -16,7 +16,7 @@
       backgroundPosition: 'center',
       backgroundSize: 'cover',
     }"
-    @click="handleContainerClick"
+    @click.stop="handleContainerClick"
     @mouseover="handleContainerHover"
   >
     <div class="name" v-if="container.isSelected">{{ name }}</div>

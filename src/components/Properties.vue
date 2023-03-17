@@ -1,132 +1,134 @@
 <template>
-  <aside :class="['sidebar-button', { hidden: !isVisible }]">
-    <button @click="toggleVisibility">&lt; Show sidebar</button>
-  </aside>
-  <aside :class="['sidebar', { hidden: !isVisible }]">
-    <button @click="toggleVisibility">&gt; Hide</button>
-    <div class="tab-bar">
-      <header v-for="(tab, index) in tabs" :key="index">
-        <i class="material-icons"> {{ tab.icon }}</i>
-        <span class="tab-text">{{ tab.label }}</span>
-        <div class="ripple"></div>
-      </header>
-    </div>
-    <div v-if="!selectedChild & !selectedContainer">
-      <h3>Nothing selected</h3>
-      <br />
-      When you select an element, you'll see its properties here.
-    </div>
-    <h2 v-if="selectedChild && !selectedContainer">
-      selected:{{ selectedChild.type }}
-    </h2>
-    <h2 v-if="!selectedChild && selectedContainer">
-      selected:{{ selectedContainer.name }}
-    </h2>
+  <div :class="sidebar">
+    <aside :class="['sidebar-button', { hidden: !isVisible }]">
+      <button @click="toggleVisibility">&lt; Show sidebar</button>
+    </aside>
+    <aside :class="['sidebar', { hidden: !isVisible }]">
+      <button @click="toggleVisibility">&gt; Hide</button>
+      <div class="tab-bar">
+        <header v-for="(tab, index) in tabs" :key="index">
+          <i class="material-icons"> {{ tab.icon }}</i>
+          <span class="tab-text">{{ tab.label }}</span>
+          <div class="ripple"></div>
+        </header>
+      </div>
+      <div v-if="!selectedChild & !selectedContainer">
+        <h3>Nothing selected</h3>
+        <br />
+        When you select an element, you'll see its properties here.
+      </div>
+      <h2 v-if="selectedChild && !selectedContainer">
+        selected:{{ selectedChild.type }}
+      </h2>
+      <h2 v-if="!selectedChild && selectedContainer">
+        selected:{{ selectedContainer.name }}
+      </h2>
 
-    <div
-      class="popup-content"
-      :class="popupContentClass"
-      style="margin-top: 16px"
-    >
-      <!-- container settings -->
+      <div
+        class="popup-content"
+        :class="popupContentClass"
+        style="margin-top: 16px"
+      >
+        <!-- container settings -->
 
-      <div class="popup-content" v-if="selectedContainer">
-        <h3>Background color/image</h3>
-        <ColorPicker
-          :color="selectedContainer.backgroundColor"
-          @color-change="updateColor"
-        />
-
-        <div style="margin-top: 16px">
-          <h4>Image upload</h4>
-          <FIleUploader
-            v-model="BGImage"
-            @set-image="setImageAsBG"
-            @clear-image="clearImage"
+        <div class="popup-content" v-if="selectedContainer">
+          <h3>Background color/image</h3>
+          <ColorPicker
+            :color="selectedContainer.backgroundColor"
+            @color-change="updateColor"
           />
-        </div>
-
-        <hr style="margin-top: 16px" />
-
-        <h3>Border settings</h3>
-        <h4>Border color</h4>
-        <ColorPicker :color="color" @color-change="updateBorderColor" />
-
-        <div style="margin-top: 16px">
-          <h4>Border width</h4>
-          <div class="slider">
-            <input
-              style="width: 100%"
-              type="range"
-              min="0"
-              max="32"
-              v-model="borderWidth"
-              @input="updateBorderWidth"
-            />
-            <span class="value">{{ borderWidth }}</span>
-          </div>
 
           <div style="margin-top: 16px">
-            <h4>Border radius</h4>
+            <h4>Image upload</h4>
+            <FIleUploader
+              v-model="BGImage"
+              @set-image="setImageAsBG"
+              @clear-image="clearImage"
+            />
+          </div>
+
+          <hr style="margin-top: 16px" />
+
+          <h3>Border settings</h3>
+          <h4>Border color</h4>
+          <ColorPicker :color="color" @color-change="updateBorderColor" />
+
+          <div style="margin-top: 16px">
+            <h4>Border width</h4>
             <div class="slider">
               <input
                 style="width: 100%"
                 type="range"
                 min="0"
-                max="100"
-                v-model="borderRadius"
-                @input="updateBorderRadius"
+                max="32"
+                v-model="borderWidth"
+                @input="updateBorderWidth"
               />
-              <span class="value">{{ borderRadius }}</span>
+              <span class="value">{{ borderWidth }}</span>
+            </div>
+
+            <div style="margin-top: 16px">
+              <h4>Border radius</h4>
+              <div class="slider">
+                <input
+                  style="width: 100%"
+                  type="range"
+                  min="0"
+                  max="100"
+                  v-model="borderRadius"
+                  @input="updateBorderRadius"
+                />
+                <span class="value">{{ borderRadius }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- text settings -->
-    <div v-if="selectedChild && selectedChild.type === 'text'">
-      <div class="form-group">
-        <label for="text-field">Text:</label>
-        <input
-          @input="updateChildText"
-          id="text-field"
-          type="text"
-          v-model="inputText"
-        />
+      <!-- text settings -->
+      <div v-if="selectedChild && selectedChild.type === 'text'">
+        <div class="form-group">
+          <label for="text-field">Text:</label>
+          <input
+            @input="updateChildText"
+            id="text-field"
+            type="text"
+            v-model="inputText"
+          />
 
-        <div>
-          <label for="fontSize">Select font size:</label>
-          <select
-            id="fontSize"
-            v-model="selectedTextSize"
-            @change="onSelectTextSize"
-          >
-            <option value="12">12px</option>
-            <option value="24">24px</option>
-            <option value="36">36px</option>
-            <option value="48">48px</option>
-          </select>
-        </div>
+          <div>
+            <label for="fontSize">Select font size:</label>
+            <select
+              id="fontSize"
+              v-model="selectedTextSize"
+              @change="onSelectTextSize"
+            >
+              <option value="12">12px</option>
+              <option value="24">24px</option>
+              <option value="36">36px</option>
+              <option value="48">48px</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="text-font-family">Font Family:</label>
-          <select
-            id="text-font-family"
-            v-model="selectedTextFont"
-            @change="onChangeTextFont"
-          >
-            <option value="Arial">Arial</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Helvetica">Helvetica</option>
-          </select>
+          <div>
+            <label for="text-font-family">Font Family:</label>
+            <select
+              id="text-font-family"
+              v-model="selectedTextFont"
+              @change="onChangeTextFont"
+            >
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Helvetica">Helvetica</option>
+            </select>
+          </div>
+          <h3>Text Color</h3>
+          <ColorPicker :color="textColor" @color-change="updateTextColor" />
+          <h3>Text background color</h3>
+          <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
         </div>
-        <h3>Text Color</h3>
-        <ColorPicker :color="textColor" @color-change="updateTextColor" />
-        <h3>Text background color</h3>
-        <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
       </div>
-    </div>
-  </aside>
+    </aside>
+  </div>
 </template>
 
 <script>
@@ -344,6 +346,7 @@ export default {
   top: 0;
   right: 0;
   overflow-y: scroll;
+  z-index: 2;
 }
 
 .hidden {
