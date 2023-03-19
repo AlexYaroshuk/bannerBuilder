@@ -146,13 +146,11 @@
 <script>
 import Container from "./Container.vue";
 import Properties from "./Properties.vue";
-import Tree from "./LeftSidebar.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 
 export default {
   components: {
     Container,
-    Tree,
     Properties,
     LeftSidebar,
   },
@@ -294,14 +292,14 @@ export default {
   }, */
   mounted() {
     document.addEventListener("mouseup", this.onElementDragEnd);
-    window.addEventListener("keydown", this.handleDeleteKeyPress);
+    window.addEventListener("keydown", this.handleDeleteKeyPress); // Change this line
     document.addEventListener("click", this.handleClickOutside);
   },
 
   beforeUnmount() {
     document.removeEventListener("mouseup", this.onElementDragEnd);
     document.removeEventListener("click", this.handleClickOutside);
-    document.removeEventListener("keyup", this.handleKeyUp);
+    window.removeEventListener("keydown", this.handleDeleteKeyPress); // Change this line
   },
 
   methods: {
@@ -340,11 +338,12 @@ export default {
       }
     },
     //delete
-    handleKeyUp(event) {
+    handleDeleteKeyPress(event) {
       if (event.key === "Delete") {
         this.deleteSelectedContainer();
       }
     },
+
     deleteSelectedContainer() {
       this.containers = this.containers.filter(
         (container) => !container.isSelected
