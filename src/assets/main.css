@@ -54,6 +54,11 @@ a,
 
 }
 
+.tab-bar {
+  position: relative;
+  overflow: hidden;
+}
+
 .tab-bar button {
   display: flex;
 
@@ -70,6 +75,29 @@ a,
   position: relative;
   overflow: hidden;
   transition: background-color 0.2s ease;
+}
+
+
+
+
+.tab-bar button:hover {
+  background-color: #ededed;
+}
+
+.tab-bar button {
+  /* other styles */
+  outline: none;
+}
+
+.tab-bar button.active {
+  border-color: #1280ff;
+  color: #1280ff;
+}
+
+
+
+.tab-bar button span {
+  margin: 0 1rem;
 }
 
 .tab-bar header {
@@ -91,38 +119,14 @@ a,
   /* Remove transition effect */
 }
 
-.tab-bar button span {
-  margin: 0 1rem;
-}
-
 .tab-bar header span {
   margin: 0 1rem;
 }
 
-.tab-bar button.active {
-  border-color: #1280ff;
-  color: #1280ff;
-}
 
-.tab-bar button:not(.active):hover {
-  background-color: #ededed;
-}
 
-.tab-bar button .ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  background-color: rgba(0, 0, 0, 0.2);
-  animation: ripple 0.5s linear;
-  pointer-events: none;
-}
 
-@keyframes ripple {
-  to {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
+
 
 .overlay {
   position: fixed;
@@ -132,4 +136,34 @@ a,
   height: 100%;
   z-index: 1;
   background-color: transparent
+}
+
+/* ripple */
+.ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  transform: scale(0);
+  pointer-events: none;
+  overflow: hidden;
+  contain: content;
+}
+
+
+.ripple-animation {
+  animation: ripple-effect 300ms linear;
+}
+
+@keyframes ripple-effect {
+  from {
+    transform: scale(0);
+    opacity: 0.2;
+  }
+
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }

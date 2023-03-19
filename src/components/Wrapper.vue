@@ -117,12 +117,11 @@
       @clear-image-nested="onClearNestedImage"
     />
 
-    <Tree
+    <LeftSidebar
       ref="tree"
       @element-drag-start="onElementDragStart"
       @element-drag-end="onElementDragEnd"
       :containers="containers"
-      :treeItems="treeItemsWithSelected"
       :selected-item="selectedChild"
       @select-child="handleSelectChild"
       @select-container="selectContainer"
@@ -147,13 +146,15 @@
 <script>
 import Container from "./Container.vue";
 import Properties from "./Properties.vue";
-import Tree from "./Tree.vue";
+import Tree from "./LeftSidebar.vue";
+import LeftSidebar from "./LeftSidebar.vue";
 
 export default {
   components: {
     Container,
     Tree,
     Properties,
+    LeftSidebar,
   },
 
   data() {
@@ -335,6 +336,7 @@ export default {
         !properties.$el.contains(event.target)
       ) {
         this.deselectAll();
+        this.dehoverAll();
       }
     },
     //delete
