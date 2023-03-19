@@ -32,6 +32,8 @@
         v-if="activeTab === 'layers'"
         @select-child="selectChild"
         @select-container="selectContainer"
+        @container-hover="handleContainerHover"
+        @child-hover="handleChildHover"
       />
     </div>
   </aside>
