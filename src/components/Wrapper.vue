@@ -312,8 +312,6 @@ export default {
       this.contextMenu.top = event.clientY + "px";
       this.contextMenu.left = event.clientX + "px";
       this.contextMenu.container = container;
-
-      this.selectContainer(container);
     },
 
     handleClickOutside(event) {
@@ -376,6 +374,7 @@ export default {
 
       const newContainer = {
         containerName: newContainerName,
+        type: "container",
         isHovered: false,
         isSelected: false,
         backgroundColor: getRandomColor(), // Use random color
