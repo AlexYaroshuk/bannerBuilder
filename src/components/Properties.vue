@@ -134,7 +134,6 @@
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
 import FIleUploader from "./FIleUploader.vue";
-/* import { debounce } from "lodash"; */
 
 export default {
   components: {
@@ -166,7 +165,6 @@ export default {
       type: String,
       default: null,
     },
-    // other props...
   },
 
   data() {
@@ -177,21 +175,11 @@ export default {
           label: "Properties",
           icon: "tune",
         },
-        /*        {
-          name: "assets",
-          label: "Assets",
-          icon: "folder",
-        }, */
-        /*         {
-          name: "elements",
-          label: "Elements",
-          icon: "widgets",
-        }, */
       ],
-      currentSettings: "container",
+      currentSettings: "",
       isVisible: true,
       text: this.text,
-      inputText: "",
+
       selectedTextSize: this.selectedTextSize,
       selectedTextFont: this.selectedTextFont,
       textColor: this.textColor,
@@ -211,11 +199,6 @@ export default {
       imageLink: this.imageLink,
     };
   },
-  watch: {
-    selectedChild: function (newValue) {
-      this.inputText = newValue.value;
-    },
-  },
 
   computed: {
     popupContentClass() {
@@ -223,19 +206,15 @@ export default {
         show: this.currentSettings === !null,
       };
     },
-    selectedText() {
-      if (
-        this.selectedChild &&
-        this.selectedChild.type === "text" &&
-        this.$parent.selectedContainerIndex !== null
-      ) {
-        const container =
-          this.$parent.containers[this.$parent.selectedContainerIndex];
-        const text = container.texts[this.selectedChild.index];
-        return text ? text.value : "";
-      } else {
-        return "";
-      }
+    inputText: {
+      get() {
+        return this.selectedChild ? this.selectedChild.value : "";
+      },
+      set(newValue) {
+        if (this.selectedChild) {
+          this.selectedChild.value = newValue;
+        }
+      },
     },
   },
 
@@ -282,11 +261,6 @@ export default {
     },
     setLinkBGColor(eventData) {
       this.$emit("link-bg-color-changed", eventData.cssColor);
-    },
-
-    //wip for expandable groups
-    showSettings(settingsType) {
-      this.currentSettings = settingsType;
     },
 
     // bg settings

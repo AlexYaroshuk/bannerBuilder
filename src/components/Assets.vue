@@ -43,7 +43,7 @@ export default {
         zIndex: this.draggableElement.style.zIndex,
       };
       this.draggableElement.style.position = "absolute";
-      this.draggableElement.style.zIndex = "777"; // Set a high z-index value
+      this.draggableElement.style.zIndex = "777";
       this.offsetX =
         event.clientX - this.draggableElement.getBoundingClientRect().left;
       this.offsetY =
@@ -61,8 +61,6 @@ export default {
       }
       this.$emit("element-drag-end");
     },
-
-    //extra
   },
 };
 </script>
@@ -109,16 +107,15 @@ export default {
   cursor: grab;
   padding: 10px;
   user-select: none;
-  width: 100%; /* Set a fixed width for the draggable element */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  transition: background-color 0.2s ease; /* Center the draggable element within the container */
+  transition: background-color 0.2s ease;
 }
 .draggable-element:hover {
   background-color: #ededed;
-  /* Center the draggable element within the container */
 }
 
 .draggable-element:active {

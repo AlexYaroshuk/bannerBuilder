@@ -16,8 +16,6 @@
         <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
       </button>
-
-      <!-- Existing button elements -->
     </div>
 
     <div class="tab-content">
@@ -30,10 +28,9 @@
         :containers="containers"
         :selectedItem="selectedItem"
         v-if="activeTab === 'layers'"
-        @select-child="selectChild"
-        @select-container="selectContainer"
-        @container-hover="handleContainerHover"
-        @child-hover="handleChildHover"
+        @item-hover="handleItemHover"
+        @select-item="handleSelectItem"
+        @mouseleave="handleTreeDehover"
       />
     </div>
   </aside>
@@ -104,19 +101,14 @@ export default {
     },
 
     //tree
-    selectChild(child) {
-      this.$emit("select-child", child);
+    handleSelectItem(item) {
+      this.$emit("select-item", item);
     },
-    selectContainer(container) {
-      this.$emit("select-container", container);
+    handleItemHover(item) {
+      this.$emit("hover-item", item);
     },
-
-    handleContainerHover(container) {
-      this.$emit("container-hover", container);
-    },
-
-    handleChildHover(child, container) {
-      this.$emit("child-hover", child, container);
+    handleTreeDehover() {
+      this.$emit("tree-dehover");
     },
 
     //animation
@@ -211,16 +203,15 @@ export default {
   cursor: grab;
   padding: 10px;
   user-select: none;
-  width: 100%; /* Set a fixed width for the draggable element */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  transition: background-color 0.2s ease; /* Center the draggable element within the container */
+  transition: background-color 0.2s ease;
 }
 .draggable-element:hover {
   background-color: #ededed;
-  /* Center the draggable element within the container */
 }
 
 .draggable-element:active {

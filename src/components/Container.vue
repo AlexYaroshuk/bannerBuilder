@@ -16,16 +16,17 @@
       backgroundPosition: 'center',
       backgroundSize: 'cover',
     }"
-    @click.stop="handleContainerClick"
-    @mouseover="handleContainerHover"
+    @click.stop="selectItem(container)"
+    @mouseover="handleItemHover(container)"
+    @mouseleave="handleContainerDehover"
   >
     <div class="name" v-if="container.isSelected">{{ name }}</div>
     <div class="child" v-if="container.children && container.children.length">
       <div
         v-for="(child, index) in container.children"
         :key="index"
-        @click.stop="selectChild(child, index)"
-        @mouseover.stop="handleContainerChildHover(child, this.container)"
+        @click.stop="selectItem(child)"
+        @mouseover.stop="handleItemHover(child)"
         class="child-item"
         :class="{
           'child-item--selected': child.isSelected,
@@ -47,20 +48,6 @@
         />
       </div>
     </div>
-    <!-- <div class="child">
-      <Link
-        :linkLabel="linkLabel"
-        :linkURL="linkURL"
-        :linkBGColor="linkBGColor"
-        :style="{
-          fontSize: linkFontSize + 'px',
-          fontFamily: linkFontFamily,
-        }"
-      />
-    </div>
-    <div class="child">
-      <Image :imageLink="imageLink" />
-    </div> -->
   </div>
 </template>
 
@@ -74,7 +61,6 @@ export default {
     return {
       currentContainerIndex: null,
       defaultColors: ["purple", "blue"],
-      /* selectedChild: {}, */
     };
   },
 
@@ -99,13 +85,6 @@ export default {
       type: Number,
       default: null,
     },
-
-    /*    isSelected: {
-      type: Boolean,
-      required: true,
-      default: false,
-    }, */
-
     backgroundColor: {
       type: [String, Object],
       default: null,
@@ -184,20 +163,14 @@ export default {
     },
   },
   methods: {
-    selectChild(child, childIndex) {
-      this.$emit("select-child", child, childIndex, this.name);
+    selectItem(item) {
+      this.$emit("select-item", item);
     },
-
-    handleContainerClick() {
-      this.$emit("select-container", this.container);
+    handleItemHover(item) {
+      this.$emit("item-hover", item);
     },
-
-    handleContainerHover() {
-      this.$emit("container-hover", this.container);
-    },
-
-    handleContainerChildHover(child, container) {
-      this.$emit("container-child-hover", child, container);
+    handleContainerDehover() {
+      this.$emit("container-dehover");
     },
   },
 
@@ -223,8 +196,6 @@ export default {
   right: 0;
   bottom: 0;
   border: 2px solid transparent;
-
-  /* Add this line to give the parent element a position */
 }
 
 .container[data-has-image="true"] {
@@ -233,8 +204,6 @@ export default {
 
 .container--selected {
   border: 2px solid #1280ff;
-
-  /*   position: relative; */
 }
 .container--hovered {
   border: 2px solid #1482ff80;
@@ -254,7 +223,6 @@ export default {
   align-items: center;
   padding: 16px;
   flex: 1;
-  /* Add this line to give the parent element a position */
 }
 
 .child-item {
@@ -262,10 +230,6 @@ export default {
   display: flex;
   z-index: 1;
   border: 2px solid transparent;
-  /*   align-items: center;
-  padding: 16px;
-  flex: 1; */
-  /* Add this line to give the parent element a position */
 }
 .child-item--hovered {
   border: 2px solid #1482ff80;
@@ -273,16 +237,5 @@ export default {
 
 .child-item--selected {
   border: 2px solid #1482ff;
-  /* Add this line to give the parent element a position */
 }
-
-/* .child--selected .name {
-  position: relative;
-  top: 0;
-  left: 0;
-  font-size: 8px;
-  background-color: #1280ff;
-  color: white;
-  padding: 0px 2px;
-} */
 </style>

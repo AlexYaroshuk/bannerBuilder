@@ -12,121 +12,119 @@
       <br />➡️ Add something from Assets to get started.
     </div>
     <div
+      @dragover.stop.prevent="updateHoverIndex(index - 1)"
+      @drop="onDrop($event, index - 1)"
       v-if="containers.length === 0"
       class="dropzone"
       :class="{
         'dropzone--visible': dragging,
         'dropzone--hovered': dragging && hoverIndex === index - 1,
       }"
-      @dragover.stop.prevent="updateHoverIndex(index - 1)"
-      @drop="onDrop($event, index - 1)"
     >
       <i class="material-icons">add_circle_outline</i>
     </div>
     <div v-for="(container, index) in containers" :key="index">
       <div
+        @dragover.stop.prevent="updateHoverIndex(index - 1)"
+        @drop="onDrop($event, index - 1)"
         v-if="index === 0"
         class="dropzone"
         :class="{
           'dropzone--visible': dragging,
           'dropzone--hovered': dragging && hoverIndex === index - 1,
         }"
-        @dragover.stop.prevent="updateHoverIndex(index - 1)"
-        @drop="onDrop($event, index - 1)"
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
       <Container
-        @contextmenu.prevent="showContextMenu($event, container)"
-        :bannerStyle="container.bannerStyle"
-        @dragover="dragOverHandler"
-        @drop="onDrop($event, containerIndex)"
-        @select-container="selectContainer"
-        @add-child="addChild"
-        :container="container"
-        :index="index"
-        :selectedChild="selectedChild"
-        @select-child="handleSelectChild"
-        @container-hover="handleContainerHover"
-        @container-child-hover="handleChildHover"
-        @deselect-all="deselectAll"
-        :class="containerClass(container.bannerStyle)"
-        :isSelected="index === selectedContainerIndex"
-        :name="container.containerName"
         :backgroundColor="container.backgroundColor"
-        :text="text"
-        :fontSize="textSize"
-        :fontFamily="textFamily"
-        :textColor="textColor"
-        :textBGColor="textBGColor"
+        :bannerStyle="container.bannerStyle"
+        :BGImage="BGImage"
+        :borderColor="borderColor"
         :borderRadius="borderRadius"
         :borderWidth="borderWidth"
-        :borderColor="borderColor"
-        :linkLabel="linkLabel"
-        :linkFontSize="linkTextSize"
-        :linkFontFamily="linkFamily"
-        :linkColor="linkColor"
-        :linkBGColor="linkBGColor"
-        :linkURL="linkURL"
+        :class="containerClass(container.bannerStyle)"
+        :container="container"
         :data-has-image="BGImage !== null"
+        :fontFamily="textFamily"
+        :fontSize="textSize"
         :imageLink="containers[index].imageLink"
-        :BGImage="BGImage"
+        :index="index"
+        :isSelected="index === selectedContainerIndex"
+        :linkBGColor="linkBGColor"
+        :linkColor="linkColor"
+        :linkFontFamily="linkFamily"
+        :linkFontSize="linkTextSize"
+        :linkLabel="linkLabel"
+        :linkURL="linkURL"
+        :name="container.containerName"
+        :selectedChild="selectedChild"
+        :text="text"
+        :textBGColor="textBGColor"
+        :textColor="textColor"
+        @add-child="addChild"
+        @container-dehover="dehoverAll"
+        @contextmenu.prevent="showContextMenu($event, container)"
+        @deselect-all="deselectAll"
+        @dragover="dragOverHandler"
+        @drop="onDrop($event, containerIndex)"
+        @item-hover="hoverItem"
+        @select-item="selectItem"
       />
 
       <div
+        @dragover.stop.prevent="updateHoverIndex(index)"
+        @drop="onDrop($event, index)"
         class="dropzone"
         :class="{
           'dropzone--visible': dragging,
           'dropzone--hovered': dragging && hoverIndex === index,
         }"
-        @dragover.stop.prevent="updateHoverIndex(index)"
-        @drop="onDrop($event, index)"
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
     </div>
     <Properties
-      ref="properties"
-      :containers="containers"
-      :selectedChild="selectedChild"
-      :selectedContainer="selectedContainer"
       :borderColor="borderColor"
       :borderWidth="borderWidth"
+      :containers="containers"
+      :imageLink="imageLink"
+      :linkLabel="linkLabel"
+      :selectedChild="selectedChild"
+      :selectedContainer="selectedContainer"
       :text="text"
       :textBGColor="textBGColor"
-      :linkLabel="linkLabel"
-      :imageLink="imageLink"
-      @set-text="onBannerTextUpdate"
-      @text-font-size-changed="onTextSizeChanged"
-      @text-font-family-changed="onTextFamilyChanged"
-      @text-color-changed="onTextColorChanged"
-      @text-bg-color-changed="onTextBGChanged"
-      @set-link-label="onBannerLinkLabelUpdate"
-      @link-font-size-changed="onLinkSizeChanged"
-      @link-font-family-changed="onLinkFontChanged"
-      @link-color-changed="onLinkColorChanged"
+      @clear-image-BG="onClearBGImage"
+      @clear-image-nested="onClearNestedImage"
       @link-bg-color-changed="onLinkBGColorChanged"
-      @set-link-URL="onBannerURLUpdate"
+      @link-color-changed="onLinkColorChanged"
+      @link-font-family-changed="onLinkFontChanged"
+      @link-font-size-changed="onLinkSizeChanged"
       @set-bg-color="onUpdateBGColor"
       @set-border-color="onUpdateBorderColor"
       @set-border-radius="onUpdateBorderRadius"
       @set-border-width="onUpdateBorderWidth"
+      @set-link-label="onBannerLinkLabelUpdate"
+      @set-link-URL="onBannerURLUpdate"
+      @set-text="onBannerTextUpdate"
+      @text-bg-color-changed="onTextBGChanged"
+      @text-color-changed="onTextColorChanged"
+      @text-font-family-changed="onTextFamilyChanged"
+      @text-font-size-changed="onTextSizeChanged"
       @update-image-BG="onUpdateBGImage"
-      @clear-image-BG="onClearBGImage"
       @update-image-nested="onUpdateNestedImage"
-      @clear-image-nested="onClearNestedImage"
+      ref="properties"
     />
 
     <LeftSidebar
-      ref="tree"
-      @element-drag-start="onElementDragStart"
-      @element-drag-end="onElementDragEnd"
       :containers="containers"
       :selected-item="selectedChild"
-      @select-child="handleSelectChild"
-      @select-container="selectContainer"
-      @container-hover="handleContainerHover"
-      @child-hover="handleChildHover"
+      @element-drag-end="onElementDragEnd"
+      @element-drag-start="onElementDragStart"
+      @hover-item="hoverItem"
+      @select-item="selectItem"
+      @tree-dehover="dehoverAll"
+      ref="tree"
     />
   </div>
   <div
@@ -162,6 +160,7 @@ export default {
           containerName: "Container 1",
           isHovered: false,
           isSelected: false,
+          type: "container",
 
           //children
           children: [
@@ -214,6 +213,7 @@ export default {
           containerName: "Container 2",
           isHovered: false,
           isSelected: false,
+          type: "container",
 
           // children
           children: [
@@ -259,6 +259,7 @@ export default {
       name: `Container ${this.index}`,
       defaultColors: ["purple", "blue"],
       selectedChild: null,
+      selectedItem: null,
       selectedContainer: null,
       hoveredContainer: null,
       draggedElement: null,
@@ -303,7 +304,7 @@ export default {
   },
 
   methods: {
-    ///////////////////////control
+    //control
     showContextMenu(event, container) {
       event.preventDefault();
 
@@ -317,8 +318,8 @@ export default {
 
     handleClickOutside(event) {
       const wrapper = this.$refs.wrapper;
-      const tree = this.$refs.tree; // Add this line
-      const properties = this.$refs.properties; // Add this line
+      const tree = this.$refs.tree;
+      const properties = this.$refs.properties;
 
       if (
         this.contextMenu.visible &&
@@ -337,6 +338,7 @@ export default {
         this.dehoverAll();
       }
     },
+
     //delete
     handleDeleteKeyPress(event) {
       if (event.key === "Delete") {
@@ -356,6 +358,7 @@ export default {
       }
       this.contextMenu.visible = false;
     },
+
     //drag
     onDrop(event, containerIndex) {
       event.preventDefault();
@@ -406,9 +409,8 @@ export default {
     },
 
     onDropContainer(index) {
-      // add child to containers[index]
       this.containers[index].children.push(this.newChild);
-      // reset hoveredContainer to null
+
       this.hoveredContainer = null;
     },
 
@@ -429,6 +431,7 @@ export default {
       this.dragging = false;
       this.hoverIndex = null;
     },
+
     //class
     containerClass(bannerStyle) {
       let classes = ["container"];
@@ -439,7 +442,8 @@ export default {
       }
       return classes;
     },
-    //select
+
+    //select, hover, deselect, dehover
     deselectAll() {
       this.containers.forEach((container) => {
         container.isSelected = false;
@@ -450,6 +454,7 @@ export default {
         }
       });
       this.selectedContainer = null;
+      this.selectedChild = null;
     },
     dehoverAll() {
       this.containers.forEach((container) => {
@@ -462,16 +467,21 @@ export default {
       });
     },
 
-    selectContainer(container) {
+    selectItem(item) {
       this.deselectAll();
-      container.isSelected = true;
-      this.selectedContainer = container;
+      item.isSelected = true;
+
+      if (item.type === "container") {
+        this.selectedContainer = item;
+      } else {
+        this.selectedChild = item;
+      }
     },
 
-    handleSelectChild(child) {
-      this.deselectAll();
-      child.isSelected = true;
-      this.selectedChild = child;
+    hoverItem(item) {
+      this.dehoverAll();
+
+      item.isHovered = true;
     },
 
     /*     addChild(containerIndex, child) {
@@ -482,21 +492,11 @@ export default {
       if (!event.target.closest(".container")) {
         this.$emit("deselect-all");
       }
+      this.selectedChild = null;
     },
 
-    handleContainerHover(container) {
-      // Reset isHovered for all other containers
+    handleDehover() {
       this.dehoverAll();
-      container.isHovered = true;
-    },
-
-    handleChildHover(child, container) {
-      this.dehoverAll();
-
-      // Dehover the parent container of the child
-      container.isHovered = false;
-
-      child.isHovered = true;
     },
 
     // text settings

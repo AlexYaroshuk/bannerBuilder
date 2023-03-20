@@ -11,8 +11,8 @@
         'tree-item--selected': container.isSelected,
         'tree-item--hovered': container.isHovered,
       }"
-      @click.stop="selectContainer(container)"
-      @mouseover="handleContainerHover(container)"
+      @click.stop="selectItem(container)"
+      @mouseover="handleItemHover(container)"
     >
       <span class="tree-item__icon-wrapper">
         <span class="material-icons">check_box_outline_blank</span>
@@ -28,8 +28,8 @@
           'tree-item--selected': child.isSelected,
           'tree-item--hovered': child.isHovered,
         }"
-        @click.stop="selectChild(child)"
-        @mouseover.stop="handleChildHover(child, container)"
+        @click.stop="selectItem(child)"
+        @mouseover="handleItemHover(child)"
       >
         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
           <span class="material-icons">text_format</span>
@@ -57,19 +57,12 @@ export default {
   },
 
   methods: {
-    selectChild(child) {
-      this.$emit("select-child", child);
-    },
-    selectContainer(container) {
-      this.$emit("select-container", container);
+    selectItem(item) {
+      this.$emit("select-item", item);
     },
 
-    handleContainerHover(container) {
-      this.$emit("container-hover", container);
-    },
-
-    handleChildHover(child, container) {
-      this.$emit("child-hover", child, container);
+    handleItemHover(item) {
+      this.$emit("item-hover", item);
     },
   },
 };

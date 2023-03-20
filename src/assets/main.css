@@ -2,12 +2,12 @@
 
 #app {
   width: 100vw;
-  /* Add this line */
+
   height: 100vh;
-  /* Add this line */
+
   margin: 0;
   padding: 0;
-  /* Change from '2rem' to '0' */
+
   font-weight: normal;
 }
 
@@ -34,7 +34,7 @@ a,
     display: inline-block;
     grid-template-columns: 1fr 1fr;
     padding: 0;
-    /* Change from '0 2rem' to '0' */
+
   }
 }
 
@@ -66,7 +66,7 @@ a,
   align-items: center;
   height: 48px;
   flex: 1;
-  /* Add this to make each button take an equal amount of space */
+
   color: #555;
   background-color: transparent;
   border: none;
@@ -85,7 +85,7 @@ a,
 }
 
 .tab-bar button {
-  /* other styles */
+
   outline: none;
 }
 
@@ -103,11 +103,11 @@ a,
 .tab-bar header {
   display: flex;
   justify-content: flex-start;
-  /* Align elements to the left/start */
+
   align-items: center;
   height: 48px;
   flex: 1;
-  /* Each button takes an equal amount of space */
+
   color: #555;
   background-color: transparent;
   border: none;
@@ -116,7 +116,7 @@ a,
   position: relative;
   overflow: hidden;
   transition: none;
-  /* Remove transition effect */
+
 }
 
 .tab-bar header span {
@@ -138,13 +138,13 @@ a,
   background-color: transparent
 }
 
-/* ripple */
+/* ripple for tab bar buttons */
 .ripple {
   position: absolute;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
   transform: scale(0);
   pointer-events: none;
   overflow: hidden;
@@ -153,17 +153,17 @@ a,
 
 
 .ripple-animation {
-  animation: ripple-effect 300ms linear;
+  animation: ripple-effect 600ms linear;
 }
 
 @keyframes ripple-effect {
   from {
-    transform: scale(0);
+    transform: scale(0.5);
     opacity: 0.2;
   }
 
   to {
-    transform: scale(2.5);
+    transform: scale(4.5);
     opacity: 0;
   }
 }
