@@ -28,6 +28,9 @@
         :containers="containers"
         :selectedItem="selectedItem"
         v-if="activeTab === 'layers'"
+        @dehover="handleDehover"
+        @drag-start="handleDragStart"
+        @drop="handleDrop"
         @item-hover="handleItemHover"
         @select-item="handleSelectItem"
         @mouseleave="handleTreeDehover"
@@ -100,6 +103,15 @@ export default {
       this.$emit("element-drag-end", event);
     },
 
+    //treedrag
+
+    handleDragStart(event) {
+      this.$emit("drag-start", event);
+    },
+
+    handleDrop(event) {
+      this.$emit("drop", event);
+    },
     //tree
     handleSelectItem(item) {
       this.$emit("select-item", item);
@@ -109,6 +121,9 @@ export default {
     },
     handleTreeDehover() {
       this.$emit("tree-dehover");
+    },
+    handleDehover() {
+      this.$emit("dehover");
     },
 
     //animation

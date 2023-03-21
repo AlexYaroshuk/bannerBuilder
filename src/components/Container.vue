@@ -212,7 +212,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  font-size: small;
+  font-size: smaller;
   background-color: #1280ff;
   color: white;
   padding: 0px 4px;

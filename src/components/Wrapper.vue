@@ -119,6 +119,9 @@
     <LeftSidebar
       :containers="containers"
       :selected-item="selectedChild"
+      @dehover="dehoverAll"
+      @drag-start="handleDragStart"
+      @drop="handleDrop"
       @element-drag-end="onElementDragEnd"
       @element-drag-start="onElementDragStart"
       @hover-item="hoverItem"
@@ -429,6 +432,67 @@ export default {
       this.draggedElement = null;
       this.dragging = false;
       this.hoverIndex = null;
+    },
+
+    //drag in tree
+
+    handleDragStart({ item, index, type, containerIndex }) {
+      this.draggedElement = { item, index, type, containerIndex };
+    },
+
+    handleDrop({ item, index, type, containerIndex }) {
+      const from = this.draggedElement;
+
+      // Handle container drag and drop
+      if (from.type === "container" && type === "container") {
+        const draggedContainer = this.containers.splice(from.index, 1)[0];
+        this.containers.splice(index, 0, draggedContainer);
+      }
+
+      // Handle child drag and drop within the same container
+      else if (
+        from.type === "child" &&
+        type === "child" &&
+        from.containerIndex === containerIndex
+      ) {
+        const draggedChild = this.containers[containerIndex].children.splice(
+          from.index,
+          1
+        )[0];
+        this.containers[containerIndex].children.splice(
+          index !== null
+            ? index
+            : this.containers[containerIndex].children.length,
+          0,
+          draggedChild
+        );
+      }
+
+      // Handle child drag and drop between different containers
+      else if (
+        from.type === "child" &&
+        type === "child" &&
+        from.containerIndex !== containerIndex
+      ) {
+        const draggedChild = this.containers[
+          from.containerIndex
+        ].children.splice(from.index, 1)[0];
+        this.containers[containerIndex].children.splice(
+          index !== null
+            ? index
+            : this.containers[containerIndex].children.length,
+          0,
+          draggedChild
+        );
+      }
+
+      // Handle child drag and drop onto container
+      else if (from.type === "child" && type === "container") {
+        const draggedChild = this.containers[
+          from.containerIndex
+        ].children.splice(from.index, 1)[0];
+        item.children.push(draggedChild);
+      }
     },
 
     //class

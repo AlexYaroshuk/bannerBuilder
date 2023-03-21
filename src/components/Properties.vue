@@ -21,7 +21,7 @@
         selected:{{ selectedChild.type }}
       </h2>
       <h2 v-if="!selectedChild && selectedContainer">
-        selected:{{ selectedContainer.name }}
+        selected:{{ selectedContainer.containerName }}
       </h2>
 
       <div
