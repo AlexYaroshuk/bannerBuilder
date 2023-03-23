@@ -23,11 +23,6 @@
     >
       <i class="material-icons">add_circle_outline</i>
     </div>
-    <!--     <div
-      class="transparent-dropzone"
-      @dragover.prevent="updateHoverIndex(-1)"
-      @drop="handleExistingElementDrop({ type: 'container', index: 0 })"
-    ></div> -->
     <div
       v-for="(container, index) in containers"
       :key="index"
@@ -90,7 +85,9 @@
         :textColor="textColor"
         @add-child="addChild"
         @container-dehover="dehoverAll"
-        @contextmenu.prevent="showContextMenu($event, container)"
+        @contextmenu.prevent="
+          showContextMenu($event, container), selectItem(container)
+        "
         @deselect-all="deselectAll"
         @item-hover="hoverItem"
         @select-item="selectItem"
@@ -103,20 +100,10 @@
       :class="{
         'dropzone--hovered': dropzoneHovered(containers.length),
       }"
-      v-show="dragging && dragSource != 'tree' && containers.length >= 0"
+      v-show="dragging && dragSource != 'tree' && containers.length > 0"
     >
       <i class="material-icons">add_circle_outline</i>
     </div>
-    <!--     <div
-      class="transparent-dropzone"
-      @dragover.prevent="updateHoverIndex(containers.length - 1)"
-      @drop="
-        handleExistingElementDrop({
-          type: 'container',
-          index: containers.length,
-        })
-      "
-    ></div> -->
     <Properties
       :borderColor="borderColor"
       :borderWidth="borderWidth"
@@ -152,6 +139,7 @@
     <LeftSidebar
       :containers="containers"
       :selected-item="selectedChild"
+      @contextmenu="showContextMenu"
       @dehover="dehoverAll"
       @drag-start="
         handleExistingElementDragStart(
@@ -188,9 +176,10 @@
       display: contextMenu.visible ? 'block' : 'none',
     }"
   >
-    <ul>
-      <li @click="deleteContainer">Delete</li>
-    </ul>
+    <div class="context-menu-row" @click="deleteContainer">
+      <span class="action">Delete</span>
+      <span class="hotkey">Ctrl+D</span>
+    </div>
   </div>
 </template>
 
@@ -223,7 +212,6 @@ export default {
               type: "text",
               isSelected: false,
               isHovered: false,
-              parentContainer: null,
             },
             {
               name: "Text 2",
@@ -231,7 +219,6 @@ export default {
               type: "text",
               isSelected: false,
               isHovered: false,
-              parentContainer: null,
             },
             {
               name: "Text 3",
@@ -239,7 +226,6 @@ export default {
               type: "text",
               isSelected: false,
               isHovered: false,
-              parentContainer: null,
             },
           ],
 
@@ -276,7 +262,6 @@ export default {
               type: "text",
               isSelected: false,
               isHovered: false,
-              parentContainer: null,
             },
             {
               name: "Text 4",
@@ -284,7 +269,6 @@ export default {
               type: "text",
               isSelected: false,
               isHovered: false,
-              parentContainer: null,
             },
           ],
           text: "This is some text",
@@ -707,6 +691,10 @@ export default {
     },
 
     selectItem(item) {
+      if (this.contextMenu.container !== item) {
+        this.contextMenu.visible = false;
+      }
+
       this.deselectAll();
       item.isSelected = true;
 
@@ -864,27 +852,37 @@ export default {
   position: absolute;
   background-color: #fff;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+
   z-index: 100;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.context-menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  min-width: 80px;
-}
+.context-menu-row {
+  display: flex;
+  padding-left: 8px;
+  padding-right: 8px;
 
-.context-menu li {
-  padding: 5px;
+  justify-content: space-between;
+
   cursor: pointer;
+  min-width: 144px;
+  min-height: 32px;
+  align-items: center;
 }
 
-.context-menu li:hover {
+.context-menu-row:hover {
   background-color: #ededed;
   transition: background-color 0.2s ease;
+}
+
+.context-menu .action {
+  color: black;
+}
+
+.context-menu .hotkey {
+  color: #666;
 }
 
 .floating-container {

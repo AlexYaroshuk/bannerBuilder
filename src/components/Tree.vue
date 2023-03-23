@@ -25,10 +25,11 @@
       }"
       draggable="true"
       @click.stop="selectItem(container)"
-      @mouseover="handleItemHover(container)"
-      @dragstart="handleDragStart(container, index, 'container')"
+      @contextmenu.prevent="onContextMenu($event, container)"
       @dragover.prevent="handleDragOver($event, container, index, 'container')"
+      @dragstart="handleDragStart(container, index, 'container')"
       @drop="handleDrop(container, index, 'container')"
+      @mouseover="handleItemHover(container)"
     >
       <span class="tree-item__icon-wrapper">
         <span class="material-icons">check_box_outline_blank</span>
@@ -47,12 +48,12 @@
         }"
         draggable="true"
         @click.stop="selectItem(child)"
-        @mouseover="handleItemHover(child)"
         @dragstart="handleDragStart(child, childIndex, 'child', index)"
         @dragover.prevent="
           handleDragOver($event, child, childIndex, 'child', index)
         "
         @drop="handleDrop(child, childIndex, 'child', index)"
+        @mouseover="handleItemHover(child)"
       >
         <div
           v-if="
@@ -188,6 +189,9 @@ export default {
     },
     handleDehover() {
       this.$emit("dehover");
+    },
+    onContextMenu(event, container) {
+      this.$emit("contextmenu", event, container);
     },
   },
   computed: {

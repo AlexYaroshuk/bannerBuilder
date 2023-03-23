@@ -27,13 +27,14 @@
       <Tree
         :containers="containers"
         :selectedItem="selectedItem"
-        v-if="activeTab === 'layers'"
+        @contextmenu="handleContextMenu"
         @dehover="handleDehover"
         @drag-start="handleDragStart"
         @drop="handleDrop"
         @item-hover="handleItemHover"
-        @select-item="handleSelectItem"
         @mouseleave="handleTreeDehover"
+        @select-item="handleSelectItem"
+        v-if="activeTab === 'layers'"
       />
     </div>
   </aside>
@@ -143,6 +144,9 @@ export default {
       setTimeout(() => {
         ripple.classList.remove("ripple-animation");
       }, 300);
+    },
+    handleContextMenu(event, container) {
+      this.$emit("contextmenu", event, container);
     },
   },
 };

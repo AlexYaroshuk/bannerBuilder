@@ -23,20 +23,22 @@
     <div class="name" v-if="container.isSelected">{{ name }}</div>
     <div class="child" v-if="container.children && container.children.length">
       <div
-        v-for="(child, index) in container.children"
-        :key="index"
-        @click.stop="selectItem(child)"
-        @mouseover.stop="handleItemHover(child)"
         class="child-item"
         :class="{
           'child-item--selected': child.isSelected,
           'child-item--hovered': child.isHovered,
         }"
+        v-for="(child, index) in container.children"
+        :key="index"
         :data-key="index"
+        @click.stop="selectItem(child)"
+        @contextmenu.prevent="onContextMenu($event, 'child', child)"
+        @mouseover.stop="handleItemHover(child)"
       >
         <!--         <div class="name" v-if="child.isSelected">{{ child.type }}</div> -->
         <Text
           v-if="child.type && child.type === 'text'"
+          :containerName="name"
           :text="child.value"
           :textBGColor="textBGColor"
           :style="{
@@ -44,7 +46,6 @@
             fontFamily: fontFamily,
             color: textColor,
           }"
-          :containerName="name"
         />
       </div>
     </div>
@@ -163,6 +164,9 @@ export default {
     },
   },
   methods: {
+    onContextMenu(event, type, element) {
+      this.$emit("contextmenu", event, type, element);
+    },
     selectItem(item) {
       this.$emit("select-item", item);
     },
