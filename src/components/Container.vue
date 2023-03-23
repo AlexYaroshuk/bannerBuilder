@@ -172,6 +172,42 @@ export default {
     handleContainerDehover() {
       this.$emit("container-dehover");
     },
+    handleDragStartContainer({ container, index }) {
+      this.onElementDragStart({ item: container, index, type: "container" });
+    },
+
+    handleDragOverContainer(event, container, index) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      const rect = event.target.getBoundingClientRect();
+      const middleY = (rect.top + rect.bottom) / 2;
+
+      if (event.clientY < middleY) {
+        this.updateHoverIndex(index - 1);
+      } else {
+        this.updateHoverIndex(index);
+      }
+    },
+
+    handleDropContainer(event, containerIndex) {
+      event.preventDefault();
+
+      const to = { item: null, index: containerIndex, type: "container" };
+      this.handleDrop(to);
+    },
+
+    // ...
+
+    handleDrop({ item, index, type, containerIndex }) {
+      const from = this.draggedElement;
+
+      // Handle container drag and drop
+      if (from.type === "container" && type === "container") {
+        const draggedContainer = this.containers.splice(from.index, 1)[0];
+        this.containers.splice(index, 0, draggedContainer);
+      }
+    },
   },
 
   components: {
@@ -237,5 +273,9 @@ export default {
 
 .child-item--selected {
   border: 2px solid #1482ff;
+}
+.container--dragging {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: grabbing;
 }
 </style>

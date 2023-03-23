@@ -11,39 +11,65 @@
       </h1>
       <br />➡️ Add something from Assets to get started.
     </div>
+
     <div
-      @dragover.stop.prevent="updateHoverIndex(index - 1)"
-      @drop="onDrop($event, index - 1)"
-      v-if="containers.length === 0"
+      @dragover.stop.prevent="updateHoverIndex(index)"
+      @drop="onNewContainerDrop($event, index)"
       class="dropzone"
       :class="{
-        'dropzone--visible': dragging,
-        'dropzone--hovered': dragging && hoverIndex === index - 1,
+        'dropzone--hovered': dropzoneHovered(index),
       }"
+      v-show="dragging && dragSource != 'tree' && containers.length <= 1"
     >
       <i class="material-icons">add_circle_outline</i>
     </div>
-    <div v-for="(container, index) in containers" :key="index">
+    <!--     <div
+      class="transparent-dropzone"
+      @dragover.prevent="updateHoverIndex(-1)"
+      @drop="handleExistingElementDrop({ type: 'container', index: 0 })"
+    ></div> -->
+    <div
+      v-for="(container, index) in containers"
+      :key="index"
+      @dragstart="
+        handleExistingElementDragStart(
+          { item, index, type: 'container' },
+          $event,
+          'main'
+        )
+      "
+      @drag="updateFloatingContainerPosition($event)"
+      @dragend="onElementFromAssetsDragEnd"
+    >
       <div
-        @dragover.stop.prevent="updateHoverIndex(index - 1)"
-        @drop="onDrop($event, index - 1)"
-        v-if="index === 0"
+        @dragover.stop.prevent="updateHoverIndex(index)"
+        @drop="onNewContainerDrop($event, index)"
         class="dropzone"
         :class="{
-          'dropzone--visible': dragging,
-          'dropzone--hovered': dragging && hoverIndex === index - 1,
+          'dropzone--hovered': dropzoneHovered(index),
         }"
+        v-show="
+          dragging &&
+          dragSource != 'tree' &&
+          containers.length > 1 &&
+          draggedContainerIndex !== index
+        "
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
+
       <Container
+        :draggable="containers.length > 1"
         :backgroundColor="container.backgroundColor"
         :bannerStyle="container.bannerStyle"
         :BGImage="BGImage"
         :borderColor="borderColor"
         :borderRadius="borderRadius"
         :borderWidth="borderWidth"
-        :class="containerClass(container.bannerStyle)"
+        :class="{
+          'container--dragging':
+            dragging && draggedElement && draggedElement.index === index,
+        }"
         :container="container"
         :data-has-image="BGImage !== null"
         :fontFamily="textFamily"
@@ -66,24 +92,31 @@
         @container-dehover="dehoverAll"
         @contextmenu.prevent="showContextMenu($event, container)"
         @deselect-all="deselectAll"
-        @dragover="dragOverHandler"
-        @drop="onDrop($event, containerIndex)"
         @item-hover="hoverItem"
         @select-item="selectItem"
       />
-
-      <div
-        @dragover.stop.prevent="updateHoverIndex(index)"
-        @drop="onDrop($event, index)"
-        class="dropzone"
-        :class="{
-          'dropzone--visible': dragging,
-          'dropzone--hovered': dragging && hoverIndex === index,
-        }"
-      >
-        <i class="material-icons">add_circle_outline</i>
-      </div>
     </div>
+    <div
+      @dragover.stop.prevent="updateHoverIndex(containers.length)"
+      @drop="onNewContainerDrop($event, containers.length)"
+      class="dropzone"
+      :class="{
+        'dropzone--hovered': dropzoneHovered(containers.length),
+      }"
+      v-show="dragging && dragSource != 'tree' && containers.length >= 0"
+    >
+      <i class="material-icons">add_circle_outline</i>
+    </div>
+    <!--     <div
+      class="transparent-dropzone"
+      @dragover.prevent="updateHoverIndex(containers.length - 1)"
+      @drop="
+        handleExistingElementDrop({
+          type: 'container',
+          index: containers.length,
+        })
+      "
+    ></div> -->
     <Properties
       :borderColor="borderColor"
       :borderWidth="borderWidth"
@@ -120,10 +153,27 @@
       :containers="containers"
       :selected-item="selectedChild"
       @dehover="dehoverAll"
-      @drag-start="handleDragStart"
-      @drop="handleDrop"
-      @element-drag-end="onElementDragEnd"
-      @element-drag-start="onElementDragStart"
+      @drag-start="
+        handleExistingElementDragStart(
+          {
+            item: $event.item,
+            index: $event.index,
+            type: $event.type,
+            containerIndex: $event.containerIndex,
+          },
+          $event.event,
+          'tree'
+        )
+      "
+      @drop="handleExistingElementDrop"
+      @element-drag-end="onElementFromAssetsDragEnd"
+      @element-drag-start="
+        handleExistingElementDragStart(
+          { item: $event.item, index: $event.index, type: $event.type },
+          $event.event,
+          'assets'
+        )
+      "
       @hover-item="hoverItem"
       @select-item="selectItem"
       @tree-dehover="dehoverAll"
@@ -266,8 +316,14 @@ export default {
       selectedContainer: null,
       hoveredContainer: null,
       draggedElement: null,
+      tempContainer: null,
+      floatingContainer: null,
+      dragOffset: { x: 0, y: 0 },
       dragging: false,
+      dragSource: null,
       hoverIndex: null,
+      draggedContainerIndex: null,
+      originalContainerIndex: null,
       //context
       contextMenu: {
         visible: false,
@@ -289,19 +345,23 @@ export default {
         ? this.currentSelectionClass
         : null;
     },
+
+    dropzoneHovered() {
+      return (index) => this.dragging && this.hoverIndex === index;
+    },
   },
   /*   created() {
     document.addEventListener("keyup", this.handleKeyUp);
     document.addEventListener("mousedown", this.handleClickOutside);
   }, */
   mounted() {
-    document.addEventListener("mouseup", this.onElementDragEnd);
+    document.addEventListener("mouseup", this.onElementFromAssetsDragEnd);
     window.addEventListener("keydown", this.handleDeleteKeyPress); // Change this line
     document.addEventListener("click", this.handleClickOutside);
   },
 
   beforeUnmount() {
-    document.removeEventListener("mouseup", this.onElementDragEnd);
+    document.removeEventListener("mouseup", this.onElementFromAssetsDragEnd);
     document.removeEventListener("click", this.handleClickOutside);
     window.removeEventListener("keydown", this.handleDeleteKeyPress); // Change this line
   },
@@ -360,92 +420,208 @@ export default {
       this.contextMenu.visible = false;
     },
 
-    //drag
-    onDrop(event, containerIndex) {
+    //drag for new elements (from assets)
+    onNewContainerDrop(event, containerIndex) {
       event.preventDefault();
       if (!this.draggedElement) return;
 
-      const totalContainers = this.containers.length;
-      const newContainerName = `Container ${totalContainers + 1}`;
+      if (this.dragSource === "assets") {
+        const totalContainers = this.containers.length;
+        const newContainerName = `Container ${totalContainers + 1}`;
 
-      // Function to generate a random color
-      const getRandomColor = () => {
-        const randomColor =
-          "#" + Math.floor(Math.random() * 16777215).toString(16);
-        return randomColor;
-      };
+        // Function to generate a random color
+        const getRandomColor = () => {
+          const randomColor =
+            "#" + Math.floor(Math.random() * 16777215).toString(16);
+          return randomColor;
+        };
 
-      const newContainer = {
-        containerName: newContainerName,
-        type: "container",
-        isHovered: false,
-        isSelected: false,
-        backgroundColor: getRandomColor(), // Use random color
-        children: [
-          {
-            name: "Text 3",
-            value: "new",
-            type: "text",
-            isSelected: false,
-            isHovered: false,
-            parentContainer: null,
-          },
-          {
-            name: "Text 4",
-            value: "container",
-            type: "text",
-            isSelected: false,
-            isHovered: false,
-            parentContainer: null,
-          },
-        ],
-      };
+        const newContainer = {
+          containerName: newContainerName,
+          type: "container",
+          isHovered: false,
+          isSelected: false,
+          backgroundColor: getRandomColor(), // Use random color
+          children: [
+            {
+              name: "Text 3",
+              value: "new",
+              type: "text",
+              isSelected: false,
+              isHovered: false,
+              parentContainer: null,
+            },
+            {
+              name: "Text 4",
+              value: "container",
+              type: "text",
+              isSelected: false,
+              isHovered: false,
+              parentContainer: null,
+            },
+          ],
+        };
 
-      this.containers.splice(containerIndex + 1, 0, newContainer);
+        this.containers.splice(containerIndex, 0, newContainer);
+      } else {
+        // Move the existing container to the new position
+        const draggedContainer = this.containers.splice(
+          this.draggedContainerIndex,
+          1
+        )[0];
 
-      this.draggedElement = null;
-    },
+        if (containerIndex > this.originalContainerIndex) {
+          containerIndex--;
+        }
+        this.containers.splice(containerIndex, 0, draggedContainer);
+      }
 
-    dragOverHandler(index) {
-      this.hoveredContainer = index;
-    },
-
-    onDropContainer(index) {
-      this.containers[index].children.push(this.newChild);
-
-      this.hoveredContainer = null;
+      this.originalContainerIndex = null;
     },
 
     updateHoverIndex(index) {
       if (this.dragging) {
+        if (
+          this.dragSource === "main" &&
+          this.draggedElement.containerIndex < index
+        ) {
+          index--;
+        }
         this.hoverIndex = index;
       } else {
         this.hoverIndex = null;
       }
     },
 
-    onElementDragStart(element) {
+    /*  onElementFromAssetsDragStart(element) {
       this.draggedElement = element;
       this.dragging = true;
-    },
-    onElementDragEnd() {
+    }, */
+    onElementFromAssetsDragEnd() {
       this.draggedElement = null;
       this.dragging = false;
       this.hoverIndex = null;
+      this.dragSource = null;
+      this.draggedContainerIndex = null;
+
+      if (this.floatingContainer) {
+        this.floatingContainer.remove();
+        this.floatingContainer = null;
+      }
+
+      if (this.tempContainer) {
+        // Add the container back to its original position
+        this.containers.splice(this.tempContainer.index, 0, this.tempContainer);
+        this.tempContainer = null;
+      }
+      const containerElements =
+        this.$refs.wrapper.querySelectorAll(".container");
+      containerElements.forEach((containerElement) => {
+        containerElement.style.display = "";
+      });
     },
 
-    //drag in tree
+    //drag for existing elements (rearrange)
 
-    handleDragStart({ item, index, type, containerIndex }) {
+    handleExistingElementDragStart(
+      { item, index, type, containerIndex },
+      event,
+      source
+    ) {
+      this.draggedContainerIndex = index;
+      this.originalContainerIndex = index;
+      if (event && event.dataTransfer) {
+        event.dataTransfer.setData("text/plain", ""); // for Firefox compatibility
+      }
       this.draggedElement = { item, index, type, containerIndex };
+      if (type === "container") {
+        this.draggedContainerIndex = index;
+      } // for Firefox compatibility
+      this.draggedElement = { item, index, type, containerIndex };
+      if (type === "container") {
+        this.draggedContainerIndex = index;
+        this.originalContainerIndex = index; // Store the original index
+      }
+      this.draggedElement = { item, index, type, containerIndex };
+      this.dragging = true;
+      this.dragSource = source;
+
+      let containerElement;
+
+      if (source === "main") {
+        // Remove the dragged container
+
+        containerElement = event.target.closest(".container");
+      }
+
+      if (!containerElement) return;
+
+      // Create a clone of the container element
+      const floatingContainer = containerElement.cloneNode(true);
+      floatingContainer.classList.add("floating-container");
+
+      // Set the initial position and append it to the body
+      floatingContainer.style.left = `${event.clientX}px`;
+      floatingContainer.style.top = `${event.clientY}px`;
+      document.body.appendChild(floatingContainer);
+
+      // Set the drag offset
+      const rect = containerElement.getBoundingClientRect();
+      this.dragOffset.x = event.clientX - rect.left;
+      this.dragOffset.y = event.clientY - rect.top;
+
+      // Assign the floating container
+      this.floatingContainer = floatingContainer;
+
+      requestAnimationFrame(() => {
+        containerElement.style.display = "none";
+      });
     },
 
-    handleDrop({ item, index, type, containerIndex }) {
+    updateFloatingContainerPosition(event) {
+      if (this.floatingContainer) {
+        const x = event.clientX;
+        const y = event.clientY;
+        this.floatingContainer.style.left = x + "px";
+        this.floatingContainer.style.top = y + "px";
+      }
+    },
+
+    handleExistingElementDragOver(
+      event,
+      item,
+      index,
+      type,
+      containerIndex = null
+    ) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      const containerElement = event.target.closest(".container");
+      const rect = containerElement.getBoundingClientRect();
+      const midY = (rect.top + rect.bottom) / 2;
+
+      // Update the hover index based on the mouse position
+      if (event.clientY < midY) {
+        this.updateHoverIndex(index - 1);
+      } else {
+        this.updateHoverIndex(index);
+      }
+    },
+
+    handleExistingElementDrop({ item, index, type, containerIndex }) {
+      if (!this.draggedElement) return;
+
       const from = this.draggedElement;
+
+      // Remove the floating container
 
       // Handle container drag and drop
       if (from.type === "container" && type === "container") {
-        const draggedContainer = this.containers.splice(from.index, 1)[0];
+        const draggedContainer = this.containers.splice(
+          this.draggedContainerIndex,
+          1
+        )[0];
         this.containers.splice(index, 0, draggedContainer);
       }
 
@@ -670,17 +846,13 @@ export default {
 
 .dropzone {
   min-width: 520px;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   min-height: 24px;
   color: white;
   background-color: #80bbff;
   transition: min-height 0.2s ease, background-color 0.2s ease;
-}
-
-.dropzone--visible {
-  display: flex;
 }
 
 .dropzone--hovered {
@@ -713,5 +885,20 @@ export default {
 .context-menu li:hover {
   background-color: #ededed;
   transition: background-color 0.2s ease;
+}
+
+.floating-container {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  opacity: 0.8;
+}
+.transparent-dropzone {
+  height: 50vh;
+  width: 100%;
+}
+.container--hidden > * {
+  display: none !important;
 }
 </style>
