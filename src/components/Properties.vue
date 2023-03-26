@@ -37,51 +37,6 @@
             :color="selectedContainer.backgroundColor"
             @color-change="updateColor"
           />
-
-          <div style="margin-top: 16px">
-            <h4>Image upload</h4>
-            <FIleUploader
-              v-model="BGImage"
-              @set-image="setImageAsBG"
-              @clear-image="clearImage"
-            />
-          </div>
-
-          <hr style="margin-top: 16px" />
-
-          <h3>Border settings</h3>
-          <h4>Border color</h4>
-          <ColorPicker :color="color" @color-change="updateBorderColor" />
-
-          <div style="margin-top: 16px">
-            <h4>Border width</h4>
-            <div class="slider">
-              <input
-                style="width: 100%"
-                type="range"
-                min="0"
-                max="32"
-                v-model="borderWidth"
-                @input="updateBorderWidth"
-              />
-              <span class="value">{{ borderWidth }}</span>
-            </div>
-
-            <div style="margin-top: 16px">
-              <h4>Border radius</h4>
-              <div class="slider">
-                <input
-                  style="width: 100%"
-                  type="range"
-                  min="0"
-                  max="100"
-                  v-model="borderRadius"
-                  @input="updateBorderRadius"
-                />
-                <span class="value">{{ borderRadius }}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <!-- text settings -->
@@ -94,37 +49,6 @@
             type="text"
             v-model="inputText"
           />
-
-          <div>
-            <label for="fontSize">Select font size:</label>
-            <select
-              id="fontSize"
-              v-model="selectedTextSize"
-              @change="onSelectTextSize"
-            >
-              <option value="12">12px</option>
-              <option value="24">24px</option>
-              <option value="36">36px</option>
-              <option value="48">48px</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="text-font-family">Font Family:</label>
-            <select
-              id="text-font-family"
-              v-model="selectedTextFont"
-              @change="onChangeTextFont"
-            >
-              <option value="Arial">Arial</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Helvetica">Helvetica</option>
-            </select>
-          </div>
-          <h3>Text Color</h3>
-          <ColorPicker :color="textColor" @color-change="updateTextColor" />
-          <h3>Text background color</h3>
-          <ColorPicker :color="textBGColor" @color-change="updateTextBGColor" />
         </div>
       </div>
     </aside>
@@ -334,5 +258,6 @@ export default {
   position: fixed;
   top: 0;
   right: 0;
+  z-index: 2;
 }
 </style>

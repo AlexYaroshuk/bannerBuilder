@@ -21,7 +21,7 @@
     <div class="tab-content">
       <Assets
         v-if="activeTab === 'assets'"
-        @element-drag-start="dragStart"
+        @element-drag-start="emitElementDragStart($event)"
         @element-drag-end="dragEnd"
       />
       <Tree
@@ -87,6 +87,10 @@ export default {
 
   methods: {
     //control
+    emitElementDragStart(eventData) {
+      this.$emit("element-drag-start", eventData);
+    },
+
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
@@ -96,8 +100,8 @@ export default {
     },
 
     //drag
-    dragStart(event) {
-      this.$emit("element-drag-start", event);
+    emitElementDragStart(eventData) {
+      this.$emit("element-drag-start", eventData);
     },
 
     dragEnd(event) {
@@ -179,6 +183,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 2;
 }
 
 .tree-item {

@@ -25,7 +25,9 @@
       }"
       draggable="true"
       @click.stop="selectItem(container)"
-      @contextmenu.prevent="onContextMenu($event, container)"
+      @contextmenu.prevent="
+        onContextMenu($event, container), selectItem(container)
+      "
       @dragover.prevent="handleDragOver($event, container, index, 'container')"
       @dragstart="handleDragStart(container, index, 'container')"
       @drop="handleDrop(container, index, 'container')"
@@ -122,11 +124,11 @@ export default {
         this.draggedItem = { item };
       }
 
-      // Set a custom drag image to ensure that only one element is being dragged at a time
+      /* // Set a custom drag image to ensure that only one element is being dragged at a time
       const dragImage = new Image();
       dragImage.src =
         "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E";
-      event.dataTransfer.setDragImage(dragImage, 0, 0);
+      event.dataTransfer.setDragImage(dragImage, 0, 0); */
     },
 
     handleDragOver(event, item, index, type, containerIndex = null) {
