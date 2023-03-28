@@ -53,7 +53,7 @@
         <i class="material-icons">add_circle_outline</i>
       </div>
 
-      <Container
+      <ElementContainer
         :draggable="containers.length > 1"
         :class="{
           'container--dragging':
@@ -104,10 +104,10 @@
   </div>
 </template>
 <script>
-import Container from "./Container.vue";
+import ElementContainer from "./ElementContainer.vue";
 export default {
   components: {
-    Container: Container,
+    ElementContainer: ElementContainer,
   },
   props: {
     containers: {
@@ -382,12 +382,4 @@ export default {
   },
 };
 </script>
-<style scoped>
-.floating-container {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
-  opacity: 0.8;
-}
-</style>
+<style scoped></style>

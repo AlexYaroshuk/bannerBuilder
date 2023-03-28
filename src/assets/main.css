@@ -168,29 +168,13 @@ a,
   }
 }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  /* Change from 'grid' to 'flex' */
-  justify-content: center;
-  /* Add this line */
-  align-items: center;
-  /* Add this line */
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background-color: transparent;
-  z-index: 2;
-}
+
 
 .layout-canvas {
   display: flex;
   flex-direction: column;
-  /* Change from 'grid' to 'flex' */
   justify-content: center;
-  /* Add this line */
   align-items: center;
-  /* Add this line */
   position: relative;
   width: 100vw;
   height: 100vh;

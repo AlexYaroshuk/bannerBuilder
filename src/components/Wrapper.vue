@@ -86,25 +86,27 @@
 </template>
 
 <script>
-import Container from "./Container.vue";
+import ElementContainer from "./ElementContainer.vue";
 import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
 import newContainerMixin from "../mixins/newContainerMixin";
-import containersMixin from "../mixins/containersMixin";
+import appsetup from "../mixins/app-setup";
 
 export default {
   components: {
-    Container,
+    ElementContainer,
     Properties,
     LeftSidebar,
     LayoutCanvas,
   },
 
-  mixins: [newContainerMixin, containersMixin],
+  mixins: [appsetup, newContainerMixin],
 
   data() {
+    const { containers } = appsetup.setup();
     return {
+      containers,
       //selection
       selectedContainer: null,
       selectedChild: null,

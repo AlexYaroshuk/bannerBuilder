@@ -6,12 +6,15 @@
       'container--selected': container.isSelected,
       'container--hovered': container.isHovered && !container.isSelected, //not sure why, but need the second condition here. TODO: check the diff w/ children
     }"
+    :border="
+      container.isSelected || container.isHovered
+        ? `${container.borderWidth}px solid ${container.borderColor}`
+        : '2px solid transparent'
+    "
     :style="{
       backgroundColor: !bannerStyle ? container.backgroundColor : undefined,
-      borderRadius: borderRadius + 'px',
-      borderWidth: borderWidth + 'px',
-      borderColor: borderColor,
-      backgroundImage: `url(${BGImage})`,
+
+      backgroundImage: `url(${container.BGImage})`,
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
       backgroundSize: 'cover',
@@ -20,7 +23,9 @@
     @mouseover="handleItemHover(container)"
     @mouseleave="handleContainerDehover"
   >
-    <div class="name" v-if="container.isSelected">{{ name }}</div>
+    <div class="name" v-if="container.isSelected">
+      {{ container.containerName }}
+    </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
         class="child-item"
@@ -36,7 +41,7 @@
         @mouseover.stop="handleItemHover(child)"
       >
         <!--         <div class="name" v-if="child.isSelected">{{ child.type }}</div> -->
-        <Text
+        <ElementText
           v-if="child.type && child.type === 'text'"
           :containerName="name"
           :text="child.value"
@@ -53,114 +58,13 @@
 </template>
 
 <script>
-import Text from "./Text.vue";
-import Link from "./Link.vue";
-import Image from "./Image.vue";
+import ElementText from "./ElementText.vue";
 
 export default {
-  data() {
-    return {
-      currentContainerIndex: null,
-      defaultColors: ["purple", "blue"],
-    };
-  },
-
   props: {
-    bannerStyle: {
-      type: String,
-      default: "",
-    },
-    children: {
-      type: Array,
-      default: [],
-    },
     container: {
       type: Object,
-      default: null,
-    },
-    selectedChild: {
-      type: Object,
-      default: null,
-    },
-    index: {
-      type: Number,
-      default: null,
-    },
-    backgroundColor: {
-      type: [String, Object],
-      default: null,
-    },
-
-    borderColor: {
-      type: String,
-      default: null,
-    },
-    borderRadius: {
-      type: Number,
-      default: 0,
-    },
-    borderWidth: {
-      type: Number,
-      default: null,
-    },
-
-    name: {
-      type: String,
-      default: null,
-    },
-    fontSize: {
-      type: String,
-      default: "16",
-    },
-    fontFamily: {
-      type: String,
-      default: "Arial",
-    },
-    textColor: {
-      type: String,
-      default: null,
-    },
-    textBGColor: {
-      type: String,
-      default: null,
-    },
-
-    linkLabel: {
-      type: String,
-      default: null,
-    },
-    linkFontSize: {
-      type: String,
-      default: "14",
-    },
-    linkFontFamily: {
-      type: String,
-      default: "Arial",
-    },
-    linkColor: {
-      type: String,
-      default: "yellow",
-    },
-    linkBGColor: {
-      type: String,
-      default: "",
-    },
-
-    linkURL: {
-      type: String,
-      default: "https://chat.openai.com/",
-    },
-    linkColor: {
-      type: String,
-      default: "yellow",
-    },
-    imageLink: {
-      type: String,
-      default: null,
-    },
-    BGImage: {
-      type: String,
-      default: "",
+      required: true,
     },
   },
   methods: {
@@ -215,9 +119,7 @@ export default {
   },
 
   components: {
-    Text,
-    Link,
-    Image,
+    ElementText: ElementText,
   },
 };
 </script>
@@ -227,7 +129,6 @@ export default {
   flex-direction: column;
   width: 520px;
   height: 96px;
-
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -237,11 +138,9 @@ export default {
   bottom: 0;
   border: 2px solid transparent;
 }
-
 .container[data-has-image="true"] {
   background-image: url(BGImage);
 }
-
 .container--selected {
   border: 2px solid #1280ff;
 }
@@ -257,14 +156,12 @@ export default {
   color: white;
   padding: 0px 4px;
 }
-
 .child {
   display: flex;
   align-items: center;
   padding: 16px;
   flex: 1;
 }
-
 .child-item {
   position: relative;
   display: flex;
@@ -274,12 +171,19 @@ export default {
 .child-item--hovered {
   border: 2px solid #1482ff80;
 }
-
 .child-item--selected {
   border: 2px solid #1482ff;
 }
 .container--dragging {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: grabbing;
+}
+
+.floating-container {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  opacity: 0.9;
 }
 </style>
