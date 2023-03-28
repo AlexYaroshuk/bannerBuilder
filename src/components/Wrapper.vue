@@ -91,7 +91,7 @@ import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
 import newContainerMixin from "../mixins/newContainerMixin";
-import appsetup from "../mixins/app-setup";
+import appSetup from "../mixins/appSetup";
 
 export default {
   components: {
@@ -101,10 +101,10 @@ export default {
     LayoutCanvas,
   },
 
-  mixins: [appsetup, newContainerMixin],
+  mixins: [appSetup, newContainerMixin],
 
   data() {
-    const { containers } = appsetup.setup();
+    const { containers } = appSetup.setup();
     return {
       containers,
       //selection
@@ -267,11 +267,11 @@ export default {
       this.draggedElement = { item, index, type, containerIndex };
       if (type === "container") {
         this.draggedContainerIndex = index;
-      } // for Firefox compatibility
+      }
       this.draggedElement = { item, index, type, containerIndex };
       if (type === "container") {
         this.draggedContainerIndex = index;
-        this.originalContainerIndex = index; // Store the original index
+        this.originalContainerIndex = index;
       }
       this.draggedElement = { item, index, type, containerIndex };
 
@@ -413,7 +413,7 @@ export default {
 
     // Data mutation methods
     addNewContainer(containerIndex) {
-      const newContainer = this.createNewContainer();
+      const newContainer = this.createNewContainer(this.containers.length);
       this.containers.splice(containerIndex, 0, newContainer);
     },
 

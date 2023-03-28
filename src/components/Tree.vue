@@ -160,7 +160,7 @@ export default {
       } else {
         this.hoveredContainerIndex = null;
         this.containerElementPosition = null;
-        element.classList.add("tree-item--hovered"); // add class to container list item
+        element.classList.add("tree-item--hovered");
       }
     },
 

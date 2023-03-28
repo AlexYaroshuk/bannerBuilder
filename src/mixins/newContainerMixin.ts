@@ -1,36 +1,14 @@
+import { ElementContainer, ElementText } from '@/mixins/elements';
+
+
 export default {
   data() {
     return {
-      newContainerTemplate: {
-        containerName: "",
-        type: "container",
-        isHovered: false,
-        isSelected: false,
-        backgroundColor: "",
-        children: [
-          {
-            name: "",
-            value: "",
-            type: "text",
-            isSelected: false,
-            isHovered: false,
-            parentContainer: null,
-          },
-          {
-            name: "",
-            value: "",
-            type: "text",
-            isSelected: false,
-            isHovered: false,
-            parentContainer: null,
-          },
-        ],
-      },
+      newContainerTemplate: null,
     };
   },
   methods: {
-    createNewContainer() {
-      const totalContainers = this.containers.length;
+    createNewContainer(totalContainers: number) {
       const newContainerName = `Container ${totalContainers + 1}`;
 
       const getRandomColor = () => {
@@ -39,16 +17,16 @@ export default {
         return randomColor;
       };
 
-      let newContainer = JSON.parse(JSON.stringify(this.newContainerTemplate));
-      newContainer.containerName = newContainerName;
+      const newContainer = new ElementContainer(newContainerName);
       newContainer.backgroundColor = getRandomColor();
-      newContainer.children[0].name = "Text 3";
-      newContainer.children[0].value = "new";
-      newContainer.children[1].name = "Text 4";
-      newContainer.children[1].value = "container";
+
+      const text1 = new ElementText('Text 3', 'new');
+      const text2 = new ElementText('Text 4', 'container');
+
+      newContainer.addChild(text1);
+      newContainer.addChild(text2);
 
       return newContainer;
-
     },
   },
 };

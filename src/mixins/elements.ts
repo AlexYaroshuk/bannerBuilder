@@ -1,12 +1,3 @@
-import { reactive } from 'vue';
-
-
-interface ElementBase {
-  // ...
-  isHovered: boolean;
-  // ...
-}
-
 abstract class Element {
   abstract addChild(child: Element): void;
   abstract removeChild(child: Element): void;

@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-/* import store from '@/store'; */
+
 
 import './assets/main.css'
 
@@ -14,5 +14,4 @@ library.add(fas, far, fab)
 
 const app = createApp(App);
 app.component('font-awesome-icon', FontAwesomeIcon);
-/* app.use(store); */
 app.mount('#app');

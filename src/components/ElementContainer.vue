@@ -4,7 +4,7 @@
     class="container"
     :class="{
       'container--selected': container.isSelected,
-      'container--hovered': container.isHovered && !container.isSelected, //not sure why, but need the second condition here. TODO: check the diff w/ children
+      'container--hovered': container.isHovered,
     }"
     :border="
       container.isSelected || container.isHovered
@@ -40,7 +40,6 @@
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
         @mouseover.stop="handleItemHover(child)"
       >
-        <!--         <div class="name" v-if="child.isSelected">{{ child.type }}</div> -->
         <ElementText
           v-if="child.type && child.type === 'text'"
           :containerName="name"
@@ -104,8 +103,6 @@ export default {
       const to = { item: null, index: containerIndex, type: "container" };
       this.handleDrop(to);
     },
-
-    // ...
 
     handleDrop({ item, index, type, containerIndex }) {
       const from = this.draggedElement;

@@ -25,12 +25,7 @@ export default {
 
 <style scoped>
 .btext {
-  /*   font-size: large; */
-
-  /*   z-index: 1; */
   padding: 4px;
   color: black;
-
-  /* Add this line to give the parent element a position */
 }
 </style>
