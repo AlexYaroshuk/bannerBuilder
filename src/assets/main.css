@@ -241,3 +241,17 @@ a,
 .container--hidden>* {
   display: none !important;
 }
+
+.widgets-container {
+  padding: 0px;
+  display: flex;
+  width: 33%;
+  justify-content: center;
+}
+
+.elements-container {
+  padding: 0px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}

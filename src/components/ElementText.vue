@@ -1,5 +1,5 @@
 <template>
-  <div class="btext" :style="{ backgroundColor: textBGColor }">
+  <div class="btext" :style="colorStyle">
     <p class="">{{ text }}</p>
   </div>
 </template>
@@ -7,9 +7,9 @@
 <script>
 export default {
   props: {
+    child: Object,
     text: String,
-    textBGColor: String,
-    value: String,
+
     isSelected: Boolean,
   },
   computed: {
@@ -17,6 +17,11 @@ export default {
       return {
         "child-text": true,
         "child-text--selected": this.isSelected && this.value,
+      };
+    },
+    colorStyle() {
+      return {
+        color: this.child.effectiveColor,
       };
     },
   },

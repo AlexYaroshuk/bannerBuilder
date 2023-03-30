@@ -2,45 +2,28 @@
   <div class="wrapper" ref="wrapper">
     <LayoutCanvas
       :containers="containers"
-      :dragged-container-index="draggedContainerIndex"
       :isDraggingAssetsElement="isDraggingAssetsElement"
+      :isDraggingWidgetsElement="isDraggingWidgetsElement"
       @addNewContainer="addNewContainer"
-      @element-drag-start-called="onLayoutCanvasElementDragStart"
       @delete-container="deleteContainer"
       @handleContainerDrop="handleContainerDrop($event)"
+      @handleWidgetDrop="handleWidgetDrop($event)"
       @updateDraggedElement="updateDraggedElement"
       @select-item="selectItem"
       @hover-item="hoverItem"
       ref="layoutcanvas"
     />
     <Properties
-      :selectedChild="selectedChild"
-      :selectedContainer="selectedContainer"
-      @clear-image-BG="onClearBGImage"
-      @clear-image-nested="onClearNestedImage"
-      @link-bg-color-changed="onLinkBGColorChanged"
-      @link-color-changed="onLinkColorChanged"
-      @link-font-family-changed="onLinkFontChanged"
-      @link-font-size-changed="onLinkSizeChanged"
+      :selectedItem="selectedItem"
+      @reset-style="onResetStyle"
+      @set-typography-color="onUpdateTypographyColor"
       @set-bg-color="onUpdateBGColor"
-      @set-border-color="onUpdateBorderColor"
-      @set-border-radius="onUpdateBorderRadius"
-      @set-border-width="onUpdateBorderWidth"
-      @set-link-label="onBannerLinkLabelUpdate"
-      @set-link-URL="onBannerURLUpdate"
-      @set-text="onBannerTextUpdate"
-      @text-bg-color-changed="onTextBGChanged"
-      @text-color-changed="onTextColorChanged"
-      @text-font-family-changed="onTextFamilyChanged"
-      @text-font-size-changed="onTextSizeChanged"
-      @update-image-BG="onUpdateBGImage"
-      @update-image-nested="onUpdateNestedImage"
       ref="properties"
     />
 
     <LeftSidebar
       :containers="containers"
-      :selected-item="selectedChild"
+      :selected-item="selectedItem"
       @contextmenu="showContextMenu"
       @dehover="dehoverAll"
       @drag-start="
@@ -62,12 +45,19 @@
           'assets'
         )
       "
+      @widget-drag-start="
+        handleDragStart(
+          { item: $event.item, index: $event.index, type: $event.type },
+          $event.event,
+          'widgets'
+        )
+      "
       @drop="handleTreeDrop"
       @element-drag-end="handleDragEnd"
       @hover-item="hoverItem"
       @select-item="selectItem"
       @tree-dehover="dehoverAll"
-      ref="tree"
+      ref="leftsidebar"
     />
   </div>
   <div
@@ -108,14 +98,15 @@ export default {
     return {
       containers,
       //selection
-      selectedContainer: null,
-      selectedChild: null,
+
+      selectedItem: null,
 
       //dragging
       draggedElement: null,
       floatingContainer: null,
       isDraggingExistingElement: false,
       isDraggingAssetsElement: false,
+      isDraggingWidgetsElement: false,
       dragSource: null,
 
       hoverIndex: null,
@@ -164,7 +155,7 @@ export default {
 
     handleClickOutside(event) {
       const wrapper = this.$refs.wrapper;
-      const tree = this.$refs.tree;
+      const leftsidebar = this.$refs.leftsidebar;
       const properties = this.$refs.properties;
 
       if (
@@ -175,9 +166,9 @@ export default {
         this.contextMenu.isVisible = false;
       }
 
-      // Check if the click event is not inside Tree or Properties components
+      // Check if the click event is not inside Leftsidebar or Properties components
       if (
-        !tree.$el.contains(event.target) &&
+        !leftsidebar.$el.contains(event.target) &&
         !properties.$el.contains(event.target)
       ) {
         this.deselectAll();
@@ -217,13 +208,13 @@ export default {
           });
         }
       });
-      this.selectedContainer = null;
-      this.selectedChild = null;
+      this.selectedItem = null;
     },
 
     dehoverAll() {
       this.containers.forEach((container) => {
         container.isHovered = false;
+        container.isWidgetDropzoneShown = false;
         if (container.children) {
           container.children.forEach((child) => {
             child.isHovered = false;
@@ -240,17 +231,19 @@ export default {
       this.deselectAll();
       item.isSelected = true;
 
-      if (item.type === "container") {
-        this.selectedContainer = item;
-      } else {
-        this.selectedChild = item;
-      }
+      this.selectedItem = item;
+
+      /* this.$refs.leftsidebar.setActiveTab("layers"); */
     },
 
     hoverItem(item) {
       this.dehoverAll();
 
       item.isHovered = true;
+
+      if (this.isDraggingWidgetsElement) {
+        item.isWidgetDropzoneShown = true;
+      }
     },
 
     //
@@ -285,11 +278,14 @@ export default {
         containerElement = event.target.closest(".container");
       }
 
-      if (source !== "assets") {
+      if (source === "main" || "tree") {
         this.isDraggingExistingElement = true;
       }
       if (source === "assets") {
         this.isDraggingAssetsElement = true;
+      }
+      if (source === "widgets") {
+        this.isDraggingWidgetsElement = true;
       }
 
       if (!containerElement) return;
@@ -325,6 +321,7 @@ export default {
       this.draggedElement = null;
       this.isDraggingExistingElement = false;
       this.isDraggingAssetsElement = false;
+      this.isDraggingWidgetsElement = false;
       this.hoverIndex = null;
       this.dragSource = null;
       this.draggedContainerIndex = null;
@@ -411,7 +408,6 @@ export default {
       this.contextMenu.isVisible = false;
     },
 
-    // Data mutation methods
     addNewContainer(containerIndex) {
       const newContainer = this.createNewContainer(this.containers.length);
       this.containers.splice(containerIndex, 0, newContainer);
@@ -469,40 +465,39 @@ export default {
       item.children.push(draggedChild);
     },
 
+    // create a new child and add it to container
+    handleWidgetDrop(container) {
+      const name = "New Text Element";
+      const value = "New text";
+      const newTextElement = this.addTextElement(container, name, value);
+      this.selectItem(newTextElement);
+      this.isDraggingWidgetsElement = false;
+    },
+
     //
     /// modify child object (text)
 
-    onBannerTextUpdate(text, child) {
-      if (!this.containers) return; // check that containers is defined
-      const containerIndex = this.containers.findIndex((container) =>
-        container.children.includes(child)
-      );
-      if (containerIndex !== -1) {
-        const container = this.containers[containerIndex];
-        const childIndex = container.children.indexOf(child);
-
-        // Create a new object with the updated value
-        const updatedChild = { ...child, value: text };
-
-        // Update the child object in the container
-        container.children.splice(childIndex, 1, updatedChild);
-
-        // Check if the updated child is currently selected
-        if (this.selectedChild === child) {
-          // Update the selectedChild object in the component
-          this.selectedChild = updatedChild;
-        }
+    onUpdateTextElementColor({ child, color }) {
+      if (color === null) {
+        child.backgroundColor = this.defaultColors[child.index];
+      } else {
+        child.backgroundColor = color;
       }
+    },
+
+    onResetStyle({ item, type }) {
+      item[type] = null;
     },
 
     /// modify container object
 
-    onUpdateBGColor({ container, color }) {
-      if (color === null) {
-        container.backgroundColor = this.defaultColors[container.index];
-      } else {
-        container.backgroundColor = color;
-      }
+    onUpdateBGColor({ item, color }) {
+      item.backgroundColor = color;
+    },
+    onUpdateTypographyColor({ item, color }) {
+      this.$nextTick(() => {
+        item.color = color;
+      });
     },
   },
 };

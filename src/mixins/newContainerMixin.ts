@@ -1,4 +1,6 @@
 import { ElementContainer, ElementText } from '@/mixins/elements';
+import { reactive } from 'vue';
+
 
 
 export default {
@@ -17,7 +19,8 @@ export default {
         return randomColor;
       };
 
-      const newContainer = new ElementContainer(newContainerName);
+      const newContainer = reactive(new ElementContainer(newContainerName));
+
       newContainer.backgroundColor = getRandomColor();
 
       const text1 = new ElementText('Text 3', 'new');
@@ -28,5 +31,12 @@ export default {
 
       return newContainer;
     },
+
+    addTextElement(container: ElementContainer, name: string, value: string): ElementText {
+      const newTextElement = new ElementText(name, value);
+      container.addChild(newTextElement);
+      return newTextElement;
+    }
+
   },
 };

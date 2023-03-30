@@ -15,7 +15,6 @@
         dragging && draggedItemType === 'container' && dropIndicator === index
       "
       class="drop-indicator"
-      :style="dropIndicatorStyles"
     ></div>
     <li
       class="tree-item"
@@ -65,18 +64,13 @@
             hoveredContainerIndex === index
           "
           class="drop-indicator"
-          :style="dropIndicatorStyles"
         ></div>
         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
           <span class="material-icons">text_format</span>
         </span>
         {{ child.value }}
       </li>
-      <div
-        v-if="isLastChildHovered(index)"
-        class="drop-indicator"
-        :style="dropIndicatorStyles"
-      ></div>
+      <div v-if="isLastChildHovered(index)" class="drop-indicator"></div>
     </div>
   </div>
 </template>
@@ -93,6 +87,18 @@ export default {
       default: null,
     },
   },
+  emits: [
+    "select-item",
+    "item-hover",
+    "drag-start",
+    "drag-end",
+    "drag-over",
+    "drop",
+    "mouseleave",
+    "contextmenu",
+    "dehover",
+  ],
+
   data() {
     return {
       dragging: false,
@@ -197,7 +203,7 @@ export default {
     },
   },
   computed: {
-    ddropIndicatorStyles() {
+    /* dropIndicatorStyles() {
       if (this.dropIndicator === null || this.topPosition === null) {
         return {};
       }
@@ -205,7 +211,7 @@ export default {
       return {
         top: `${this.topPosition}px`,
       };
-    },
+    }, */
 
     isLastChildHovered() {
       return (containerIndex) => {
@@ -258,12 +264,6 @@ export default {
 
 .tree-item:not(.selected):hover {
   border: 2px solid hsl(212, 100%, 54%);
-}
-
-.elements-container {
-  padding: 10px;
-  display: flex;
-  justify-content: center;
 }
 
 .tree-item-wrapper {
