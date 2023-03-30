@@ -14,21 +14,21 @@ export default defineComponent({
     const containers = ref<ElementContainer[]>([]);
 
 
-    const container1 = new ElementContainer("Container 1");
+    const container1 = new ElementContainer("One");
     container1.addChild(new ElementText("Text 1", "foo"));
-container1.addChild(new ElementText("Text 2", "bar"));
-container1.addChild(new ElementText("Text 3", "sac"));
-container1.backgroundColor = "aliceblue"
+    container1.addChild(new ElementText("Text 2", "bar"));
+    container1.addChild(new ElementText("Text 3", "sac"));
+    container1.backgroundColor = "aliceblue"
 
-const container2 = new ElementContainer("Container 2");
-container2.addChild(new ElementText("Text 3", "baz"));
-container2.addChild(new ElementText("Text 4", "wee"));
-container2.backgroundColor = "lightgreen"
+    const container2 = new ElementContainer("Two");
+    container2.addChild(new ElementText("Text 3", "baz"));
+    container2.addChild(new ElementText("Text 4", "wee"));
+    container2.backgroundColor = "lightgreen"
 
-containers.value = [container1, container2];
+    containers.value = [container1, container2];
 
-return {
-  containers,
-};
-},
+    return {
+      containers,
+    };
+  },
 });

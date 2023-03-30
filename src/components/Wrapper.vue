@@ -259,37 +259,24 @@ export default {
       this.draggedElement = draggedElement;
     },
     handleDragStart({ item, index, type, containerIndex }, event, source) {
+      this.isDraggingExistingElement = source !== "assets";
+      this.isDraggingAssetsElement = source === "assets";
+
+      let containerElement;
+      this.dragSource = source;
+
       this.draggedContainerIndex = index;
       this.originalContainerIndex = index;
+
+      this.draggedElement = { item, index, type, containerIndex };
+
       if (event && event.dataTransfer) {
         event.dataTransfer.setData("text/plain", ""); // for Firefox compatibility
       }
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-      } // for Firefox compatibility
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-        this.originalContainerIndex = index; // Store the original index
-      }
-      this.draggedElement = { item, index, type, containerIndex };
-
-      this.dragSource = source;
-
-      let containerElement;
 
       if (source === "main") {
         // Remove the dragged container
-
         containerElement = event.target.closest(".container");
-      }
-
-      if (source !== "assets") {
-        this.isDraggingExistingElement = true;
-      }
-      if (source === "assets") {
-        this.isDraggingAssetsElement = true;
       }
 
       if (!containerElement) return;
@@ -422,15 +409,14 @@ export default {
       draggedContainerIndex,
       fromTree = false
     ) {
-      const draggedContainer = this.containers.splice(
-        draggedContainerIndex,
-        1
-      )[0];
+      // const draggedContainer = this.containers.splice(draggedContainerIndex, 1)[0];
+      draggedContainerIndex = this.draggedContainerIndex;
+      [this.containers[targetIndex], this.containers[draggedContainerIndex]] = [this.containers[draggedContainerIndex], this.containers[targetIndex]];
 
-      if (!fromTree && targetIndex > this.originalContainerIndex) {
-        targetIndex--;
-      }
-      this.containers.splice(targetIndex, 0, draggedContainer);
+      // if (!fromTree && targetIndex > this.originalContainerIndex) {
+      //   targetIndex--;
+      // }
+      // this.containers.splice(targetIndex, 0, draggedContainer);
     },
 
     moveChildWithinContainer(from, index, containerIndex) {
