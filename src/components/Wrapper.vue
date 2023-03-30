@@ -255,7 +255,6 @@ export default {
       this.isDraggingExistingElement = source !== "assets";
       this.isDraggingAssetsElement = source === "assets";
 
-      let containerElement;
       this.dragSource = source;
 
       this.draggedContainerIndex = index;
