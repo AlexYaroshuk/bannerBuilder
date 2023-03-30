@@ -59,6 +59,18 @@ export default {
       default: null,
     },
   },
+  emits: [
+    "select-item",
+    "item-hover",
+    "drag-start",
+    "drag-end",
+    "drag-over",
+    "drop",
+    "mouseleave",
+    "contextmenu",
+    "dehover",
+  ],
+
   data() {
     return {
       dragging: false,
@@ -126,7 +138,7 @@ export default {
       } else {
         this.hoveredContainerIndex = null;
         this.containerElementPosition = null;
-        element.classList.add("tree-item--hovered"); // add class to container list item
+        element.classList.add("tree-item--hovered");
       }
     },
 
@@ -165,7 +177,7 @@ export default {
     },
   },
   computed: {
-    ddropIndicatorStyles() {
+    /* dropIndicatorStyles() {
       if (this.dropIndicator === null || this.topPosition === null) {
         return {};
       }
@@ -173,7 +185,7 @@ export default {
       return {
         top: `${this.topPosition}px`,
       };
-    },
+    }, */
 
     isLastChildHovered() {
       return (containerIndex) => {
@@ -226,12 +238,6 @@ export default {
 
 .tree-item:not(.selected):hover {
   border: 2px solid hsl(212, 100%, 54%);
-}
-
-.elements-container {
-  padding: 10px;
-  display: flex;
-  justify-content: center;
 }
 
 .tree-item-wrapper {

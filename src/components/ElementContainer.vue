@@ -4,7 +4,7 @@
     class="container"
     :class="{
       'container--selected': container.isSelected,
-      'container--hovered': container.isHovered && !container.isSelected, //not sure why, but need the second condition here. TODO: check the diff w/ children
+      'container--hovered': container.isHovered,
     }"
     :border="
       container.isSelected || container.isHovered
@@ -12,7 +12,7 @@
         : '2px solid transparent'
     "
     :style="{
-      backgroundColor: !bannerStyle ? container.backgroundColor : undefined,
+      backgroundColor: container.backgroundColor,
 
       backgroundImage: `url(${container.BGImage})`,
       backgroundRepeat: 'no-repeat',
@@ -21,7 +21,9 @@
     }"
     @click.stop="selectItem(container)"
     @mouseover="handleItemHover(container)"
+    @dragover.stop.prevent="handleItemHover(container)"
     @mouseleave="handleContainerDehover"
+    @drop="handleWidgetDrop(container)"
   >
     <div class="name" v-if="container.isSelected">
       {{ container.containerName }}
@@ -34,25 +36,22 @@
           'child-item--hovered': child.isHovered,
         }"
         v-for="(child, index) in container.children"
-        :key="index"
+        :key="child"
         :data-key="index"
         @click.stop="selectItem(child)"
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
         @mouseover.stop="handleItemHover(child)"
       >
-        <!--         <div class="name" v-if="child.isSelected">{{ child.type }}</div> -->
         <ElementText
           v-if="child.type && child.type === 'text'"
-          :containerName="name"
+          :child="child"
           :text="child.value"
-          :textBGColor="textBGColor"
-          :style="{
-            fontSize: fontSize + 'px',
-            fontFamily: fontFamily,
-            color: textColor,
-          }"
         />
       </div>
+      <div
+        class="widget-dropzone"
+        v-show="container.isWidgetDropzoneShown && container.isHovered"
+      ></div>
     </div>
   </div>
 </template>
@@ -67,54 +66,16 @@ export default {
       required: true,
     },
   },
+  emits: ["select-item", "item-hover", "widget-drop"],
   methods: {
-    onContextMenu(event, type, element) {
-      this.$emit("contextmenu", event, type, element);
-    },
     selectItem(item) {
       this.$emit("select-item", item);
     },
     handleItemHover(item) {
       this.$emit("item-hover", item);
     },
-    handleContainerDehover() {
-      this.$emit("container-dehover");
-    },
-    handleDragStartContainer({ container, index }) {
-      this.onElementDragStart({ item: container, index, type: "container" });
-    },
-
-    handleDragOverContainer(event, container, index) {
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-
-      const rect = event.target.getBoundingClientRect();
-      const middleY = (rect.top + rect.bottom) / 2;
-
-      if (event.clientY < middleY) {
-        this.updateHoverIndex(index - 1);
-      } else {
-        this.updateHoverIndex(index);
-      }
-    },
-
-    handleDropContainer(event, containerIndex) {
-      event.preventDefault();
-
-      const to = { item: null, index: containerIndex, type: "container" };
-      this.handleDrop(to);
-    },
-
-    // ...
-
-    handleDrop({ item, index, type, containerIndex }) {
-      const from = this.draggedElement;
-
-      // Handle container drag and drop
-      if (from.type === "container" && type === "container") {
-        const draggedContainer = this.containers.splice(from.index, 1)[0];
-        this.containers.splice(index, 0, draggedContainer);
-      }
+    handleWidgetDrop(container) {
+      this.$emit("widget-drop", container);
     },
   },
 
@@ -185,5 +146,19 @@ export default {
   z-index: 5;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
   opacity: 0.9;
+}
+.widget-dropzone {
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 2px solid #1482ff80;
+  transition: min-height 0.2s ease, background-color 0.2s ease;
+}
+
+.widget-dropzone--hovered {
+  min-height: 48px;
+  background-color: #1280ff;
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
-  <div class="elements-container">
+  <div class="widgets-container">
     <div
-      class="draggable-element"
+      class="draggable-widget"
       draggable="true"
       @dragstart="dragStart($event)"
       @dragend="dragEnd"
     >
-      <i class="material-icons icon">drag_indicator</i>
-      <span class="text">Banner Style 1</span>
+      <i class="material-icons icon">text_format</i>
+      <span class="text">Text</span>
     </div>
   </div>
 </template>
@@ -37,7 +37,7 @@ export default {
 
     dragStart(event) {
       this.dragging = true;
-      this.draggableElement = event.target.closest(".draggable-element");
+      this.draggableElement = event.target.closest(".draggable-widget");
       this.originalPosition = {
         position: this.draggableElement.style.position,
         zIndex: this.draggableElement.style.zIndex,
@@ -49,7 +49,7 @@ export default {
       this.offsetY =
         event.clientY - this.draggableElement.getBoundingClientRect().top;
 
-      this.$emit("element-drag-start", this.draggableElement);
+      this.$emit("widget-drag-start", this.draggableElement);
     },
 
     dragEnd(event) {
@@ -59,7 +59,7 @@ export default {
         this.draggableElement.style.zIndex = this.originalPosition.zIndex;
         this.draggableElement = null;
       }
-      this.$emit("element-drag-end");
+      this.$emit("widget-drag-end");
     },
   },
 };
@@ -94,30 +94,29 @@ export default {
   left: 0;
 }
 
-.draggable-element {
+.draggable-widget {
   background-color: #fff;
   border: 1px solid #ddd;
   color: #333;
   cursor: grab;
   padding: 10px;
-  user-select: none;
   width: 100%;
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
   transition: background-color 0.2s ease;
 }
-
-.draggable-element:hover {
+.draggable-widget:hover {
   background-color: #ededed;
 }
 
-.draggable-element:active {
+.draggable-widget:active {
   cursor: grabbing;
 }
 
-.draggable-element::after {
+.draggable-widget::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -127,7 +126,7 @@ export default {
   height: 40px;
 }
 
-.draggable-element:active::after {
+.draggable-widget:active::after {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1.8);
   transition: none;

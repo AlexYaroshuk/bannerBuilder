@@ -17,7 +17,7 @@
       @drop="handleContainerDrop($event, index)"
       class="dropzone"
       :class="{
-        'dropzone--hovered': dropzoneHovered(index),
+        'dropzone--hovered': dropzoneHovered,
       }"
       v-show="
         (isDraggingExistingElement || isDraggingAssetsElement) &&
@@ -62,14 +62,11 @@
             draggedElement.index === index,
         }"
         :container="container"
-        :name="container.containerName"
-        @add-child="addChild"
-        @container-dehover="dehoverAll"
         @contextmenu.prevent="
           showContextMenu($event, container), selectItem(container)
         "
-        @deselect-all="deselectAll"
         @item-hover="hoverItem"
+        @widget-drop="handleWidgetDrop"
         @select-item="selectItem"
       />
     </div>
@@ -109,6 +106,25 @@ export default {
   components: {
     ElementContainer: ElementContainer,
   },
+  emits: [
+    "addNewContainer",
+    "container-drop",
+    "delete-container",
+    "handleClickOutside",
+    "handleContainerDrop",
+    "handleDeleteContainer",
+    "handleDeleteKeyPress",
+    "handleDragEnd",
+    "handleDragStart",
+    "handleWidgetDrop",
+    "hover-item",
+    "select-item",
+    "showContextMenu",
+    "updateDraggedElement",
+    "update-floating-container",
+    "updateHoverIndex",
+    "widget-drop",
+  ],
   props: {
     containers: {
       type: Array,
@@ -119,13 +135,15 @@ export default {
       type: Boolean,
       required: true,
     },
+    isDraggingWidgetsElement: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   data() {
     return {
       //selection
-      selectedContainer: null,
-      selectedChild: null,
 
       //dragging
       draggedElement: null,
@@ -332,6 +350,10 @@ export default {
         dragSource: this.dragSource,
         draggedContainerIndex: this.draggedContainerIndex,
       });
+    },
+
+    handleWidgetDrop(container) {
+      this.$emit("handleWidgetDrop", container);
     },
 
     handleTreeDrop({ item, index, type, containerIndex }) {

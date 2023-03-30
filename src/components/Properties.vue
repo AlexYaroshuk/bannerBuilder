@@ -1,5 +1,5 @@
 <template>
-  <div :class="sidebar">
+  <div>
     <aside :class="['sidebar-button', { hidden: !isVisible }]">
       <button @click="toggleVisibility">&lt; Show sidebar</button>
     </aside>
@@ -12,42 +12,81 @@
           <div class="ripple"></div>
         </header>
       </div>
-      <div v-if="!selectedChild & !selectedContainer">
+      <div v-if="!selectedItem">
         <h3>Nothing selected</h3>
         <br />
         When you select an element, you'll see its properties here.
       </div>
-      <h2 v-if="selectedChild && !selectedContainer">
-        selected:{{ selectedChild.type }}
-      </h2>
-      <h2 v-if="!selectedChild && selectedContainer">
-        selected:{{ selectedContainer.containerName }}
-      </h2>
+      <h2 v-if="selectedItem">selected:{{ selectedItem.type }}</h2>
 
       <div
         class="popup-content"
         :class="popupContentClass"
         style="margin-top: 16px"
       >
-        <!-- container settings -->
-
-        <div class="popup-content" v-if="selectedContainer">
-          <h3>Background color/image</h3>
+        <!-- text settings -->
+        <div v-if="selectedItem && selectedItem.type === 'text'">
+          <div class="form-group">
+            <label for="text-field">Text:</label>
+            <input
+              @input="updateChildText"
+              id="text-field"
+              type="text"
+              v-model="inputText"
+            />
+          </div>
+        </div>
+        <!-- hybrid settings -->
+        <div class="popup-content" v-if="selectedItem">
+          <h3>Typography color (container)</h3>
+          <div class="status-text" v-if="selectedItem.parentContainer">
+            <p
+              v-if="selectedItem.parentContainer"
+              class="status-text"
+              :class="
+                selectedItem.color
+                  ? 'status-text-selected-color'
+                  : 'status-text-inherited-color'
+              "
+            >
+              {{
+                selectedItem.color
+                  ? "Custom color"
+                  : "Inheriting from " +
+                    selectedItem.parentContainer.containerName
+              }}
+            </p>
+            <button
+              v-if="selectedItem.color"
+              @click.stop="resetStyle('color')"
+              class="reset-button"
+            >
+              Reset
+            </button>
+          </div>
           <ColorPicker
-            :color="selectedContainer.backgroundColor"
-            @color-change="updateColor"
+            v-model="selectedItemColor"
+            @color-change="updateTypographyColor"
           />
         </div>
-      </div>
-      <!-- text settings -->
-      <div v-if="selectedChild && selectedChild.type === 'text'">
-        <div class="form-group">
-          <label for="text-field">Text:</label>
-          <input
-            @input="updateChildText"
-            id="text-field"
-            type="text"
-            v-model="inputText"
+        <!--         <div class="popup-content" v-if="selectedChild">
+          <h3>Typography color (child)</h3>
+          <ColorPicker
+            :color="selectedChild.color"
+            @color-change="updateTextColor"
+          />
+        </div> -->
+
+        <!-- container settings -->
+
+        <div
+          class="popup-content"
+          v-if="selectedItem && selectedItem.type === 'container'"
+        >
+          <h3>Background color/image</h3>
+          <ColorPicker
+            :color="selectedItem.backgroundColor"
+            @color-change="updateColor"
           />
         </div>
       </div>
@@ -65,28 +104,8 @@ export default {
     FIleUploader,
   },
   props: {
-    containers: {
-      type: Array,
-      default: [],
-    },
-    currentContainerIndex: {
-      type: Number,
-      default: null,
-    },
-    containerName: {
-      type: String,
-      default: null,
-    },
-    selectedChild: {
+    selectedItem: {
       type: Object,
-      default: null,
-    },
-    selectedContainer: {
-      type: Object,
-      default: null,
-    },
-    currentSelectionClass: {
-      type: String,
       default: null,
     },
   },
@@ -106,21 +125,6 @@ export default {
 
       selectedTextSize: this.selectedTextSize,
       selectedTextFont: this.selectedTextFont,
-      textColor: this.textColor,
-      textBGColor: this.textBGColor,
-      inputLinkLabel: "",
-      selectedLinkFont: this.selectedLinkFont,
-      linkColor: this.linkColor,
-      linkBGColor: this.linkBGColor,
-      selectedLinkTextSize: this.selectedLinkTextSize,
-      inputLinkURL: "",
-      backgroundColor: this.backgroundColor,
-      borderColor: this.bannerBorderColor,
-      selectedColor: "",
-      borderRadius: this.borderRadius,
-      borderWidth: this.borderWidth,
-      BGImage: this.BGImage,
-      imageLink: this.imageLink,
     };
   },
 
@@ -132,13 +136,29 @@ export default {
     },
     inputText: {
       get() {
-        return this.selectedChild ? this.selectedChild.value : "";
+        return this.selectedItem ? this.selectedItem.value : "";
       },
       set(newValue) {
-        if (this.selectedChild) {
-          this.selectedChild.value = newValue;
+        if (this.selectedItem) {
+          this.selectedItem.value = newValue;
         }
       },
+    },
+
+    selectedItemColor: {
+      get() {
+        return this.selectedItem.color !== null
+          ? this.selectedItem.color
+          : this.selectedItem.parentContainer
+          ? this.selectedItem.parentContainer.color
+          : null;
+      },
+      set(newColor) {
+        this.selectedItem.color = newColor;
+      },
+    },
+    paragraphBgColor() {
+      return this.selectedItem.color ? "red" : "green";
     },
   },
 
@@ -147,56 +167,28 @@ export default {
       this.isVisible = !this.isVisible;
     },
 
-    // text settings
-    updateChildText() {
-      this.$emit("set-text", this.inputText, this.selectedChild);
-    },
-
-    onSelectTextSize() {
-      this.$emit("text-font-size-changed", this.selectedTextSize);
-    },
-    onChangeTextFont() {
-      this.$emit("text-font-family-changed", this.selectedTextFont);
-    },
-
-    updateTextColor(eventData) {
-      this.$emit("text-color-changed", eventData.cssColor);
-    },
-    updateTextBGColor(eventData) {
-      this.$emit("text-bg-color-changed", eventData.cssColor);
-    },
-
-    // link settings
-    updateLinkLabel() {
-      this.$emit("set-link-label", this.inputLinkLabel);
-    },
-    onSelectLinkSize() {
-      this.$emit("link-font-size-changed", this.selectedLinkTextSize);
-    },
-    onChangeLinkFont() {
-      this.$emit("link-font-family-changed", this.selectedLinkFont);
-    },
-    updateLinkURL() {
-      this.$emit("set-link-URL", this.inputLinkURL);
-    },
-
-    setLinkColor(eventData) {
-      this.$emit("link-color-changed", eventData.cssColor);
-    },
-    setLinkBGColor(eventData) {
-      this.$emit("link-bg-color-changed", eventData.cssColor);
-    },
-
-    // bg settings
-    updateColor(eventData) {
-      this.$emit("set-bg-color", {
-        container: this.selectedContainer,
+    //hybrid settings
+    // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
+    updateTypographyColor(eventData) {
+      this.$emit("set-typography-color", {
+        item: this.selectedItem,
         color: eventData.cssColor,
       });
     },
 
-    updateBorderColor(eventData) {
-      this.$emit("set-border-color", eventData.cssColor);
+    updateColor(eventData) {
+      this.$emit("set-bg-color", {
+        item: this.selectedItem,
+        color: eventData.cssColor,
+      });
+    },
+
+    // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
+    resetStyle() {
+      this.$emit("reset-style", {
+        item: this.selectedItem,
+        type: "color",
+      });
     },
 
     setImageAsBG(image) {
@@ -206,26 +198,6 @@ export default {
     clearImage() {
       this.BGImage = null;
       this.$emit("clear-image-BG");
-    },
-
-    // border settings
-    updateBorderRadius(event) {
-      this.sliderValueRadius = parseInt(event.target.value);
-      this.$emit("set-border-radius", this.sliderValueRadius);
-    },
-    updateBorderWidth(event) {
-      this.sliderValueWidth = parseInt(event.target.value);
-      this.$emit("set-border-width", this.sliderValueWidth);
-    },
-
-    // image settings
-    setNestedImage(image) {
-      this.imageLink = image;
-      this.$emit("update-image-nested", this.imageLink);
-    },
-    clearNestedImage() {
-      this.imageLink = null;
-      this.$emit("clear-image-nested");
     },
   },
 };
@@ -259,5 +231,22 @@ export default {
   top: 0;
   right: 0;
   z-index: 2;
+}
+.status-text {
+  display: flex;
+  font-weight: 600;
+  font-size: small;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.status-text-inherited-color {
+  color: rgb(154, 67, 253);
+  background-color: rgba(154, 67, 253, 0.2);
+}
+
+.status-text-selected-color {
+  color: rgba(0, 123, 255);
+  background-color: rgba(0, 123, 255, 0.2);
 }
 </style>

@@ -24,6 +24,11 @@
         @element-drag-start="emitElementDragStart($event)"
         @element-drag-end="dragEnd"
       />
+      <Widgets
+        v-if="activeTab === 'widgets'"
+        @widget-drag-start="emitWidgetDragStart($event)"
+        @widget-drag-end="dragEnd"
+      />
       <Tree
         :containers="containers"
         :selectedItem="selectedItem"
@@ -42,11 +47,13 @@
 <script>
 import Tree from "./Tree.vue";
 import Assets from "./Assets.vue";
+import Widgets from "./Widgets.vue";
 
 export default {
   components: {
     Tree,
     Assets,
+    Widgets,
   },
   props: {
     containers: {
@@ -59,6 +66,19 @@ export default {
       default: null,
     },
   },
+  emits: [
+    "element-drag-start",
+    "element-drag-end",
+    "widget-drag-start",
+    "widget-drag-end",
+    "drag-start",
+    "drop",
+    "select-item",
+    "hover-item",
+    "tree-dehover",
+    "dehover",
+    "contextmenu",
+  ],
   data() {
     return {
       isVisible: true,
@@ -68,6 +88,11 @@ export default {
           name: "layers",
           label: "Layers",
           icon: "layers",
+        },
+        {
+          name: "widgets",
+          label: "Widgets",
+          icon: "widgets",
         },
         {
           name: "assets",
@@ -86,9 +111,12 @@ export default {
   },
 
   methods: {
-    //control
+    // internal control
     emitElementDragStart(eventData) {
       this.$emit("element-drag-start", eventData);
+    },
+    emitWidgetDragStart(eventData) {
+      this.$emit("widget-drag-start", eventData);
     },
 
     toggleVisibility() {
@@ -97,6 +125,11 @@ export default {
 
     activateTab(tab) {
       this.activeTab = tab;
+    },
+
+    // externall control
+    setActiveTab(tabName) {
+      this.activeTab = tabName;
     },
 
     //drag
@@ -212,49 +245,5 @@ export default {
 
 .tree-item:not(.selected):hover {
   border: 2px solid hsl(212, 100%, 54%);
-}
-
-.elements-container {
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-.draggable-element {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  color: #333;
-  cursor: grab;
-  padding: 10px;
-  user-select: none;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-  transition: background-color 0.2s ease;
-}
-.draggable-element:hover {
-  background-color: #ededed;
-}
-
-.draggable-element:active {
-  cursor: grabbing;
-}
-
-.draggable-element::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-}
-
-.draggable-element:active::after {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.8);
-  transition: none;
 }
 </style>
