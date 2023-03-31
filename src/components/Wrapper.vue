@@ -4,10 +4,11 @@
       :containers="containers"
       :isDraggingAssetsElement="isDraggingAssetsElement"
       :isDraggingWidgetsElement="isDraggingWidgetsElement"
+      :draggedWidget="draggedWidget"
       @addNewContainer="addNewContainer"
       @delete-container="deleteContainer"
       @handleContainerDrop="handleContainerDrop($event)"
-      @handleWidgetDrop="handleWidgetDrop($event)"
+      @handleWidgetDrop="handleWidgetDrop($event.container, $event.widget)"
       @updateDraggedElement="updateDraggedElement"
       @select-item="selectItem"
       @hover-item="hoverItem"
@@ -47,8 +48,13 @@
       "
       @widget-drag-start="
         handleDragStart(
-          { item: $event.item, index: $event.index, type: $event.type },
-          $event.event,
+          {
+            item: $event.item,
+            index: $event.index,
+            type: $event.type,
+            containerIndex,
+          },
+          $event,
           'widgets'
         )
       "
@@ -80,7 +86,7 @@ import ElementContainer from "./ElementContainer.vue";
 import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
-import newContainerMixin from "../mixins/newContainerMixin";
+import newContainerMixin from "../mixins/elementTemplates";
 import appSetup from "../mixins/appSetup";
 
 export default {
@@ -108,6 +114,7 @@ export default {
       isDraggingAssetsElement: false,
       isDraggingWidgetsElement: false,
       dragSource: null,
+      draggedWidget: null,
 
       hoverIndex: null,
       draggedContainerIndex: null,
@@ -316,6 +323,7 @@ export default {
       }
       if (source === "widgets") {
         this.isDraggingWidgetsElement = true;
+        this.draggedWidget = event.widget;
       }
 
       if (!containerElement) return;
@@ -323,6 +331,7 @@ export default {
 
     handleDragEnd() {
       this.draggedElement = null;
+      this.draggedWidget = null;
       this.isDraggingExistingElement = false;
       this.isDraggingAssetsElement = false;
       this.isDraggingWidgetsElement = false;
@@ -411,7 +420,9 @@ export default {
     },
 
     addNewContainer(containerIndex) {
-      const newContainer = this.createNewContainer(this.containers.length);
+      const newContainer = this.createNewElementContainer(
+        this.containers.length
+      );
       this.containers.splice(containerIndex, 0, newContainer);
     },
 
@@ -471,12 +482,11 @@ export default {
     },
 
     // create a new child and add it to container
-    handleWidgetDrop(container) {
-      const name = "New Text Element";
-      const value = "New text";
-      const newTextElement = this.addTextElement(container, name, value);
-      this.selectItem(newTextElement);
+    handleWidgetDrop(container, widget) {
+      const newElement = this.createNewElement(container, widget.type);
+      this.selectItem(newElement);
       this.isDraggingWidgetsElement = false;
+      this.draggedWidget = null;
     },
 
     //

@@ -1,4 +1,4 @@
-abstract class Element {
+abstract class CustomElement {
   color: string | null;
   parentContainer: ElementContainer | null;
 
@@ -7,18 +7,18 @@ abstract class Element {
     this.parentContainer = null;
   }
 
-  abstract addChild(child: Element): void;
-  abstract removeChild(child: Element): void;
+  abstract addChild(child: CustomElement): void;
+  abstract removeChild(child: CustomElement): void;
   abstract get isLeaf(): boolean;
 }
 
-class ElementContainer extends Element {
+class ElementContainer extends CustomElement {
   containerName: string;
   isHovered: boolean;
   isSelected: boolean;
   isWidgetDropzonesShown: boolean;
   type: string;
-  children: Element[];
+  children: CustomElement[];
   backgroundColor: string;
   borderColor: string;
   borderRadius: number;
@@ -43,12 +43,12 @@ class ElementContainer extends Element {
 
   }
 
-  addChild(child: Element): void {
+  addChild(child: CustomElement): void {
     this.children.push(child);
-    child.parentContainer = this; // Set the parentContainer property of the child
+    child.parentContainer = this;
   }
 
-  removeChild(child: Element): void {
+  removeChild(child: CustomElement): void {
     const index = this.children.indexOf(child);
     if (index >= 0) {
       this.children.splice(index, 1);
@@ -60,40 +60,59 @@ class ElementContainer extends Element {
   }
 }
 
-class ElementText extends Element {
-
-  get effectiveColor(): string | null {
-    // Return this ElementText's color if it's defined, otherwise return its parent's color
-    return this.color || (this.parentContainer && this.parentContainer.color) || null;
-  }
-
+abstract class ElementLeaf extends CustomElement {
   name: string;
   value: string;
   type: string;
   isSelected: boolean;
   isHovered: boolean;
 
-  constructor(name: string, value: string) {
+  constructor(type: string, name: string = "New Leaf Element", value: string = "New value") {
     super();
     this.name = name;
     this.value = value;
-    this.type = "text";
+    this.type = type;
     this.isSelected = false;
     this.isHovered = false;
   }
 
-
-
-  addChild(child: Element): void {
+  addChild(child: CustomElement): void {
     throw new InvalidOperationError("Cannot add a child to a leaf element.");
   }
 
-  removeChild(child: Element): void {
+  removeChild(child: CustomElement): void {
     throw new InvalidOperationError("Cannot remove a child from a leaf element.");
   }
 
   get isLeaf(): boolean {
     return true;
+  }
+}
+
+class ElementText extends ElementLeaf {
+  constructor(name: string = "New Text Element", value: string = "New text") {
+    super("text", name, value);
+  }
+
+  get effectiveColor(): string | null {
+    // Return this ElementText's color if it's defined, otherwise return its parent's color
+    return this.color || (this.parentContainer && this.parentContainer.color) || null;
+  }
+}
+
+class ElementLink extends ElementLeaf {
+  hover: string;
+  visited: string;
+  visitedHover: string;
+  URL: string;
+
+  constructor(name: string = "New Link Element", value: string = "New link", URL: string = "https://example.com") {
+    super("link", name, value);
+    this.color = "blue";
+    this.hover = "";
+    this.visited = "";
+    this.visitedHover = "";
+    this.URL = URL;
   }
 }
 
@@ -104,4 +123,4 @@ class InvalidOperationError extends Error {
   }
 }
 
-export { Element, ElementContainer, ElementText, InvalidOperationError };
+export { CustomElement, ElementContainer, ElementText, ElementLink, ElementLeaf, InvalidOperationError };

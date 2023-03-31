@@ -42,11 +42,7 @@
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
         @mouseover.stop="handleItemHover(child)"
       >
-        <ElementText
-          v-if="child.type && child.type === 'text'"
-          :child="child"
-          :text="child.value"
-        />
+        <ElementLeaf style="padding: 4px" :child="child" :type="child.type" />
       </div>
       <div
         class="widget-dropzone"
@@ -57,7 +53,7 @@
 </template>
 
 <script>
-import ElementText from "./ElementText.vue";
+import ElementLeaf from "./ElementLeaf.vue";
 
 export default {
   props: {
@@ -80,7 +76,7 @@ export default {
   },
 
   components: {
-    ElementText: ElementText,
+    ElementLeaf: ElementLeaf,
   },
 };
 </script>

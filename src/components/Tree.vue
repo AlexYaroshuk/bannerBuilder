@@ -68,7 +68,7 @@
           :style="dropIndicatorStyles"
         ></div>
         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
-          <span class="material-icons">text_format</span>
+          <span class="material-icons">{{ iconMap[child.type] }}</span>
         </span>
         {{ child.value }}
       </li>
@@ -114,6 +114,11 @@ export default {
       hoveredElementPosition: null,
       containerElementPosition: null,
       topPosition: null,
+      iconMap: {
+        text: "text_format",
+        link: "link",
+        // Add more mappings for other child types
+      },
     };
   },
 

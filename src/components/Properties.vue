@@ -24,8 +24,13 @@
         :class="popupContentClass"
         style="margin-top: 16px"
       >
-        <!-- text settings -->
-        <div v-if="selectedItem && selectedItem.type === 'text'">
+        <!-- text/link settings -->
+        <div
+          v-if="
+            (selectedItem?.type ?? '') === 'text' ||
+            (selectedItem?.type ?? '') === 'link'
+          "
+        >
           <div class="form-group">
             <label for="text-field">Text:</label>
             <input
@@ -33,6 +38,18 @@
               id="text-field"
               type="text"
               v-model="inputText"
+            />
+          </div>
+        </div>
+        <!-- link settings -->
+        <div v-if="selectedItem && selectedItem.type === 'link'">
+          <div class="form-group">
+            <label for="text-field">URL:</label>
+            <input
+              @input="updateChildText"
+              id="text-field"
+              type="text"
+              v-model="selectedItem.URL"
             />
           </div>
         </div>

@@ -139,6 +139,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    draggedWidget: {
+      type: Object,
+      required: false,
+    },
   },
 
   data() {
@@ -353,7 +357,7 @@ export default {
     },
 
     handleWidgetDrop(container) {
-      this.$emit("handleWidgetDrop", container);
+      this.$emit("handleWidgetDrop", { container, widget: this.draggedWidget });
     },
 
     handleTreeDrop({ item, index, type, containerIndex }) {
