@@ -2,24 +2,37 @@ import { ElementContainer } from "@/models/container";
 
 abstract class Element {
   name: string
-  color: string | null;
+  color: string;
+  backgroundColor: string;
   parentContainer: ElementContainer | null;
 
-  constructor({ name }
-    : { name: string }) {
+  constructor({ name, color='black', backgroundColor='white' }
+    : { name: string, color: string, backgroundColor: string }) {
     
     this.name = name;
-    this.color = null;
+    this.color = color;
+    this.backgroundColor = backgroundColor;
     this.parentContainer = null;
   }
-
-  abstract addChild(child: Element): void;
-  abstract removeChild(child: Element): void;
-  abstract get isLeaf(): boolean;
 
   getName(): string {
     return this.name;
   }
+
+  getColor(): string | null {
+    return this.color;
+  }
+
+  getBackgroundColot(): string | null {
+    return this.backgroundColor;
+  }
+
+  abstract addChild(child: Element): void;
+
+  abstract removeChild(child: Element): void;
+
+  abstract get isLeaf(): boolean;
+
 }
 
 export { Element };

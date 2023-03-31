@@ -30,8 +30,8 @@ class BannerBuilderViewModel {
             ]
         });
 
-        // this.elementList[0].backgroundColor = "aliceblue";
-        // this.elementList[1].backgroundColor = "lightgreen";
+        // this.rootContainer.getChildren()[0].backgroundColor = "aliceblue";
+        // this.rootContainer.getChildren()[1].backgroundColor = "lightgreen";
     }
 
     getRootContainer(): ElementContainer {
