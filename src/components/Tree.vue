@@ -4,45 +4,79 @@
     <br />
     When you add a component, you'll see it here.
   </div>
-  <div v-for="(container, index) in containers" :key="'container-' + index" class="tree-item-wrapper"
-    @mouseleave="handleDehover">
-    <div v-if="
-      dragging && draggedItemType === 'container' && dropIndicator === index
-    " class="drop-indicator" :style="dropIndicatorStyles"></div>
-    <li class="tree-item" :class="{
-      'tree-item--selected': container.isSelected,
-      'tree-item--hovered': container.isHovered,
-    }" draggable="true" @click.stop="selectItem(container)" @contextmenu.prevent="
-  onContextMenu($event, container), selectItem(container)
-" @dragover.prevent="handleDragOver($event, container, index, 'container')"
-      @dragstart="handleDragStart(container, index, 'container')" @drop="handleDrop(container, index, 'container')"
-      @mouseover="handleItemHover(container)">
+  <div
+    v-for="(container, index) in containers"
+    :key="'container-' + index"
+    class="tree-item-wrapper"
+    @mouseleave="handleDehover"
+  >
+    <div
+      v-if="
+        dragging && draggedItemType === 'container' && dropIndicator === index
+      "
+      class="drop-indicator"
+      :style="dropIndicatorStyles"
+    ></div>
+    <li
+      class="tree-item"
+      :class="{
+        'tree-item--selected': container.isSelected,
+        'tree-item--hovered': container.isHovered,
+      }"
+      draggable="true"
+      @click.stop="selectItem(container)"
+      @contextmenu.prevent="
+        onContextMenu($event, container), selectItem(container)
+      "
+      @dragover.prevent="handleDragOver($event, container, index, 'container')"
+      @dragstart="handleDragStart(container, index, 'container')"
+      @drop="handleDrop(container, index, 'container')"
+      @mouseover="handleItemHover(container)"
+    >
       <span class="tree-item__icon-wrapper">
         <span class="material-icons">check_box_outline_blank</span>
       </span>
       {{ container.containerName }}
     </li>
     <div v-if="container.children">
-      <li v-for="(child, childIndex) in container.children" :key="'child-' + childIndex" class="tree-item" :class="{
-        'tree-item--selected': child.isSelected,
-        'tree-item--hovered': child.isHovered,
-        [childSelectedClass(container)]: true,
-      }" draggable="true" @click.stop="selectItem(child)"
-        @dragstart="handleDragStart(child, childIndex, 'child', index)" @dragover.prevent="
+      <li
+        v-for="(child, childIndex) in container.children"
+        :key="'child-' + childIndex"
+        class="tree-item"
+        :class="{
+          'tree-item--selected': child.isSelected,
+          'tree-item--hovered': child.isHovered,
+          [childSelectedClass(container)]: true,
+        }"
+        draggable="true"
+        @click.stop="selectItem(child)"
+        @dragstart="handleDragStart(child, childIndex, 'child', index)"
+        @dragover.prevent="
           handleDragOver($event, child, childIndex, 'child', index)
-        " @drop="handleDrop(child, childIndex, 'child', index)" @mouseover="handleItemHover(child)">
-        <div v-if="
-          dragging &&
-          draggedItemType === 'child' &&
-          dropIndicator === childIndex &&
-          hoveredContainerIndex === index
-        " class="drop-indicator" :style="dropIndicatorStyles"></div>
+        "
+        @drop="handleDrop(child, childIndex, 'child', index)"
+        @mouseover="handleItemHover(child)"
+      >
+        <div
+          v-if="
+            dragging &&
+            draggedItemType === 'child' &&
+            dropIndicator === childIndex &&
+            hoveredContainerIndex === index
+          "
+          class="drop-indicator"
+          :style="dropIndicatorStyles"
+        ></div>
         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
           <span class="material-icons">text_format</span>
         </span>
         {{ child.value }}
       </li>
-      <div v-if="isLastChildHovered(index)" class="drop-indicator" :style="dropIndicatorStyles"></div>
+      <div
+        v-if="isLastChildHovered(index)"
+        class="drop-indicator"
+        :style="dropIndicatorStyles"
+      ></div>
     </div>
   </div>
 </template>
@@ -91,7 +125,7 @@ export default {
     handleItemHover(item) {
       this.$emit("item-hover", item);
     },
-    handleDragStart(item, index, type, containerIndex = null) {
+    handleDragStart(item, index, type, containerIndex) {
       this.$emit("drag-start", { item, index, type, containerIndex });
       this.dragging = true;
       this.draggedItemType = type;
@@ -142,30 +176,14 @@ export default {
       }
     },
 
-    handleDrop(item, index, type, containerIndex = null) {
+    handleDrop(item, index, type, containerIndex) {
       this.dragging = false;
       this.draggedItemType = null;
       this.dropIndicator = null;
       this.hoveredElementPosition = null;
       this.containerElementPosition = null;
 
-      if (type === "container" && containerIndex !== null) {
-        return;
-      }
-
-      if (
-        this.draggedItemType === "child" &&
-        this.hoveredContainer &&
-        this.hoveredItem === this.hoveredContainer
-      ) {
-        this.$emit("drop", {
-          item: this.draggedItem.item,
-          type,
-          containerIndex,
-        });
-      } else {
-        this.$emit("drop", { item, index, type, containerIndex });
-      }
+      this.$emit("drop", { item, index, type, containerIndex });
     },
 
     handleDehover() {
@@ -177,16 +195,6 @@ export default {
     },
   },
   computed: {
-    /* dropIndicatorStyles() {
-      if (this.dropIndicator === null || this.topPosition === null) {
-        return {};
-      }
-
-      return {
-        top: `${this.topPosition}px`,
-      };
-    }, */
-
     isLastChildHovered() {
       return (containerIndex) => {
         if (!this.dragging || this.draggedItemType !== "child") return false;

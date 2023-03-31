@@ -111,7 +111,6 @@ export default {
 
       hoverIndex: null,
       draggedContainerIndex: null,
-      originalContainerIndex: null,
 
       //context
       contextMenu: {
@@ -258,7 +257,6 @@ export default {
       this.dragSource = source;
 
       this.draggedContainerIndex = index;
-      this.originalContainerIndex = index;
 
       this.draggedElement = { item, index, type, containerIndex };
 
@@ -272,7 +270,6 @@ export default {
       this.draggedElement = { item, index, type, containerIndex };
       if (type === "container") {
         this.draggedContainerIndex = index;
-        this.originalContainerIndex = index;
       }
       this.draggedElement = { item, index, type, containerIndex };
 
@@ -283,6 +280,32 @@ export default {
       if (source === "main") {
         // Remove the dragged container
         containerElement = event.target.closest(".container");
+
+        // Create a clone of the container element
+        const floatingContainer = containerElement.cloneNode(true);
+        floatingContainer.classList.add("floating-container");
+
+        // Remove default drag ghost image
+        const dragImage = new Image();
+        dragImage.src =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E";
+        event.dataTransfer.setDragImage(dragImage, 0, 0);
+
+        const rect = containerElement.getBoundingClientRect();
+        const halfWidth = rect.width / 2;
+        const halfHeight = rect.height / 2;
+
+        // Set the initial position and append it to the body
+        floatingContainer.style.left = `${event.clientX - halfWidth}px`;
+        floatingContainer.style.top = `${event.clientY - halfHeight}px`;
+        document.body.appendChild(floatingContainer);
+
+        // Assign the floating container
+        this.floatingContainer = floatingContainer;
+
+        requestAnimationFrame(() => {
+          containerElement.style.display = "none";
+        });
       }
 
       if (source === "main" || "tree") {
@@ -296,32 +319,6 @@ export default {
       }
 
       if (!containerElement) return;
-
-      // Create a clone of the container element
-      const floatingContainer = containerElement.cloneNode(true);
-      floatingContainer.classList.add("floating-container");
-
-      // Remove default drag ghost image
-      const dragImage = new Image();
-      dragImage.src =
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E";
-      event.dataTransfer.setDragImage(dragImage, 0, 0);
-
-      const rect = containerElement.getBoundingClientRect();
-      const halfWidth = rect.width / 2;
-      const halfHeight = rect.height / 2;
-
-      // Set the initial position and append it to the body
-      floatingContainer.style.left = `${event.clientX - halfWidth}px`;
-      floatingContainer.style.top = `${event.clientY - halfHeight}px`;
-      document.body.appendChild(floatingContainer);
-
-      // Assign the floating container
-      this.floatingContainer = floatingContainer;
-
-      requestAnimationFrame(() => {
-        containerElement.style.display = "none";
-      });
     },
 
     handleDragEnd() {
@@ -370,8 +367,6 @@ export default {
       } else {
         this.moveExistingContainer(containerIndex, draggedContainerIndex);
       }
-
-      this.originalContainerIndex = null;
     },
     handleTreeDrop({ item, index, type, containerIndex }) {
       if (!this.draggedElement) return;
@@ -380,7 +375,7 @@ export default {
 
       // Handle container drag and drop
       if (from.type === "container" && type === "container") {
-        this.moveExistingContainer(index, true);
+        this.moveExistingContainer(index, this.draggedContainerIndex, true);
       }
       // Handle child drag and drop within the same container
       else if (
@@ -425,16 +420,20 @@ export default {
       draggedContainerIndex,
       fromTree = false
     ) {
-      // const draggedContainer = this.containers.splice(draggedContainerIndex, 1)[0];
-      draggedContainerIndex = this.draggedContainerIndex;
-      [this.containers[targetIndex], this.containers[draggedContainerIndex]] = [this.containers[draggedContainerIndex], this.containers[targetIndex]];
+      // Check if the targetIndex is different from draggedContainerIndex
+      if (targetIndex !== draggedContainerIndex) {
+        const draggedContainer = this.containers.splice(
+          draggedContainerIndex,
+          1
+        )[0];
 
-      // if (!fromTree && targetIndex > this.originalContainerIndex) {
-      //   targetIndex--;
-      // }
-      // this.containers.splice(targetIndex, 0, draggedContainer);
+        if (!fromTree && targetIndex > draggedContainerIndex) {
+          targetIndex--;
+        }
+
+        this.containers.splice(targetIndex, 0, draggedContainer);
+      }
     },
-
     moveChildWithinContainer(from, index, containerIndex) {
       const draggedChild = this.containers[containerIndex].children.splice(
         from.index,
