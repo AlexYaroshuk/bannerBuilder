@@ -18,7 +18,7 @@
         @element-drag-end="dragEnd" />
       <Widgets v-if="activeTab === 'widgets'" @widget-drag-start="emitWidgetDragStart($event)"
         @widget-drag-end="dragEnd" />
-      <Tree :containers="containers" :selectedItem="selectedItem" @contextmenu="handleContextMenu"
+      <Tree :viewModel="this.viewModel" :selectedItem="selectedItem" @contextmenu="handleContextMenu"
         @dehover="handleDehover" @drag-start="handleDragStart" @drop="handleDrop" @item-hover="handleItemHover"
         @mouseleave="handleTreeDehover" @select-item="handleSelectItem" v-if="activeTab === 'layers'" />
     </div>
@@ -28,8 +28,15 @@
 import Tree from "./Tree.vue";
 import Assets from "./Assets.vue";
 import Widgets from "./Widgets.vue";
+import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
 export default {
+  created() {
+    console.log('created');
+    console.log('lsb');
+    console.log(this.viewModel);
+    console.log('lsb');
+  },
   components: {
     Tree,
     Assets,

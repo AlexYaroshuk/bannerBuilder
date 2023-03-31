@@ -1,32 +1,15 @@
 <template>
   <div class="wrapper" ref="wrapper">
-    <LayoutCanvas
-      :containers="containers"
-      :isDraggingAssetsElement="isDraggingAssetsElement"
-      :isDraggingWidgetsElement="isDraggingWidgetsElement"
-      @addNewContainer="addNewContainer"
-      @delete-container="deleteContainer"
-      @handleContainerDrop="handleContainerDrop($event)"
-      @handleWidgetDrop="handleWidgetDrop($event)"
-      @updateDraggedElement="updateDraggedElement"
-      @select-item="selectItem"
-      @hover-item="hoverItem"
-      ref="layoutcanvas"
-    />
-    <Properties
-      :selectedItem="selectedItem"
-      @reset-style="onResetStyle"
-      @set-typography-color="onUpdateTypographyColor"
-      @set-bg-color="onUpdateBGColor"
-      ref="properties"
-    />
+    <LayoutCanvas :containers="containers" :isDraggingAssetsElement="isDraggingAssetsElement"
+      :isDraggingWidgetsElement="isDraggingWidgetsElement" @addNewContainer="addNewContainer"
+      @delete-container="deleteContainer" @handleContainerDrop="handleContainerDrop($event)"
+      @handleWidgetDrop="handleWidgetDrop($event)" @updateDraggedElement="updateDraggedElement" @select-item="selectItem"
+      @hover-item="hoverItem" ref="layoutcanvas" />
+    <Properties :selectedItem="selectedItem" @reset-style="onResetStyle" @set-typography-color="onUpdateTypographyColor"
+      @set-bg-color="onUpdateBGColor" ref="properties" />
 
-    <LeftSidebar
-      :containers="containers"
-      :selected-item="selectedItem"
-      @contextmenu="showContextMenu"
-      @dehover="dehoverAll"
-      @drag-start="
+    <LeftSidebar :viewModel="this.viewModel" :containers="containers" :selected-item="selectedItem"
+      @contextmenu="showContextMenu" @dehover="dehoverAll" @drag-start="
         handleDragStart(
           {
             item: $event.item,
@@ -37,37 +20,26 @@
           $event.event,
           'tree'
         )
-      "
-      @element-drag-start="
-        handleDragStart(
-          { item: $event.item, index: $event.index, type: $event.type },
-          $event.event,
-          'assets'
-        )
-      "
-      @widget-drag-start="
-        handleDragStart(
-          { item: $event.item, index: $event.index, type: $event.type },
-          $event.event,
-          'widgets'
-        )
-      "
-      @drop="handleTreeDrop"
-      @element-drag-end="handleDragEnd"
-      @hover-item="hoverItem"
-      @select-item="selectItem"
-      @tree-dehover="dehoverAll"
-      ref="leftsidebar"
-    />
+      " @element-drag-start="
+  handleDragStart(
+    { item: $event.item, index: $event.index, type: $event.type },
+    $event.event,
+    'assets'
+  )
+" @widget-drag-start="
+  handleDragStart(
+    { item: $event.item, index: $event.index, type: $event.type },
+    $event.event,
+    'widgets'
+  )
+" @drop="handleTreeDrop" @element-drag-end="handleDragEnd" @hover-item="hoverItem" @select-item="selectItem"
+      @tree-dehover="dehoverAll" ref="leftsidebar" />
   </div>
-  <div
-    class="context-menu"
-    :style="{
-      top: contextMenu.top,
-      left: contextMenu.left,
-      display: contextMenu.isVisible ? 'block' : 'none',
-    }"
-  >
+  <div class="context-menu" :style="{
+    top: contextMenu.top,
+    left: contextMenu.left,
+    display: contextMenu.isVisible ? 'block' : 'none',
+  }">
     <div class="context-menu-row" @click="deleteContainer">
       <span class="action">Delete</span>
       <span class="hotkey">Ctrl+D</span>
@@ -82,7 +54,7 @@ import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
 import newContainerMixin from "../mixins/newContainerMixin";
 import appSetup from "../mixins/appSetup";
-import bannerBuilderViewModel from "../viewmodels/bannerBuilderViewModel"
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
   components: {
@@ -95,10 +67,9 @@ export default {
   mixins: [appSetup, newContainerMixin],
 
   data() {
-    const { viewModel } = new bannerBuilderViewModel();
     const { containers } = appSetup.setup();
     return {
-      viewModel,
+      viewModel: new BannerBuilderViewModel(),
       containers,
       //selection
 
@@ -136,6 +107,7 @@ export default {
   mounted() {
     window.addEventListener("keydown", this.handleDeleteKeyPress);
     document.addEventListener("click", this.handleClickOutside);
+    console.log(this.viewModel);
   },
 
   beforeUnmount() {

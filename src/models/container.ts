@@ -1,7 +1,6 @@
 import { Element } from "@/models/element";
 
 class ElementContainer extends Element {
-    name: string;
     isHovered: boolean;
     isSelected: boolean;
     isWidgetDropzonesShown: boolean;
@@ -16,10 +15,9 @@ class ElementContainer extends Element {
     constructor({ name, children }
         : { name: string, children: Element[] }) {
 
-        super();
-        this.name = name;
-        this.children = children;
+        super({ name: name });
 
+        this.children = children;
         this.isHovered = false;
         this.isSelected = false;
         this.isWidgetDropzonesShown = false;
@@ -43,6 +41,10 @@ class ElementContainer extends Element {
         if (index >= 0) {
             this.children.splice(index, 1);
         }
+    }
+
+    getChildren(): Element[] {
+        return this.children;
     }
 
     get isLeaf(): boolean {

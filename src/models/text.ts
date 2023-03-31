@@ -9,21 +9,23 @@ class ElementText extends Element {
   }
 
   name: string;
-  value: string;
+  text: string;
   type: string;
   isSelected: boolean;
   isHovered: boolean;
 
-  constructor(name: string, value: string) {
-    super();
+  constructor(name: string, text: string) {
+    super({ name: name });
     this.name = name;
-    this.value = value;
+    this.text = text;
     this.type = "text";
     this.isSelected = false;
     this.isHovered = false;
   }
 
-
+  getText(): string {
+    return this.text;
+  }
 
   addChild(child: Element): void {
     throw new InvalidOperationError("Cannot add a child to a leaf element.");
