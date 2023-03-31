@@ -5,13 +5,8 @@
   <aside @click.stop :class="['sidebar', { hidden: !isVisible }]">
     <button @click="toggleVisibility">&lt; Hide</button>
     <div class="tab-bar">
-      <button
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :class="{ active: activeTab === tab.name }"
-        @click="activeTab = tab.name"
-        @mousedown="startRipple($event)"
-      >
+      <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
+        @click="activeTab = tab.name" @mousedown="startRipple($event)">
         <i class="material-icons"> {{ tab.icon }}</i>
         <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
@@ -19,28 +14,13 @@
     </div>
 
     <div class="tab-content">
-      <Assets
-        v-if="activeTab === 'assets'"
-        @element-drag-start="emitElementDragStart($event)"
-        @element-drag-end="dragEnd"
-      />
-      <Widgets
-        v-if="activeTab === 'widgets'"
-        @widget-drag-start="emitWidgetDragStart($event)"
-        @widget-drag-end="dragEnd"
-      />
-      <Tree
-        :containers="containers"
-        :selectedItem="selectedItem"
-        @contextmenu="handleContextMenu"
-        @dehover="handleDehover"
-        @drag-start="handleDragStart"
-        @drop="handleDrop"
-        @item-hover="handleItemHover"
-        @mouseleave="handleTreeDehover"
-        @select-item="handleSelectItem"
-        v-if="activeTab === 'layers'"
-      />
+      <Assets v-if="activeTab === 'assets'" @element-drag-start="emitElementDragStart($event)"
+        @element-drag-end="dragEnd" />
+      <Widgets v-if="activeTab === 'widgets'" @widget-drag-start="emitWidgetDragStart($event)"
+        @widget-drag-end="dragEnd" />
+      <Tree :containers="containers" :selectedItem="selectedItem" @contextmenu="handleContextMenu"
+        @dehover="handleDehover" @drag-start="handleDragStart" @drop="handleDrop" @item-hover="handleItemHover"
+        @mouseleave="handleTreeDehover" @select-item="handleSelectItem" v-if="activeTab === 'layers'" />
     </div>
   </aside>
 </template>
@@ -56,6 +36,11 @@ export default {
     Widgets,
   },
   props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: null,
+    },
+
     containers: {
       type: Array,
       default: () => [],

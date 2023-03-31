@@ -82,6 +82,7 @@ import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
 import newContainerMixin from "../mixins/newContainerMixin";
 import appSetup from "../mixins/appSetup";
+import bannerBuilderViewModel from "../viewmodels/bannerBuilderViewModel"
 
 export default {
   components: {
@@ -94,8 +95,10 @@ export default {
   mixins: [appSetup, newContainerMixin],
 
   data() {
+    const { viewModel } = new bannerBuilderViewModel();
     const { containers } = appSetup.setup();
     return {
+      viewModel,
       containers,
       //selection
 
