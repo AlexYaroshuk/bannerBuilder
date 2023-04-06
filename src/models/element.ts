@@ -7,7 +7,7 @@ abstract class Element {
   parentContainer: ElementContainer | null;
 
   constructor({ name, color='black', backgroundColor='white' }
-    : { name: string, color: string, backgroundColor: string }) {
+    : { name: string, color?: string, backgroundColor?: string }) {
     
     this.name = name;
     this.color = color;

@@ -4,7 +4,6 @@ class ElementContainer extends Element {
     isHovered: boolean;
     isSelected: boolean;
     isWidgetDropzonesShown: boolean;
-    type: string;
     children: Element[];
     backgroundColor: string;
     borderColor: string;
@@ -21,7 +20,6 @@ class ElementContainer extends Element {
         this.isHovered = false;
         this.isSelected = false;
         this.isWidgetDropzonesShown = false;
-        this.type = "container";
         this.backgroundColor = "teal";
         this.color = "black"
         this.borderColor = "transparent";

@@ -10,15 +10,16 @@ class ElementText extends Element {
 
   name: string;
   text: string;
-  type: string;
   isSelected: boolean;
   isHovered: boolean;
 
-  constructor(name: string, text: string) {
+  constructor({ name, text }
+    : { name: string, text: string }) {
+
     super({ name: name });
+
     this.name = name;
     this.text = text;
-    this.type = "text";
     this.isSelected = false;
     this.isHovered = false;
   }

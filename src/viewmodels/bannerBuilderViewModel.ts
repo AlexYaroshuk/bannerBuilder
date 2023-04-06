@@ -10,21 +10,21 @@ class BannerBuilderViewModel {
             name: "Root", children: [
                 new ElementContainer({
                     name: 'Container 1', children: [
-                        new ElementText("Text 1", "foo"),
-                        new ElementText("Text 2", "bar"),
-                        new ElementText("Text 3", "sac"),
+                        new ElementText({ name: "Text 1", text: "foo" }),
+                        new ElementText({ name: "Text 2", text: "bar" }),
+                        new ElementText({ name: "Text 3", text: "sac" }),
                         new ElementContainer({
                             name: 'Container 1-1', children: [
-                                new ElementText("Text 1-1", "das"),
-                                new ElementText("Text 1-2", "mor"),
+                                new ElementText({ name: "Text 1-1", text: "das" }),
+                                new ElementText({ name: "Text 1-2", text: "mor" }),
                             ]
                         })
                     ]
                 }),
                 new ElementContainer({
                     name: 'Container 2', children: [
-                        new ElementText("Text 3", "baz"),
-                        new ElementText("Text 4", "wee"),
+                        new ElementText({ name: "Text 3", text: "baz" }),
+                        new ElementText({ name: "Text 4", text: "wee" }),
                     ]
                 }),
             ]
