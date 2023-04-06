@@ -18,6 +18,8 @@
       :selectedItem="selectedItem"
       @reset-style="onResetStyle"
       @set-typography-color="onUpdateTypographyColor"
+      @set-typography-fontsize="onUpdateTypographyFontsize"
+      @set-typography-fontfamily="onUpdateTypographyFontfamily"
       @set-bg-color="onUpdateBGColor"
       ref="properties"
     />
@@ -184,7 +186,11 @@ export default {
 
     handleDeleteKeyPress(event) {
       if (event.key === "Delete") {
-        this.deleteContainer();
+        if (this.selectedItem.type != "container") {
+          this.deleteChild();
+        } else {
+          this.deleteContainer();
+        }
       }
     },
 
@@ -493,6 +499,17 @@ export default {
       this.draggedWidget = null;
     },
 
+    // delete a child
+
+    deleteChild() {
+      this.containers.forEach((container) => {
+        container.children = container.children.filter(
+          (child) => !child.isSelected
+        );
+      });
+      this.contextMenu.isVisible = false;
+    },
+
     //
     /// modify child object (text)
 
@@ -516,6 +533,18 @@ export default {
     onUpdateTypographyColor({ item, color }) {
       this.$nextTick(() => {
         item.color = color;
+      });
+    },
+    onUpdateTypographyFontsize({ item, size }) {
+      console.log(item, size);
+      this.$nextTick(() => {
+        item.fontSize = size;
+      });
+    },
+    onUpdateTypographyFontfamily({ item, family }) {
+      console.log(item, family);
+      this.$nextTick(() => {
+        item.fontFamily = family;
       });
     },
   },

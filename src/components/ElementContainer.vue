@@ -73,6 +73,11 @@ export default {
     handleWidgetDrop(container) {
       this.$emit("widget-drop", container);
     },
+    onContextMenu(event, type, item) {
+      event.preventDefault();
+      this.$emit("context-menu", event, type, item);
+      this.$emit("select-item", item); // Add this line
+    },
   },
 
   components: {

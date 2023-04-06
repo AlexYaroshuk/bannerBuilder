@@ -65,6 +65,12 @@
         @contextmenu.prevent="
           showContextMenu($event, container), selectItem(container)
         "
+        @onContextMenu="
+          ($event, child) => {
+            showContextMenu($event, child);
+            selectItem(child);
+          }
+        "
         @item-hover="hoverItem"
         @widget-drop="handleWidgetDrop"
         @select-item="selectItem"

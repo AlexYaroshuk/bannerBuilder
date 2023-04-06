@@ -1,9 +1,15 @@
 abstract class CustomElement {
   color: string | null;
+  fontFamily: string | null;
+  fontWeight: number | null;
+  fontSize: number | null;
   parentContainer: ElementContainer | null;
 
   constructor() {
     this.color = null;
+    this.fontFamily = null;
+    this.fontWeight = null;
+    this.fontSize = null;
     this.parentContainer = null;
   }
 
@@ -36,6 +42,9 @@ class ElementContainer extends CustomElement {
     this.children = [];
     this.backgroundColor = "teal";
     this.color = "black"
+    this.fontFamily = "Arial, sans-serif";
+    this.fontWeight = 400;
+    this.fontSize = 16;
     this.borderColor = "transparent";
     this.borderRadius = 0;
     this.borderWidth = 0;
@@ -76,6 +85,16 @@ abstract class ElementLeaf extends CustomElement {
     this.isHovered = false;
   }
 
+  get effectiveStyles() {
+    const parent = this.parentContainer;
+    return {
+      color: this.color || (parent && parent.color) || null,
+      fontFamily: this.fontFamily || (parent && parent.fontFamily) || null,
+      fontWeight: this.fontWeight || (parent && parent.fontWeight) || null,
+      fontSize: this.fontSize || (parent && parent.fontSize) || null,
+    };
+  }
+
   addChild(child: CustomElement): void {
     throw new InvalidOperationError("Cannot add a child to a leaf element.");
   }
@@ -94,10 +113,10 @@ class ElementText extends ElementLeaf {
     super("text", name, value);
   }
 
-  get effectiveColor(): string | null {
-    // Return this ElementText's color if it's defined, otherwise return its parent's color
-    return this.color || (this.parentContainer && this.parentContainer.color) || null;
-  }
+  /*   get effectiveColor(): string | null {
+      // Return this ElementText's color if it's defined, otherwise return its parent's color
+      return this.color || (this.parentContainer && this.parentContainer.color) || null;
+    } */
 }
 
 class ElementLink extends ElementLeaf {

@@ -17,7 +17,7 @@
         <br />
         When you select an element, you'll see its properties here.
       </div>
-      <h2 v-if="selectedItem">selected:{{ selectedItem.type }}</h2>
+      <h3 v-if="selectedItem">selected:{{ selectedItem.type }}</h3>
 
       <div
         class="popup-content"
@@ -53,38 +53,131 @@
             />
           </div>
         </div>
-        <!-- hybrid settings -->
-        <div class="popup-content" v-if="selectedItem">
-          <h3>Typography color (container)</h3>
-          <div class="status-text" v-if="selectedItem.parentContainer">
-            <p
-              v-if="selectedItem.parentContainer"
-              class="status-text"
-              :class="
-                selectedItem.color
-                  ? 'status-text-selected-color'
-                  : 'status-text-inherited-color'
-              "
-            >
-              {{
-                selectedItem.color
-                  ? "Custom color"
-                  : "Inheriting from " +
-                    selectedItem.parentContainer.containerName
-              }}
-            </p>
-            <button
-              v-if="selectedItem.color"
-              @click.stop="resetStyle('color')"
-              class="reset-button"
-            >
-              Reset
-            </button>
+      </div>
+      <!-- hybrid settings -->
+      <div class="popup-content" v-if="selectedItem">
+        <h3 @click="expandableGroups.typography = !expandableGroups.typography">
+          Typography ({{ selectedItem.type }})
+          <i class="material-icons">
+            {{ expandableGroups.typography ? "expand_less" : "expand_more" }}
+          </i>
+        </h3>
+        <div v-if="expandableGroups.typography">
+          <div style="border: 1px solid black">
+            <div class="status-text" v-if="selectedItem.parentContainer">
+              <p
+                v-if="selectedItem.parentContainer"
+                class="status-text"
+                :class="
+                  selectedItem.fontSize
+                    ? 'status-text-selected-color'
+                    : 'status-text-inherited-color'
+                "
+              >
+                {{
+                  selectedItem.fontSize
+                    ? "Custom font size"
+                    : "Inheriting from " +
+                      selectedItem.parentContainer.containerName
+                }}
+              </p>
+              <button
+                v-if="selectedItem.fontSize"
+                @click.stop="resetStyle('fontSize')"
+                class="reset-button"
+              >
+                Reset
+              </button>
+            </div>
+            <label for="fontSize">Font size:</label>
+            <input
+              id="fontSize"
+              type="number"
+              min="1"
+              step="1"
+              v-model="fontSize"
+            />
           </div>
-          <ColorPicker
-            v-model="selectedItemColor"
-            @color-change="updateTypographyColor"
-          />
+
+          <div style="border: 1px solid black; margin-top: 4px">
+            <div class="status-text" v-if="selectedItem.parentContainer">
+              <p
+                v-if="selectedItem.parentContainer"
+                class="status-text"
+                :class="
+                  selectedItem.fontFamily
+                    ? 'status-text-selected-color'
+                    : 'status-text-inherited-color'
+                "
+              >
+                {{
+                  selectedItem.fontFamily
+                    ? "Custom font family"
+                    : "Inheriting from " +
+                      selectedItem.parentContainer.containerName
+                }}
+              </p>
+              <button
+                v-if="selectedItem.fontFamily"
+                @click.stop="resetStyle('fontFamily')"
+                class="reset-button"
+              >
+                Reset
+              </button>
+            </div>
+            <label for="text-font-family">Font Family:</label>
+            <select
+              id="text-font-family"
+              v-model="fontFamily"
+              @change="updateTypographyFontfamily"
+            >
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Helvetica">Helvetica</option>
+            </select>
+          </div>
+          <div style="border: 1px solid black; margin-top: 4px">
+            <div class="status-text" v-if="selectedItem.parentContainer">
+              <p
+                v-if="selectedItem.parentContainer"
+                class="status-text"
+                :class="
+                  selectedItem.color
+                    ? 'status-text-selected-color'
+                    : 'status-text-inherited-color'
+                "
+              >
+                {{
+                  selectedItem.color
+                    ? "Custom color"
+                    : "Inheriting from " +
+                      selectedItem.parentContainer.containerName
+                }}
+              </p>
+              <button
+                v-if="selectedItem.color"
+                @click.stop="resetStyle('color')"
+                class="reset-button"
+              >
+                Reset
+              </button>
+            </div>
+            <div class="color-display-container">
+              <label for="color-picker">Color:</label>
+              <div
+                class="color-square"
+                :style="{ backgroundColor: selectedItemColor }"
+                @click="showColorPicker = !showColorPicker"
+              ></div>
+              <span class="hex-code">{{ selectedItemColor }}</span>
+            </div>
+            <ColorPicker
+              default-format="hex"
+              v-if="showColorPicker"
+              v-model="selectedItemColor"
+              @color-change="updateTypographyColor"
+            />
+          </div>
         </div>
         <!--         <div class="popup-content" v-if="selectedChild">
           <h3>Typography color (child)</h3>
@@ -95,13 +188,33 @@
         </div> -->
 
         <!-- container settings -->
-
-        <div
-          class="popup-content"
+        <h3
+          @click="expandableGroups.background = !expandableGroups.background"
+          style="margin-top: 16px"
           v-if="selectedItem && selectedItem.type === 'container'"
         >
-          <h3>Background color/image</h3>
+          Backgrounds
+          <i class="material-icons">
+            {{ expandableGroups.background ? "expand_less" : "expand_more" }}
+          </i>
+        </h3>
+        <div
+          v-if="
+            expandableGroups.background && selectedItem.type === 'container'
+          "
+        >
+          <div class="color-display-container">
+            <label for="color-picker">Color:</label>
+            <div
+              class="color-square"
+              :style="{ backgroundColor: selectedItem.backgroundColor }"
+              @click="showBGColorPicker = !showBGColorPicker"
+            ></div>
+            <span class="hex-code">{{ selectedItem.backgroundColor }}</span>
+          </div>
           <ColorPicker
+            default-format="hex"
+            v-if="showBGColorPicker"
             :color="selectedItem.backgroundColor"
             @color-change="updateColor"
           />
@@ -136,12 +249,18 @@ export default {
           icon: "tune",
         },
       ],
+      expandableGroups: {
+        typography: true,
+        background: true,
+      },
       currentSettings: "",
       isVisible: true,
       text: this.text,
 
       selectedTextSize: this.selectedTextSize,
       selectedTextFont: this.selectedTextFont,
+      showColorPicker: false,
+      showBGColorPicker: false,
     };
   },
 
@@ -159,6 +278,30 @@ export default {
         if (this.selectedItem) {
           this.selectedItem.value = newValue;
         }
+      },
+    },
+    fontSize: {
+      get() {
+        return this.selectedItem.fontSize !== null
+          ? this.selectedItem.fontSize
+          : this.selectedItem.parentContainer
+          ? this.selectedItem.parentContainer.fontSize
+          : null;
+      },
+      set(fontSize) {
+        this.selectedItem.fontSize = fontSize;
+      },
+    },
+    fontFamily: {
+      get() {
+        return this.selectedItem.fontFamily !== null
+          ? this.selectedItem.fontFamily
+          : this.selectedItem.parentContainer
+          ? this.selectedItem.parentContainer.fontFamily
+          : null;
+      },
+      set(fontFamily) {
+        this.selectedItem.fontFamily = fontFamily;
       },
     },
 
@@ -193,6 +336,17 @@ export default {
       });
     },
 
+    updateTypographyFontsize() {
+      console.log("size", this.selectedTextSize);
+      this.$emit("set-typography-fontsize", {
+        item: this.selectedItem,
+        size: this.selectedTextSize,
+      });
+    },
+    updateTypographyFontfamily() {
+      this.selectedItem.fontfamily = this.selectedTextFont;
+    },
+
     updateColor(eventData) {
       this.$emit("set-bg-color", {
         item: this.selectedItem,
@@ -201,10 +355,10 @@ export default {
     },
 
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
-    resetStyle() {
+    resetStyle(type) {
       this.$emit("reset-style", {
         item: this.selectedItem,
-        type: "color",
+        type: type,
       });
     },
 
@@ -253,8 +407,8 @@ export default {
   display: flex;
   font-weight: 600;
   font-size: small;
-  padding-left: 4px;
-  padding-right: 4px;
+  /*   padding-left: 4px;
+  padding-right: 4px; */
 }
 
 .status-text-inherited-color {
@@ -265,5 +419,23 @@ export default {
 .status-text-selected-color {
   color: rgba(0, 123, 255);
   background-color: rgba(0, 123, 255, 0.2);
+}
+
+.color-display-container {
+  display: flex;
+  align-items: center;
+}
+
+.color-square {
+  width: 24px;
+  height: 24px;
+  border: 1px solid black;
+  margin-left: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.hex-code {
+  margin-right: 4px;
 }
 </style>

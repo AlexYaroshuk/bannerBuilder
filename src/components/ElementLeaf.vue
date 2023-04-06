@@ -1,9 +1,9 @@
 <template>
   <div class="element-leaf">
-    <div v-if="type === 'text'" :style="colorStyle">
+    <div v-if="type === 'text'" :style="typographyStyle">
       <span>{{ child.value }}</span>
     </div>
-    <div v-else-if="type === 'link'" class="link-text" :style="colorStyle">
+    <div v-else-if="type === 'link'" class="link-text" :style="typographyStyle">
       <a :href="child.URL" target="_blank">{{ child.value }}</a>
     </div>
   </div>
@@ -22,16 +22,14 @@ export default {
     },
   },
   computed: {
-    colorStyle() {
-      if (this.child.type === "text") {
-        return {
-          color: this.child.effectiveColor,
-        };
-      } else {
-        return {
-          color: this.child.color,
-        };
-      }
+    typographyStyle() {
+      const styles = this.child.effectiveStyles;
+      return {
+        color: styles.color,
+        fontFamily: styles.fontFamily,
+        fontWeight: styles.fontWeight,
+        fontSize: `${styles.fontSize}px`,
+      };
     },
   },
 };
