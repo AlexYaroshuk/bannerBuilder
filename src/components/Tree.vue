@@ -15,7 +15,6 @@
         dragging && draggedItemType === 'container' && dropIndicator === index
       "
       class="drop-indicator"
-      :style="dropIndicatorStyles"
     ></div>
     <li
       class="tree-item"
@@ -65,18 +64,13 @@
             hoveredContainerIndex === index
           "
           class="drop-indicator"
-          :style="dropIndicatorStyles"
         ></div>
         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
           <span class="material-icons">{{ iconMap[child.type] }}</span>
         </span>
         {{ child.value }}
       </li>
-      <div
-        v-if="isLastChildHovered(index)"
-        class="drop-indicator"
-        :style="dropIndicatorStyles"
-      ></div>
+      <div v-if="isLastChildHovered(index)" class="drop-indicator"></div>
     </div>
   </div>
 </template>

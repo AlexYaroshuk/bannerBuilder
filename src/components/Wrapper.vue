@@ -464,6 +464,10 @@ export default {
         from.index,
         1
       )[0];
+
+      // Update the parent reference
+      draggedChild.parentContainer = this.containers[containerIndex];
+
       this.containers[containerIndex].children.splice(
         index !== null
           ? index

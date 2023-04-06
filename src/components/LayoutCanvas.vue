@@ -357,7 +357,12 @@ export default {
     },
 
     handleWidgetDrop(container) {
-      this.$emit("handleWidgetDrop", { container, widget: this.draggedWidget });
+      if (this.isDraggingWidgetsElement) {
+        this.$emit("handleWidgetDrop", {
+          container,
+          widget: this.draggedWidget,
+        });
+      }
     },
 
     handleTreeDrop({ item, index, type, containerIndex }) {

@@ -18,18 +18,7 @@ export default {
     return {
       draggableElement: null,
       dragging: false,
-      offsetX: 0,
-      offsetY: 0,
     };
-  },
-
-  mounted() {
-    window.addEventListener("mousemove", this.moveElement);
-    window.addEventListener("mouseup", this.dragEnd);
-  },
-  beforeUnmount() {
-    window.removeEventListener("mousemove", this.moveElement);
-    window.removeEventListener("mouseup", this.dragEnd);
   },
 
   methods: {
