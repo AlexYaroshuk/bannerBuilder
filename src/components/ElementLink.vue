@@ -1,6 +1,8 @@
 <template>
-  <div class="element-text" :style="typographyStyle">
-    <span>{{ child.value }}</span>
+  <div class="element-link">
+    <a :href="child.URL" target="_blank" :style="typographyStyle">
+      {{ child.value }}
+    </a>
   </div>
 </template>
 
@@ -17,11 +19,17 @@ export default {
       const styles = this.child.getEffectiveStyles();
       return {
         color: styles.color,
-        fontFamily: styles.fontFamily,
+        /*        fontFamily: styles.fontFamily,
         fontWeight: styles.fontWeight,
-        fontSize: `${styles.fontSize}px`,
+        fontSize: `${styles.fontSize}px`, */
       };
     },
   },
 };
 </script>
+
+<style scoped>
+/* .element-link a {
+  color: inherit;
+} */
+</style>

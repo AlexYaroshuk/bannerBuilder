@@ -65,6 +65,12 @@
         @contextmenu.prevent="
           showContextMenu($event, container), selectItem(container)
         "
+        @onContextMenu="
+          ($event, child) => {
+            showContextMenu($event, child);
+            selectItem(child);
+          }
+        "
         @item-hover="hoverItem"
         @widget-drop="handleWidgetDrop"
         @select-item="selectItem"
@@ -138,6 +144,10 @@ export default {
     isDraggingWidgetsElement: {
       type: Boolean,
       required: true,
+    },
+    draggedWidget: {
+      type: Object,
+      required: false,
     },
   },
 
@@ -353,7 +363,12 @@ export default {
     },
 
     handleWidgetDrop(container) {
-      this.$emit("handleWidgetDrop", container);
+      if (this.isDraggingWidgetsElement) {
+        this.$emit("handleWidgetDrop", {
+          container,
+          widget: this.draggedWidget,
+        });
+      }
     },
 
     handleTreeDrop({ item, index, type, containerIndex }) {

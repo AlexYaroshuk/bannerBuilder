@@ -1,12 +1,28 @@
 <template>
   <div class="wrapper" ref="wrapper">
-    <LayoutCanvas :containers="containers" :isDraggingAssetsElement="isDraggingAssetsElement"
-      :isDraggingWidgetsElement="isDraggingWidgetsElement" @addNewContainer="addNewContainer"
-      @delete-container="deleteContainer" @handleContainerDrop="handleContainerDrop($event)"
-      @handleWidgetDrop="handleWidgetDrop($event)" @updateDraggedElement="updateDraggedElement" @select-item="selectItem"
-      @hover-item="hoverItem" ref="layoutcanvas" />
-    <Properties :selectedItem="selectedItem" @reset-style="onResetStyle" @set-typography-color="onUpdateTypographyColor"
-      @set-bg-color="onUpdateBGColor" ref="properties" />
+    <LayoutCanvas
+      :containers="containers"
+      :isDraggingAssetsElement="isDraggingAssetsElement"
+      :isDraggingWidgetsElement="isDraggingWidgetsElement"
+      :draggedWidget="draggedWidget"
+      @addNewContainer="addNewContainer"
+      @delete-container="deleteContainer"
+      @handleContainerDrop="handleContainerDrop($event)"
+      @handleWidgetDrop="handleWidgetDrop($event.container, $event.widget)"
+      @updateDraggedElement="updateDraggedElement"
+      @select-item="selectItem"
+      @hover-item="hoverItem"
+      ref="layoutcanvas"
+    />
+    <Properties
+      :selectedItem="selectedItem"
+      @reset-style="onResetStyle"
+      @set-typography-color="onUpdateTypographyColor"
+      @set-typography-fontsize="onUpdateTypographyFontsize"
+      @set-typography-fontfamily="onUpdateTypographyFontfamily"
+      @set-bg-color="onUpdateBGColor"
+      ref="properties"
+    />
 
     <LeftSidebar :viewModel="this.viewModel" :containers="containers" :selected-item="selectedItem"
       @contextmenu="showContextMenu" @dehover="dehoverAll" @drag-start="
@@ -20,20 +36,33 @@
           $event.event,
           'tree'
         )
-      " @element-drag-start="
-  handleDragStart(
-    { item: $event.item, index: $event.index, type: $event.type },
-    $event.event,
-    'assets'
-  )
-" @widget-drag-start="
-  handleDragStart(
-    { item: $event.item, index: $event.index, type: $event.type },
-    $event.event,
-    'widgets'
-  )
-" @drop="handleTreeDrop" @element-drag-end="handleDragEnd" @hover-item="hoverItem" @select-item="selectItem"
-      @tree-dehover="dehoverAll" ref="leftsidebar" />
+      "
+      @element-drag-start="
+        handleDragStart(
+          { item: $event.item, index: $event.index, type: $event.type },
+          $event.event,
+          'assets'
+        )
+      "
+      @widget-drag-start="
+        handleDragStart(
+          {
+            item: $event.item,
+            index: $event.index,
+            type: $event.type,
+            containerIndex,
+          },
+          $event,
+          'widgets'
+        )
+      "
+      @drop="handleTreeDrop"
+      @element-drag-end="handleDragEnd"
+      @hover-item="hoverItem"
+      @select-item="selectItem"
+      @tree-dehover="dehoverAll"
+      ref="leftsidebar"
+    />
   </div>
   <div class="context-menu" :style="{
     top: contextMenu.top,
@@ -52,7 +81,7 @@ import ElementContainer from "./ElementContainer.vue";
 import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
-import newContainerMixin from "../mixins/newContainerMixin";
+import newContainerMixin from "../mixins/elementTemplates";
 import appSetup from "../mixins/appSetup";
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
@@ -82,10 +111,10 @@ export default {
       isDraggingAssetsElement: false,
       isDraggingWidgetsElement: false,
       dragSource: null,
+      draggedWidget: null,
 
       hoverIndex: null,
       draggedContainerIndex: null,
-      originalContainerIndex: null,
 
       //context
       contextMenu: {
@@ -153,7 +182,11 @@ export default {
 
     handleDeleteKeyPress(event) {
       if (event.key === "Delete") {
-        this.deleteContainer();
+        if (this.selectedItem.type != "container") {
+          this.deleteChild();
+        } else {
+          this.deleteContainer();
+        }
       }
     },
 
@@ -233,7 +266,6 @@ export default {
       this.dragSource = source;
 
       this.draggedContainerIndex = index;
-      this.originalContainerIndex = index;
 
       this.draggedElement = { item, index, type, containerIndex };
 
@@ -247,7 +279,6 @@ export default {
       this.draggedElement = { item, index, type, containerIndex };
       if (type === "container") {
         this.draggedContainerIndex = index;
-        this.originalContainerIndex = index;
       }
       this.draggedElement = { item, index, type, containerIndex };
 
@@ -258,6 +289,32 @@ export default {
       if (source === "main") {
         // Remove the dragged container
         containerElement = event.target.closest(".container");
+
+        // Create a clone of the container element
+        const floatingContainer = containerElement.cloneNode(true);
+        floatingContainer.classList.add("floating-container");
+
+        // Remove default drag ghost image
+        const dragImage = new Image();
+        dragImage.src =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E";
+        event.dataTransfer.setDragImage(dragImage, 0, 0);
+
+        const rect = containerElement.getBoundingClientRect();
+        const halfWidth = rect.width / 2;
+        const halfHeight = rect.height / 2;
+
+        // Set the initial position and append it to the body
+        floatingContainer.style.left = `${event.clientX - halfWidth}px`;
+        floatingContainer.style.top = `${event.clientY - halfHeight}px`;
+        document.body.appendChild(floatingContainer);
+
+        // Assign the floating container
+        this.floatingContainer = floatingContainer;
+
+        requestAnimationFrame(() => {
+          containerElement.style.display = "none";
+        });
       }
 
       if (source === "main" || "tree") {
@@ -268,39 +325,15 @@ export default {
       }
       if (source === "widgets") {
         this.isDraggingWidgetsElement = true;
+        this.draggedWidget = event.widget;
       }
 
       if (!containerElement) return;
-
-      // Create a clone of the container element
-      const floatingContainer = containerElement.cloneNode(true);
-      floatingContainer.classList.add("floating-container");
-
-      // Remove default drag ghost image
-      const dragImage = new Image();
-      dragImage.src =
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E";
-      event.dataTransfer.setDragImage(dragImage, 0, 0);
-
-      const rect = containerElement.getBoundingClientRect();
-      const halfWidth = rect.width / 2;
-      const halfHeight = rect.height / 2;
-
-      // Set the initial position and append it to the body
-      floatingContainer.style.left = `${event.clientX - halfWidth}px`;
-      floatingContainer.style.top = `${event.clientY - halfHeight}px`;
-      document.body.appendChild(floatingContainer);
-
-      // Assign the floating container
-      this.floatingContainer = floatingContainer;
-
-      requestAnimationFrame(() => {
-        containerElement.style.display = "none";
-      });
     },
 
     handleDragEnd() {
       this.draggedElement = null;
+      this.draggedWidget = null;
       this.isDraggingExistingElement = false;
       this.isDraggingAssetsElement = false;
       this.isDraggingWidgetsElement = false;
@@ -345,8 +378,6 @@ export default {
       } else {
         this.moveExistingContainer(containerIndex, draggedContainerIndex);
       }
-
-      this.originalContainerIndex = null;
     },
     handleTreeDrop({ item, index, type, containerIndex }) {
       if (!this.draggedElement) return;
@@ -355,7 +386,7 @@ export default {
 
       // Handle container drag and drop
       if (from.type === "container" && type === "container") {
-        this.moveExistingContainer(index, true);
+        this.moveExistingContainer(index, this.draggedContainerIndex, true);
       }
       // Handle child drag and drop within the same container
       else if (
@@ -391,7 +422,9 @@ export default {
     },
 
     addNewContainer(containerIndex) {
-      const newContainer = this.createNewContainer(this.containers.length);
+      const newContainer = this.createNewElementContainer(
+        this.containers.length
+      );
       this.containers.splice(containerIndex, 0, newContainer);
     },
 
@@ -400,16 +433,20 @@ export default {
       draggedContainerIndex,
       fromTree = false
     ) {
-      // const draggedContainer = this.containers.splice(draggedContainerIndex, 1)[0];
-      draggedContainerIndex = this.draggedContainerIndex;
-      [this.containers[targetIndex], this.containers[draggedContainerIndex]] = [this.containers[draggedContainerIndex], this.containers[targetIndex]];
+      // Check if the targetIndex is different from draggedContainerIndex
+      if (targetIndex !== draggedContainerIndex) {
+        const draggedContainer = this.containers.splice(
+          draggedContainerIndex,
+          1
+        )[0];
 
-      // if (!fromTree && targetIndex > this.originalContainerIndex) {
-      //   targetIndex--;
-      // }
-      // this.containers.splice(targetIndex, 0, draggedContainer);
+        if (!fromTree && targetIndex > draggedContainerIndex) {
+          targetIndex--;
+        }
+
+        this.containers.splice(targetIndex, 0, draggedContainer);
+      }
     },
-
     moveChildWithinContainer(from, index, containerIndex) {
       const draggedChild = this.containers[containerIndex].children.splice(
         from.index,
@@ -429,6 +466,10 @@ export default {
         from.index,
         1
       )[0];
+
+      // Update the parent reference
+      draggedChild.parentContainer = this.containers[containerIndex];
+
       this.containers[containerIndex].children.splice(
         index !== null
           ? index
@@ -447,12 +488,22 @@ export default {
     },
 
     // create a new child and add it to container
-    handleWidgetDrop(container) {
-      const name = "New Text Element";
-      const value = "New text";
-      const newTextElement = this.addTextElement(container, name, value);
-      this.selectItem(newTextElement);
+    handleWidgetDrop(container, widget) {
+      const newElement = this.createNewElement(container, widget.type);
+      this.selectItem(newElement);
       this.isDraggingWidgetsElement = false;
+      this.draggedWidget = null;
+    },
+
+    // delete a child
+
+    deleteChild() {
+      this.containers.forEach((container) => {
+        container.children = container.children.filter(
+          (child) => !child.isSelected
+        );
+      });
+      this.contextMenu.isVisible = false;
     },
 
     //
@@ -478,6 +529,18 @@ export default {
     onUpdateTypographyColor({ item, color }) {
       this.$nextTick(() => {
         item.color = color;
+      });
+    },
+    onUpdateTypographyFontsize({ item, size }) {
+      console.log(item, size);
+      this.$nextTick(() => {
+        item.fontSize = size;
+      });
+    },
+    onUpdateTypographyFontfamily({ item, family }) {
+      console.log(item, family);
+      this.$nextTick(() => {
+        item.fontFamily = family;
       });
     },
   },

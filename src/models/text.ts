@@ -1,24 +1,23 @@
+import { Container } from "./container";
 import { Element } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
-class ElementText extends Element {
+class Text extends Element {
 
   get effectiveColor(): string | null {
     // Return this ElementText's color if it's defined, otherwise return its parent's color
     return this.color || (this.parentContainer && this.parentContainer.color) || null;
   }
 
-  name: string;
   text: string;
   isSelected: boolean;
   isHovered: boolean;
 
-  constructor({ name, text }
-    : { name: string, text: string }) {
+  constructor({ name, text, color = 'black', backgroundColor = 'transparent', borderColor = 'transparent', parentContainer = null }
+    : { name: string, text: string, backgroundColor?: string, color?: string, borderColor?: string, parentContainer?: Container | null }) {
 
-    super({ name: name });
+    super({ name: name, backgroundColor: backgroundColor, color: color, borderColor: borderColor, parentContainer: parentContainer });
 
-    this.name = name;
     this.text = text;
     this.isSelected = false;
     this.isHovered = false;
@@ -41,4 +40,4 @@ class ElementText extends Element {
   }
 }
 
-export { ElementText }
+export { Text }

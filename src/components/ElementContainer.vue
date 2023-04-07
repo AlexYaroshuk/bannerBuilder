@@ -26,7 +26,7 @@
     @drop="handleWidgetDrop(container)"
   >
     <div class="name" v-if="container.isSelected">
-      {{ container.containerName }}
+      {{ container.name }}
     </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
@@ -36,16 +36,21 @@
           'child-item--hovered': child.isHovered,
         }"
         v-for="(child, index) in container.children"
-        :key="child"
+        :key="index"
         :data-key="index"
         @click.stop="selectItem(child)"
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
         @mouseover.stop="handleItemHover(child)"
       >
         <ElementText
-          v-if="child.type && child.type === 'text'"
+          v-if="child && child.type === 'text'"
+          style="padding: 4px"
           :child="child"
-          :text="child.value"
+        />
+        <ElementLink
+          v-if="child && child.type === 'link'"
+          style="padding: 4px"
+          :child="child"
         />
       </div>
       <div
@@ -58,6 +63,7 @@
 
 <script>
 import ElementText from "./ElementText.vue";
+import ElementLink from "./ElementLink.vue";
 
 export default {
   props: {
@@ -77,10 +83,16 @@ export default {
     handleWidgetDrop(container) {
       this.$emit("widget-drop", container);
     },
+    onContextMenu(event, type, item) {
+      event.preventDefault();
+      this.$emit("context-menu", event, type, item);
+      this.$emit("select-item", item); // Add this line
+    },
   },
 
   components: {
     ElementText: ElementText,
+    ElementLink: ElementLink,
   },
 };
 </script>

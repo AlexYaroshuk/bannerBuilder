@@ -1,28 +1,23 @@
 import { Element } from "@/models/element";
 
-class ElementContainer extends Element {
+class Container extends Element {
     isHovered: boolean;
     isSelected: boolean;
     isWidgetDropzonesShown: boolean;
     children: Element[];
-    backgroundColor: string;
-    borderColor: string;
     borderRadius: number;
     borderWidth: number;
     BGImage: string | null;
 
-    constructor({ name, children }
-        : { name: string, children: Element[] }) {
+    constructor({ name, children, color = 'black', backgroundColor = 'teal', borderColor = 'transparent', parentContainer = null }
+        : { name: string, children: Element[], backgroundColor?: string, color?: string, borderColor?: string, parentContainer?: Container | null }) {
 
-        super({ name: name });
+        super({ name: name, backgroundColor: backgroundColor, color: color, borderColor: borderColor, parentContainer: parentContainer });
 
         this.children = children;
         this.isHovered = false;
         this.isSelected = false;
         this.isWidgetDropzonesShown = false;
-        this.backgroundColor = "teal";
-        this.color = "black"
-        this.borderColor = "transparent";
         this.borderRadius = 0;
         this.borderWidth = 0;
         this.BGImage = null;
@@ -50,4 +45,4 @@ class ElementContainer extends Element {
     }
 }
 
-export { ElementContainer }
+export { Container }

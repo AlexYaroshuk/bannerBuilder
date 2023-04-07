@@ -3,12 +3,12 @@
 </template>
 
 <script lang="ts">
-import { ElementText } from '@/models/text';
+import { Text } from '@/models/text';
 
 export default {
     props: {
         element: {
-            type: ElementText,
+            type: Text,
         },
     },
     methods: {

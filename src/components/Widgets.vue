@@ -1,16 +1,19 @@
 <template>
-  <div class="widgets-container">
-    <div
-      class="draggable-widget"
-      draggable="true"
-      @dragstart="dragStart($event)"
-      @dragend="dragEnd"
-    >
-      <i class="material-icons icon">text_format</i>
-      <span class="text">Text</span>
+  <div class="widgets-wrapper">
+    <div v-for="widget in widgets" class="widgets-container">
+      <div
+        class="draggable-widget"
+        draggable="true"
+        @dragstart="dragStart($event, widget)"
+        @dragend="dragEnd"
+      >
+        <i class="material-icons icon">{{ widget.icon }}</i>
+        <span class="text">{{ widget.label }}</span>
+      </div>
     </div>
   </div>
 </template>
+
 <script>
 export default {
   props: {},
@@ -20,6 +23,10 @@ export default {
       dragging: false,
       offsetX: 0,
       offsetY: 0,
+      widgets: [
+        { type: "text", label: "Text", icon: "text_format" },
+        { type: "link", label: "Link", icon: "link" },
+      ],
     };
   },
 
@@ -35,7 +42,7 @@ export default {
   methods: {
     //control
 
-    dragStart(event) {
+    dragStart(event, widget) {
       this.dragging = true;
       this.draggableElement = event.target.closest(".draggable-widget");
       this.originalPosition = {
@@ -49,7 +56,10 @@ export default {
       this.offsetY =
         event.clientY - this.draggableElement.getBoundingClientRect().top;
 
-      this.$emit("widget-drag-start", this.draggableElement);
+      this.$emit("widget-drag-start", {
+        element: this.draggableElement,
+        widget,
+      });
     },
 
     dragEnd(event) {
@@ -66,32 +76,10 @@ export default {
 </script>
 
 <style scoped>
-.sidebar {
-  color: black;
-  background-color: #f5f5f5;
-  padding: 1rem;
-  width: 20%;
-  float: left;
-  transition: all 0.2s ease-in-out;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  overflow-y: scroll;
-  z-index: 2;
-}
-
-.hidden {
-  left: -20%;
-}
-
-.sidebar-button {
-  padding: 1rem;
-  float: left;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
+.widgets-wrapper {
+  display: flex;
+  justify-content: start;
+  flex-wrap: wrap;
 }
 
 .draggable-widget {

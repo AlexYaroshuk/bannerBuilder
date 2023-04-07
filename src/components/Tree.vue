@@ -21,29 +21,42 @@
       <span class="tree-item__icon-wrapper">
         <span class="material-icons">check_box_outline_blank</span>
       </span>
-      {{ container.containerName }}
+      {{ container.name }}
     </li>
     <div v-if="container.children">
-      <li v-for="(child, childIndex) in container.children" :key="'child-' + childIndex" class="tree-item" :class="{
-        'tree-item--selected': child.isSelected,
-        'tree-item--hovered': child.isHovered,
-        [childSelectedClass(container)]: true,
-      }" draggable="true" @click.stop="selectItem(child)"
-        @dragstart="handleDragStart(child, childIndex, 'child', index)" @dragover.prevent="
+      <li
+        v-for="(child, childIndex) in container.children"
+        :key="'child-' + childIndex"
+        class="tree-item"
+        :class="{
+          'tree-item--selected': child.isSelected,
+          'tree-item--hovered': child.isHovered,
+          [childSelectedClass(container)]: true,
+        }"
+        draggable="true"
+        @click.stop="selectItem(child)"
+        @dragstart="handleDragStart(child, childIndex, 'child', index)"
+        @dragover.prevent="
           handleDragOver($event, child, childIndex, 'child', index)
-        " @drop="handleDrop(child, childIndex, 'child', index)" @mouseover="handleItemHover(child)">
-        <div v-if="
-          dragging &&
-          draggedItemType === 'child' &&
-          dropIndicator === childIndex &&
-          hoveredContainerIndex === index
-        " class="drop-indicator" :style="dropIndicatorStyles"></div>
-        <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
-          <span class="material-icons">text_format</span>
-        </span>
+        "
+        @drop="handleDrop(child, childIndex, 'child', index)"
+        @mouseover="handleItemHover(child)"
+      >
+        <div
+          v-if="
+            dragging &&
+            draggedItemType === 'child' &&
+            dropIndicator === childIndex &&
+            hoveredContainerIndex === index
+          "
+          class="drop-indicator"
+        ></div>
+        <!-- <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
+          <span class="material-icons">{{ iconMap[child.type] }}</span>
+        </span> -->
         {{ child.value }}
       </li>
-      <div v-if="isLastChildHovered(index)" class="drop-indicator" :style="dropIndicatorStyles"></div>
+      <div v-if="isLastChildHovered(index)" class="drop-indicator"></div>
     </div>
   </div>
 </template>

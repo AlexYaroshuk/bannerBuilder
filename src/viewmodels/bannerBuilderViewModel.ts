@@ -1,40 +1,36 @@
-import { Element } from "@/models/element";
-import { ElementText } from "@/models/text";
-import { ElementContainer } from "@/models/container";
+import { Text } from "@/models/text";
+import { Container } from "@/models/container";
 
 class BannerBuilderViewModel {
-    rootContainer: ElementContainer;
+    rootContainer: Container;
 
     constructor() {
-        this.rootContainer = new ElementContainer({
+        this.rootContainer = new Container({
             name: "Root", children: [
-                new ElementContainer({
+                new Container({
                     name: 'Container 1', children: [
-                        new ElementText({ name: "Text 1", text: "foo" }),
-                        new ElementText({ name: "Text 2", text: "bar" }),
-                        new ElementText({ name: "Text 3", text: "sac" }),
-                        new ElementContainer({
+                        new Text({ name: "Text 1", text: "foo" }),
+                        new Text({ name: "Text 2", text: "bar" }),
+                        new Text({ name: "Text 3", text: "sac" }),
+                        new Container({
                             name: 'Container 1-1', children: [
-                                new ElementText({ name: "Text 1-1", text: "das" }),
-                                new ElementText({ name: "Text 1-2", text: "mor" }),
+                                new Text({ name: "Text 1-1", text: "das" }),
+                                new Text({ name: "Text 1-2", text: "mor" }),
                             ]
                         })
                     ]
                 }),
-                new ElementContainer({
+                new Container({
                     name: 'Container 2', children: [
-                        new ElementText({ name: "Text 3", text: "baz" }),
-                        new ElementText({ name: "Text 4", text: "wee" }),
+                        new Text({ name: "Text 3", text: "baz" }),
+                        new Text({ name: "Text 4", text: "wee" }),
                     ]
                 }),
             ]
         });
-
-        // this.rootContainer.getChildren()[0].backgroundColor = "aliceblue";
-        // this.rootContainer.getChildren()[1].backgroundColor = "lightgreen";
     }
 
-    getRootContainer(): ElementContainer {
+    getRootContainer(): Container {
         return this.rootContainer;
     }
 }

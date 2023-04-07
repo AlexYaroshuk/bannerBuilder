@@ -1,18 +1,20 @@
-import { ElementContainer } from "@/models/container";
+import { Container } from "@/models/container";
 
 abstract class Element {
   name: string
   color: string;
   backgroundColor: string;
-  parentContainer: ElementContainer | null;
+  borderColor: string;
+  parentContainer: Container | null;
 
-  constructor({ name, color='black', backgroundColor='white' }
-    : { name: string, color?: string, backgroundColor?: string }) {
-    
+  constructor({ name, color = 'black', backgroundColor = 'white', borderColor = 'transparent', parentContainer = null }
+    : { name: string, color?: string, backgroundColor?: string, borderColor?: string, parentContainer?: Container | null }) {
+
     this.name = name;
     this.color = color;
     this.backgroundColor = backgroundColor;
-    this.parentContainer = null;
+    this.borderColor = borderColor;
+    this.parentContainer = parentContainer;
   }
 
   getName(): string {

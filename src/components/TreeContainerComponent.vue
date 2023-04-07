@@ -11,23 +11,23 @@
 import TreeTextComponent from './TreeTextComponent.vue';
 import TreeContainerComponent from './TreeContainerComponent.vue';
 import { Element } from '@/models/element';
-import { ElementContainer } from '@/models/container';
-import { ElementText } from '@/models/text';
+import { Container } from '@/models/container';
+import { Text } from '@/models/text';
 
 export default {
     props: {
         element: {
-            type: ElementContainer,
+            type: Container,
         },
     },
 
     methods: {
         getComponent(element: Element) {
-            if (element instanceof ElementContainer) {
+            if (element instanceof Container) {
                 return TreeContainerComponent;
             }
 
-            if (element instanceof ElementText) {
+            if (element instanceof Text) {
                 return TreeTextComponent;
             }
         },
