@@ -30,6 +30,10 @@ export default {
             if (element instanceof ElementText) {
                 return TreeTextComponent;
             }
+        },
+
+        onHover() {
+            console.log(this.element?.getName());
         }
     }
 };
@@ -40,8 +44,7 @@ export default {
     cursor: default;
 }
 
-:hover {
-    border-style: solid;
-    border-color: blue;
-}
+/* :hover {
+    border: 2px solid hsl(212, 100%, 54%);
+} */
 </style>

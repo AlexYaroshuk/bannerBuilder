@@ -11,11 +11,17 @@ export default {
             type: ElementText,
         },
     },
+    methods: {
+    }
 };
 </script>
 
 <style scoped>
 .tree-text-component {
     cursor: default;
+}
+
+:hover {
+    border: 2px solid hsl(212, 100%, 54%);
 }
 </style>

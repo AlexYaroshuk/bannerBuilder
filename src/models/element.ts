@@ -23,7 +23,7 @@ abstract class Element {
     return this.color;
   }
 
-  getBackgroundColot(): string | null {
+  getBackgroundColor(): string | null {
     return this.backgroundColor;
   }
 

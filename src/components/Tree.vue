@@ -4,10 +4,10 @@
     <br />
     When you add a component, you'll see it here.
   </div>
-  <div v-for="(element, index) in this.viewModel.getRootContainer().getChildren()" :key="'container-' + index" class="tree-item-wrapper"
+  <div v-for="(container, index) in this.containers" :key="'container-' + index" class="tree-item-wrapper"
     @mouseleave="handleDehover">
-    <TreeContainerComponent :element="element"/>
-    <!-- <div v-if="
+    <!-- <TreeContainerComponent :element="element"/> -->
+    <div v-if="
       dragging && draggedItemType === 'container' && dropIndicator === index
     " class="drop-indicator" :style="dropIndicatorStyles"></div>
     <li class="tree-item" :class="{
@@ -44,7 +44,7 @@
         {{ child.value }}
       </li>
       <div v-if="isLastChildHovered(index)" class="drop-indicator" :style="dropIndicatorStyles"></div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -57,6 +57,10 @@ export default {
         viewModel: {
             type: BannerBuilderViewModel,
             default: null,
+        },
+        containers: {
+          type: Array,
+          default: null,
         },
         selectedItem: {
             type: Object,
