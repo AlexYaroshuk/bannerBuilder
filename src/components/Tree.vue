@@ -35,7 +35,7 @@
       <span class="tree-item__icon-wrapper">
         <span class="material-icons">check_box_outline_blank</span>
       </span>
-      {{ container.containerName }}
+      {{ container.name }}
     </li>
     <div v-if="container.children">
       <li

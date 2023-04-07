@@ -1,9 +1,18 @@
-abstract class CustomElement {
+interface Typography {
+  color: string | null;
+  fontFamily: string | null;
+  fontWeight: number | null;
+  fontSize: number | null;
+}
+
+abstract class CustomElement implements Typography {
   color: string | null;
   fontFamily: string | null;
   fontWeight: number | null;
   fontSize: number | null;
   parentContainer: ElementContainer | null;
+  isSelected: boolean;
+  isHovered: boolean;
 
   constructor() {
     this.color = null;
@@ -11,19 +20,29 @@ abstract class CustomElement {
     this.fontWeight = null;
     this.fontSize = null;
     this.parentContainer = null;
+    this.isSelected = false;
+    this.isHovered = false;
   }
 
   abstract addChild(child: CustomElement): void;
   abstract removeChild(child: CustomElement): void;
   abstract get isLeaf(): boolean;
+  abstract readonly type: string;
+
+  getEffectiveStyles(): Typography {
+    const parent = this.parentContainer;
+    return {
+      color: this.color || (parent && parent.color) || null,
+      fontFamily: this.fontFamily || (parent && parent.fontFamily) || null,
+      fontWeight: this.fontWeight || (parent && parent.fontWeight) || null,
+      fontSize: this.fontSize || (parent && parent.fontSize) || null,
+    };
+  }
 }
 
 class ElementContainer extends CustomElement {
-  containerName: string;
-  isHovered: boolean;
-  isSelected: boolean;
-  isWidgetDropzonesShown: boolean;
-  type: string;
+  name: string;
+  readonly type: string;
   children: CustomElement[];
   backgroundColor: string;
   borderColor: string;
@@ -31,17 +50,13 @@ class ElementContainer extends CustomElement {
   borderWidth: number;
   BGImage: string | null;
 
-
-  constructor(containerName: string) {
+  constructor(name: string) {
     super();
-    this.containerName = containerName;
-    this.isHovered = false;
-    this.isSelected = false;
-    this.isWidgetDropzonesShown = false;
+    this.name = name;
     this.type = "container";
     this.children = [];
     this.backgroundColor = "teal";
-    this.color = "black"
+    this.color = "black";
     this.fontFamily = "Arial, sans-serif";
     this.fontWeight = 400;
     this.fontSize = 16;
@@ -49,7 +64,6 @@ class ElementContainer extends CustomElement {
     this.borderRadius = 0;
     this.borderWidth = 0;
     this.BGImage = null;
-
   }
 
   addChild(child: CustomElement): void {
@@ -69,30 +83,16 @@ class ElementContainer extends CustomElement {
   }
 }
 
-abstract class ElementLeaf extends CustomElement {
+class ElementText extends CustomElement {
   name: string;
   value: string;
-  type: string;
-  isSelected: boolean;
-  isHovered: boolean;
+  readonly type: string;
 
-  constructor(type: string, name: string = "New Leaf Element", value: string = "New value") {
+  constructor(name: string = "New Text Element", value: string = "New text") {
     super();
     this.name = name;
     this.value = value;
-    this.type = type;
-    this.isSelected = false;
-    this.isHovered = false;
-  }
-
-  get effectiveStyles() {
-    const parent = this.parentContainer;
-    return {
-      color: this.color || (parent && parent.color) || null,
-      fontFamily: this.fontFamily || (parent && parent.fontFamily) || null,
-      fontWeight: this.fontWeight || (parent && parent.fontWeight) || null,
-      fontSize: this.fontSize || (parent && parent.fontSize) || null,
-    };
+    this.type = "text";
   }
 
   addChild(child: CustomElement): void {
@@ -108,30 +108,38 @@ abstract class ElementLeaf extends CustomElement {
   }
 }
 
-class ElementText extends ElementLeaf {
-  constructor(name: string = "New Text Element", value: string = "New text") {
-    super("text", name, value);
-  }
-
-  /*   get effectiveColor(): string | null {
-      // Return this ElementText's color if it's defined, otherwise return its parent's color
-      return this.color || (this.parentContainer && this.parentContainer.color) || null;
-    } */
-}
-
-class ElementLink extends ElementLeaf {
+class ElementLink extends CustomElement {
+  name: string;
+  value: string;
+  readonly type: string;
+  color: string;
   hover: string;
   visited: string;
   visitedHover: string;
   URL: string;
 
   constructor(name: string = "New Link Element", value: string = "New link", URL: string = "https://example.com") {
-    super("link", name, value);
+    super();
+    this.name = name;
+    this.value = value;
+    this.type = "link";
     this.color = "blue";
     this.hover = "";
     this.visited = "";
     this.visitedHover = "";
     this.URL = URL;
+  }
+
+  addChild(child: CustomElement): void {
+    throw new InvalidOperationError("Cannot add a child to a leaf element.");
+  }
+
+  removeChild(child: CustomElement): void {
+    throw new InvalidOperationError("Cannot remove a child from a leaf element.");
+  }
+
+  get isLeaf(): boolean {
+    return true;
   }
 }
 
@@ -142,4 +150,4 @@ class InvalidOperationError extends Error {
   }
 }
 
-export { CustomElement, ElementContainer, ElementText, ElementLink, ElementLeaf, InvalidOperationError };
+export { CustomElement, ElementContainer, ElementText, ElementLink, InvalidOperationError };

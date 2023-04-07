@@ -55,7 +55,13 @@
         </div>
       </div>
       <!-- hybrid settings -->
-      <div class="popup-content" v-if="selectedItem">
+      <h3 v-if="selectedItem && selectedItem.type === 'link'">
+        Link styles are WIP
+      </h3>
+      <div
+        class="popup-content"
+        v-if="selectedItem && selectedItem.type != 'link'"
+      >
         <h3 @click="expandableGroups.typography = !expandableGroups.typography">
           Typography ({{ selectedItem.type }})
           <i class="material-icons">
@@ -77,8 +83,7 @@
                 {{
                   selectedItem.fontSize
                     ? "Custom font size"
-                    : "Inheriting from " +
-                      selectedItem.parentContainer.containerName
+                    : "Inheriting from " + selectedItem.parentContainer.name
                 }}
               </p>
               <button
@@ -113,8 +118,7 @@
                 {{
                   selectedItem.fontFamily
                     ? "Custom font family"
-                    : "Inheriting from " +
-                      selectedItem.parentContainer.containerName
+                    : "Inheriting from " + selectedItem.parentContainer.name
                 }}
               </p>
               <button
@@ -150,8 +154,7 @@
                 {{
                   selectedItem.color
                     ? "Custom color"
-                    : "Inheriting from " +
-                      selectedItem.parentContainer.containerName
+                    : "Inheriting from " + selectedItem.parentContainer.name
                 }}
               </p>
               <button

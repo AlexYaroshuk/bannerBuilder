@@ -26,7 +26,7 @@
     @drop="handleWidgetDrop(container)"
   >
     <div class="name" v-if="container.isSelected">
-      {{ container.containerName }}
+      {{ container.name }}
     </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
@@ -36,13 +36,22 @@
           'child-item--hovered': child.isHovered,
         }"
         v-for="(child, index) in container.children"
-        :key="child"
+        :key="index"
         :data-key="index"
         @click.stop="selectItem(child)"
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
         @mouseover.stop="handleItemHover(child)"
       >
-        <ElementLeaf style="padding: 4px" :child="child" :type="child.type" />
+        <ElementText
+          v-if="child && child.type === 'text'"
+          style="padding: 4px"
+          :child="child"
+        />
+        <ElementLink
+          v-if="child && child.type === 'link'"
+          style="padding: 4px"
+          :child="child"
+        />
       </div>
       <div
         class="widget-dropzone"
@@ -53,7 +62,8 @@
 </template>
 
 <script>
-import ElementLeaf from "./ElementLeaf.vue";
+import ElementText from "./ElementText.vue";
+import ElementLink from "./ElementLink.vue";
 
 export default {
   props: {
@@ -81,7 +91,8 @@ export default {
   },
 
   components: {
-    ElementLeaf: ElementLeaf,
+    ElementText: ElementText,
+    ElementLink: ElementLink,
   },
 };
 </script>
