@@ -15,14 +15,20 @@
 </template>
 
 <script>
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 export default {
-  props: {},
+  props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: null,
+    },
+  },
   data() {
     return {
-      draggableElement: null,
+      /*       draggableElement: null,
       dragging: false,
       offsetX: 0,
-      offsetY: 0,
+      offsetY: 0, */
       widgets: [
         { type: "text", label: "Text", icon: "text_format" },
         { type: "link", label: "Link", icon: "link" },
@@ -43,7 +49,7 @@ export default {
     //control
 
     dragStart(event, widget) {
-      this.dragging = true;
+      /*       this.dragging = true;
       this.draggableElement = event.target.closest(".draggable-widget");
       this.originalPosition = {
         position: this.draggableElement.style.position,
@@ -55,21 +61,11 @@ export default {
         event.clientX - this.draggableElement.getBoundingClientRect().left;
       this.offsetY =
         event.clientY - this.draggableElement.getBoundingClientRect().top;
-
-      this.$emit("widget-drag-start", {
-        element: this.draggableElement,
-        widget,
-      });
+ */
+      this.viewModel.widgetDragStart(widget);
     },
-
-    dragEnd(event) {
-      this.dragging = false;
-      if (this.draggableElement) {
-        this.draggableElement.style.position = this.originalPosition.position;
-        this.draggableElement.style.zIndex = this.originalPosition.zIndex;
-        this.draggableElement = null;
-      }
-      this.$emit("widget-drag-end");
+    dragEnd() {
+      this.viewModel.handleDragEnd();
     },
   },
 };

@@ -2,14 +2,11 @@
   <div class="wrapper" ref="wrapper">
     <LayoutCanvas
       :containers="containers"
-      :isDraggingAssetsElement="isDraggingAssetsElement"
-      :isDraggingWidgetsElement="isDraggingWidgetsElement"
-      :draggedWidget="draggedWidget"
-      @addNewContainer="addNewContainer"
+      :viewModel="this.viewModel"
+      @delete-key-press="deleteContainer"
       @delete-container="deleteContainer"
       @handleContainerDrop="handleContainerDrop($event)"
       @handleWidgetDrop="handleWidgetDrop($event.container, $event.widget)"
-      @updateDraggedElement="updateDraggedElement"
       @select-item="selectItem"
       @hover-item="hoverItem"
       ref="layoutcanvas"
@@ -24,8 +21,13 @@
       ref="properties"
     />
 
-    <LeftSidebar :viewModel="this.viewModel" :containers="containers" :selected-item="selectedItem"
-      @contextmenu="showContextMenu" @dehover="dehoverAll" @drag-start="
+    <LeftSidebar
+      :viewModel="this.viewModel"
+      :containers="containers"
+      :selected-item="selectedItem"
+      @contextmenu="showContextMenu"
+      @dehover="dehoverAll"
+      @drag-start="
         handleDragStart(
           {
             item: $event.item,
@@ -44,18 +46,6 @@
           'assets'
         )
       "
-      @widget-drag-start="
-        handleDragStart(
-          {
-            item: $event.item,
-            index: $event.index,
-            type: $event.type,
-            containerIndex,
-          },
-          $event,
-          'widgets'
-        )
-      "
       @drop="handleTreeDrop"
       @element-drag-end="handleDragEnd"
       @hover-item="hoverItem"
@@ -64,11 +54,14 @@
       ref="leftsidebar"
     />
   </div>
-  <div class="context-menu" :style="{
-    top: contextMenu.top,
-    left: contextMenu.left,
-    display: contextMenu.isVisible ? 'block' : 'none',
-  }">
+  <div
+    class="context-menu"
+    :style="{
+      top: contextMenu.top,
+      left: contextMenu.left,
+      display: contextMenu.isVisible ? 'block' : 'none',
+    }"
+  >
     <div class="context-menu-row" @click="deleteContainer">
       <span class="action">Delete</span>
       <span class="hotkey">Ctrl+D</span>
@@ -105,16 +98,6 @@ export default {
       selectedItem: null,
 
       //dragging
-      draggedElement: null,
-      floatingContainer: null,
-      isDraggingExistingElement: false,
-      isDraggingAssetsElement: false,
-      isDraggingWidgetsElement: false,
-      dragSource: null,
-      draggedWidget: null,
-
-      hoverIndex: null,
-      draggedContainerIndex: null,
 
       //context
       contextMenu: {
@@ -134,14 +117,13 @@ export default {
   },
 
   mounted() {
-    window.addEventListener("keydown", this.handleDeleteKeyPress);
+    /* window.addEventListener("keydown", this.handleDeleteKeyPress); */
     document.addEventListener("click", this.handleClickOutside);
-    console.log(this.viewModel);
   },
 
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
-    window.removeEventListener("keydown", this.handleDeleteKeyPress);
+    /* window.removeEventListener("keydown", this.handleDeleteKeyPress); */
   },
   methods: {
     // || UI CONTROL
@@ -180,7 +162,7 @@ export default {
       }
     },
 
-    handleDeleteKeyPress(event) {
+    /*     handleDeleteKeyPress(event) {
       if (event.key === "Delete") {
         if (this.selectedItem.type != "container") {
           this.deleteChild();
@@ -188,7 +170,7 @@ export default {
           this.deleteContainer();
         }
       }
-    },
+    }, */
 
     updateHoverIndex(index) {
       if (this.isDraggingExistingElement || this.isDraggingAssetsElement) {
@@ -249,9 +231,9 @@ export default {
 
       item.isHovered = true;
 
-      if (this.isDraggingWidgetsElement) {
+      /*       if (this.isDraggingWidgetsElement) {
         item.isWidgetDropzoneShown = true;
-      }
+      } */
     },
 
     //
@@ -367,18 +349,19 @@ export default {
     handleContainerDrop({
       event,
       containerIndex,
-      dragSource,
+
       draggedContainerIndex,
     }) {
       event.preventDefault();
-      if (!this.draggedElement) return;
+      if (!this.viewModel.draggedElement) return;
 
-      if (dragSource === "assets") {
+      if (this.viewModel.isDraggingAssetsElement) {
         this.addNewContainer(containerIndex);
-      } else {
+      } else if (this.viewModel.isDraggingExistingElement) {
         this.moveExistingContainer(containerIndex, draggedContainerIndex);
       }
     },
+
     handleTreeDrop({ item, index, type, containerIndex }) {
       if (!this.draggedElement) return;
 
@@ -489,10 +472,11 @@ export default {
 
     // create a new child and add it to container
     handleWidgetDrop(container, widget) {
-      const newElement = this.createNewElement(container, widget.type);
+      const newElement = this.createNewElement(
+        container,
+        this.viewModel.draggedElement.type
+      );
       this.selectItem(newElement);
-      this.isDraggingWidgetsElement = false;
-      this.draggedWidget = null;
     },
 
     // delete a child
@@ -532,13 +516,11 @@ export default {
       });
     },
     onUpdateTypographyFontsize({ item, size }) {
-      console.log(item, size);
       this.$nextTick(() => {
         item.fontSize = size;
       });
     },
     onUpdateTypographyFontfamily({ item, family }) {
-      console.log(item, family);
       this.$nextTick(() => {
         item.fontFamily = family;
       });

@@ -5,8 +5,13 @@
   <aside @click.stop :class="['sidebar', { hidden: !isVisible }]">
     <button @click="toggleVisibility">&lt; Hide</button>
     <div class="tab-bar">
-      <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
-        @click="activeTab = tab.name" @mousedown="startRipple($event)">
+      <button
+        v-for="(tab, index) in tabs"
+        :key="index"
+        :class="{ active: activeTab === tab.name }"
+        @click="activeTab = tab.name"
+        @mousedown="startRipple($event)"
+      >
         <i class="material-icons"> {{ tab.icon }}</i>
         <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
@@ -14,13 +19,26 @@
     </div>
 
     <div class="tab-content">
-      <Assets v-if="activeTab === 'assets'" @element-drag-start="emitElementDragStart($event)"
-        @element-drag-end="dragEnd" />
-      <Widgets v-if="activeTab === 'widgets'" @widget-drag-start="emitWidgetDragStart($event)"
-        @widget-drag-end="dragEnd" />
-      <Tree :viewModel="this.viewModel" :containers="containers" :selectedItem="selectedItem" @contextmenu="handleContextMenu"
-        @dehover="handleDehover" @drag-start="handleDragStart" @drop="handleDrop" @item-hover="handleItemHover"
-        @mouseleave="handleTreeDehover" @select-item="handleSelectItem" v-if="activeTab === 'layers'" />
+      <Assets
+        v-if="activeTab === 'assets'"
+        @element-drag-start="emitElementDragStart($event)"
+        @element-drag-end="dragEnd"
+        :viewModel="this.viewModel"
+      />
+      <Widgets v-if="activeTab === 'widgets'" :viewModel="this.viewModel" />
+      <Tree
+        :viewModel="this.viewModel"
+        :containers="containers"
+        :selectedItem="selectedItem"
+        @contextmenu="handleContextMenu"
+        @dehover="handleDehover"
+        @drag-start="handleDragStart"
+        @drop="handleDrop"
+        @item-hover="handleItemHover"
+        @mouseleave="handleTreeDehover"
+        @select-item="handleSelectItem"
+        v-if="activeTab === 'layers'"
+      />
     </div>
   </aside>
 </template>
@@ -31,12 +49,6 @@ import Widgets from "./Widgets.vue";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
 export default {
-  created() {
-    console.log('created');
-    console.log('lsb');
-    console.log(this.viewModel);
-    console.log('lsb');
-  },
   components: {
     Tree,
     Assets,
@@ -61,8 +73,7 @@ export default {
   emits: [
     "element-drag-start",
     "element-drag-end",
-    "widget-drag-start",
-    "widget-drag-end",
+
     "drag-start",
     "drop",
     "select-item",
@@ -106,9 +117,6 @@ export default {
     // internal control
     emitElementDragStart(eventData) {
       this.$emit("element-drag-start", eventData);
-    },
-    emitWidgetDragStart(eventData) {
-      this.$emit("widget-drag-start", eventData);
     },
 
     toggleVisibility() {

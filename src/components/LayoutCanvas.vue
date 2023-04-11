@@ -20,8 +20,8 @@
         'dropzone--hovered': dropzoneHovered,
       }"
       v-show="
-        (isDraggingExistingElement || isDraggingAssetsElement) &&
-        dragSource != 'tree' &&
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
         containers.length <= 1
       "
     >
@@ -44,23 +44,18 @@
           'dropzone--hovered': dropzoneHovered(index),
         }"
         v-show="
-          (isDraggingExistingElement || isDraggingAssetsElement) &&
-          dragSource != 'tree' &&
+          (this.viewModel.isDraggingExistingElement ||
+            this.viewModel.isDraggingAssetsElement) &&
           containers.length > 1 &&
-          draggedContainerIndex !== index
+          this.viewModel.draggedContainerIndex !== index
         "
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
 
       <ElementContainer
+        :viewModel="this.viewModel"
         :draggable="containers.length > 1"
-        :class="{
-          'container--dragging':
-            isDraggingExistingElement &&
-            draggedElement &&
-            draggedElement.index === index,
-        }"
         :container="container"
         @contextmenu.prevent="
           showContextMenu($event, container), selectItem(container)
@@ -84,8 +79,8 @@
         'dropzone--hovered': dropzoneHovered(containers.length),
       }"
       v-show="
-        (isDraggingExistingElement || isDraggingAssetsElement) &&
-        dragSource != 'tree' &&
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
         containers.length > 0
       "
     >
@@ -108,6 +103,8 @@
 </template>
 <script>
 import ElementContainer from "./ElementContainer.vue";
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
+
 export default {
   components: {
     ElementContainer: ElementContainer,
@@ -116,55 +113,34 @@ export default {
     "addNewContainer",
     "container-drop",
     "delete-container",
+    "delete-key-press",
     "handleClickOutside",
     "handleContainerDrop",
     "handleDeleteContainer",
     "handleDeleteKeyPress",
-    "handleDragEnd",
-    "handleDragStart",
+
     "handleWidgetDrop",
-    "hover-item",
-    "select-item",
+
     "showContextMenu",
-    "updateDraggedElement",
-    "update-floating-container",
+
     "updateHoverIndex",
     "widget-drop",
   ],
   props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: null,
+    },
+
     containers: {
       type: Array,
       default: () => [],
-    },
-
-    isDraggingAssetsElement: {
-      type: Boolean,
-      required: true,
-    },
-    isDraggingWidgetsElement: {
-      type: Boolean,
-      required: true,
-    },
-    draggedWidget: {
-      type: Object,
-      required: false,
     },
   },
 
   data() {
     return {
-      //selection
-
-      //dragging
-      draggedElement: null,
-      floatingContainer: null,
-      isDraggingExistingElement: false,
-
-      dragSource: null,
-
       hoverIndex: null,
-      draggedContainerIndex: null,
-      originalContainerIndex: null,
 
       //context
       contextMenu: {
@@ -178,23 +154,20 @@ export default {
 
   computed: {
     dropzoneHovered() {
-      if (this.isDraggingAssetsElement) {
-        this.dragSource = "assets";
-      }
-
       return (index) =>
-        (this.isDraggingExistingElement || this.isDraggingAssetsElement) &&
-        this.hoverIndex === index;
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
+        this.viewModel.hoverIndex === index;
     },
   },
 
   mounted() {
-    document.addEventListener("click", this.handleClickOutside);
+    /* document.addEventListener("click", this.handleClickOutside); */
     window.addEventListener("keydown", this.handleDeleteKeyPress);
   },
 
   beforeUnmount() {
-    document.removeEventListener("click", this.handleClickOutside);
+    /* document.removeEventListener("click", this.handleClickOutside); */
     window.removeEventListener("keydown", this.handleDeleteKeyPress);
   },
 
@@ -211,7 +184,6 @@ export default {
       this.contextMenu.left = event.clientX + "px";
       this.contextMenu.container = container;
     },
-
     handleDeleteContainer() {
       this.$emit("delete-container");
       this.contextMenu.isVisible = false;
@@ -223,29 +195,33 @@ export default {
       }
     },
 
-    handleClickOutside() {
+    /* handleClickOutside() {
       if (this.contextMenu.isVisible) {
         this.contextMenu.isVisible = false;
       }
-    },
+    }, */
 
     updateHoverIndex(index) {
-      if (this.isDraggingExistingElement || this.isDraggingAssetsElement) {
+      /* viewModel.updateHoverIndex(index, this.$emit); */
+
+      if (
+        this.viewModel.isDraggingExistingElement ||
+        this.viewModel.isDraggingAssetsElement
+      ) {
         if (
-          this.dragSource === "main" &&
-          this.draggedElement.containerIndex < index
+          this.viewModel.dragSource === "main" &&
+          this.viewModel.draggedElement.containerIndex < index
         ) {
           index--;
         }
-        this.hoverIndex = index;
+        this.viewModel.hoverIndex = index;
       } else {
-        this.hoverIndex = null;
+        this.viewModel.hoverIndex = null;
       }
     },
 
     //
-    ///select, hover, deselect, dehover
-
+    ///select, hover
     selectItem(item) {
       this.$emit("select-item", item);
     },
@@ -254,29 +230,28 @@ export default {
       this.$emit("hover-item", item);
     },
 
+    /*     selectItem(item) {
+      this.viewModel.selectItem(item);
+    },
+
+    hoverItem(item) {
+      this.viewModel.hoverItem(item);
+    }, */
+
     //
     /// drag
     handleDragStart({ item, index, type, containerIndex }, event, source) {
-      this.draggedContainerIndex = index;
+      this.viewModel.existingElementDragStart(
+        { item, index, type, containerIndex },
+        event,
+        source,
+        this.$emit
+      );
 
-      this.originalContainerIndex = index;
       if (event && event.dataTransfer) {
         event.dataTransfer.setData("text/plain", ""); // for Firefox compatibility
       }
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-      } // for Firefox compatibility
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-        this.originalContainerIndex = index; // Store the original index
-      }
 
-      this.draggedElement = { item, index, type, containerIndex };
-      this.isDraggingExistingElement = true;
-      this.dragSource = source;
-      this.$emit("updateDraggedElement", this.draggedElement);
       let containerElement;
 
       if (source === "main") {
@@ -309,26 +284,25 @@ export default {
       // Assign the floating container
 
       this.floatingContainer = floatingContainer;
-      this.$emit("update-floating-container", floatingContainer);
 
       requestAnimationFrame(() => {
         containerElement.style.display = "none";
       });
     },
     onElementDragStart(event, item, index, type, containerIndex, source) {
-      this.handleDragStart(
+      this.viewModel.existingElementDragStart(
         { item, index, type, containerIndex },
         event,
-        source
+        source,
+        this.$emit
       );
     },
 
     handleDragEnd() {
-      this.draggedElement = null;
-      this.isDraggingExistingElement = false;
+      this.viewModel.handleDragEnd();
       this.hoverIndex = null;
-      this.dragSource = null;
-      this.draggedContainerIndex = null;
+      /* this.dragSource = null;
+      this.draggedContainerIndex = null; */
 
       if (this.floatingContainer) {
         this.floatingContainer.remove();
@@ -357,18 +331,18 @@ export default {
       this.$emit("handleContainerDrop", {
         event,
         containerIndex,
-        dragSource: this.dragSource,
-        draggedContainerIndex: this.draggedContainerIndex,
+
+        draggedContainerIndex: this.viewModel.draggedContainerIndex,
       });
+      this.viewModel.handleDragEnd();
     },
 
     handleWidgetDrop(container) {
-      if (this.isDraggingWidgetsElement) {
-        this.$emit("handleWidgetDrop", {
-          container,
-          widget: this.draggedWidget,
-        });
-      }
+      this.$emit("handleWidgetDrop", {
+        container,
+        widget: this.viewModel.draggedElement,
+      });
+      this.viewModel.handleDragEnd();
     },
 
     handleTreeDrop({ item, index, type, containerIndex }) {

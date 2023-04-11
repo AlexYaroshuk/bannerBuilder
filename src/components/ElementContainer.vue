@@ -55,7 +55,7 @@
       </div>
       <div
         class="widget-dropzone"
-        v-show="container.isWidgetDropzoneShown && container.isHovered"
+        v-show="this.viewModel.isDraggingWidgetElement && container.isHovered"
       ></div>
     </div>
   </div>
@@ -64,15 +64,21 @@
 <script>
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
   props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: null,
+    },
     container: {
       type: Object,
       required: true,
     },
   },
   emits: ["select-item", "item-hover", "widget-drop"],
+
   methods: {
     selectItem(item) {
       this.$emit("select-item", item);
@@ -81,6 +87,7 @@ export default {
       this.$emit("item-hover", item);
     },
     handleWidgetDrop(container) {
+      if (this.viewModel.draggedElement.type === "container") return;
       this.$emit("widget-drop", container);
     },
     onContextMenu(event, type, item) {

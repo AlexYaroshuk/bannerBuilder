@@ -1,54 +1,59 @@
 <template>
   <div class="elements-container">
     <div
+      v-for="(asset, index) in assets"
+      :key="index"
       class="draggable-element"
       draggable="true"
-      @dragstart="dragStart($event)"
+      @dragstart="dragStart($event, asset)"
       @dragend="dragEnd"
     >
       <i class="material-icons icon">drag_indicator</i>
-      <span class="text">Banner Style 1</span>
+      <span class="text">{{ asset.type }}</span>
     </div>
   </div>
 </template>
 <script>
 export default {
-  props: {},
+  props: {
+    viewModel: {
+      type: Object,
+      default: null,
+    },
+  },
   data() {
     return {
       draggableElement: null,
       dragging: false,
+      assets: [
+        {
+          type: "Type 1",
+          // Add other properties here
+        },
+      ],
     };
   },
 
   methods: {
     //control
 
-    dragStart(event) {
-      this.dragging = true;
-      this.draggableElement = event.target.closest(".draggable-element");
-      this.originalPosition = {
-        position: this.draggableElement.style.position,
-        zIndex: this.draggableElement.style.zIndex,
-      };
-      this.draggableElement.style.position = "absolute";
-      this.draggableElement.style.zIndex = "777";
-      this.offsetX =
-        event.clientX - this.draggableElement.getBoundingClientRect().left;
-      this.offsetY =
-        event.clientY - this.draggableElement.getBoundingClientRect().top;
+    dragStart(event, asset) {
+      this.viewModel.draggedElement =
+        event.target.closest(".draggable-element");
+      this.viewModel.isDraggingAssetsElement = true;
 
-      this.$emit("element-drag-start", this.draggableElement);
+      /* this.viewModel.assetsDragStart({ item: asset, type: asset.type }, event); */
     },
 
     dragEnd(event) {
-      this.dragging = false;
+      /* this.dragging = false;
       if (this.draggableElement) {
         this.draggableElement.style.position = this.originalPosition.position;
         this.draggableElement.style.zIndex = this.originalPosition.zIndex;
         this.draggableElement = null;
       }
-      this.$emit("element-drag-end");
+      this.$emit("element-drag-end"); */
+      this.viewModel.handleDragEnd();
     },
   },
 };
