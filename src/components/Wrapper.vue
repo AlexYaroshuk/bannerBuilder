@@ -7,12 +7,10 @@
       @delete-container="deleteContainer"
       @handleContainerDrop="handleContainerDrop($event)"
       @handleWidgetDrop="handleWidgetDrop($event.container, $event.widget)"
-      @select-item="selectItem"
-      @hover-item="hoverItem"
       ref="layoutcanvas"
     />
     <Properties
-      :selectedItem="selectedItem"
+      :viewModel="this.viewModel"
       @reset-style="onResetStyle"
       @set-typography-color="onUpdateTypographyColor"
       @set-typography-fontsize="onUpdateTypographyFontsize"
@@ -24,7 +22,6 @@
     <LeftSidebar
       :viewModel="this.viewModel"
       :containers="containers"
-      :selected-item="selectedItem"
       @contextmenu="showContextMenu"
       @dehover="dehoverAll"
       @drag-start="
@@ -49,7 +46,6 @@
       @drop="handleTreeDrop"
       @element-drag-end="handleDragEnd"
       @hover-item="hoverItem"
-      @select-item="selectItem"
       @tree-dehover="dehoverAll"
       ref="leftsidebar"
     />
@@ -93,12 +89,6 @@ export default {
     return {
       viewModel: new BannerBuilderViewModel(),
       containers,
-      //selection
-
-      selectedItem: null,
-
-      //dragging
-
       //context
       contextMenu: {
         isVisible: false,
@@ -190,50 +180,11 @@ export default {
     ///select, hover, deselect, dehover
 
     deselectAll() {
-      this.containers.forEach((container) => {
-        container.isSelected = false;
-        if (container.children) {
-          container.children.forEach((child) => {
-            child.isSelected = false;
-          });
-        }
-      });
-      this.selectedItem = null;
+      this.viewModel.deselect();
     },
 
     dehoverAll() {
-      this.containers.forEach((container) => {
-        container.isHovered = false;
-        container.isWidgetDropzoneShown = false;
-        if (container.children) {
-          container.children.forEach((child) => {
-            child.isHovered = false;
-          });
-        }
-      });
-    },
-
-    selectItem(item) {
-      if (this.contextMenu.container !== item) {
-        this.contextMenu.isVisible = false;
-      }
-
-      this.deselectAll();
-      item.isSelected = true;
-
-      this.selectedItem = item;
-
-      /* this.$refs.leftsidebar.setActiveTab("layers"); */
-    },
-
-    hoverItem(item) {
-      this.dehoverAll();
-
-      item.isHovered = true;
-
-      /*       if (this.isDraggingWidgetsElement) {
-        item.isWidgetDropzoneShown = true;
-      } */
+      this.viewModel.dehover();
     },
 
     //
@@ -399,7 +350,7 @@ export default {
 
     deleteContainer() {
       this.containers = this.containers.filter(
-        (container) => !container.isSelected
+        (container) => !this.viewModel.selectedItem
       );
       this.contextMenu.isVisible = false;
     },
@@ -476,7 +427,7 @@ export default {
         container,
         this.viewModel.draggedElement.type
       );
-      this.selectItem(newElement);
+      this.viewModel.selectItem(newElement);
     },
 
     // delete a child

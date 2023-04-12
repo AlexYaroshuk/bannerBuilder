@@ -29,14 +29,10 @@
       <Tree
         :viewModel="this.viewModel"
         :containers="containers"
-        :selectedItem="selectedItem"
         @contextmenu="handleContextMenu"
-        @dehover="handleDehover"
         @drag-start="handleDragStart"
         @drop="handleDrop"
-        @item-hover="handleItemHover"
         @mouseleave="handleTreeDehover"
-        @select-item="handleSelectItem"
         v-if="activeTab === 'layers'"
       />
     </div>
@@ -64,22 +60,12 @@ export default {
       type: Array,
       default: () => [],
     },
-
-    selectedItem: {
-      type: Object,
-      default: null,
-    },
   },
   emits: [
     "element-drag-start",
     "element-drag-end",
-
     "drag-start",
     "drop",
-    "select-item",
-    "hover-item",
-    "tree-dehover",
-    "dehover",
     "contextmenu",
   ],
   data() {
@@ -151,17 +137,8 @@ export default {
       this.$emit("drop", event);
     },
     //tree
-    handleSelectItem(item) {
-      this.$emit("select-item", item);
-    },
-    handleItemHover(item) {
-      this.$emit("hover-item", item);
-    },
     handleTreeDehover() {
-      this.$emit("tree-dehover");
-    },
-    handleDehover() {
-      this.$emit("dehover");
+      this.viewModel.dehover();
     },
 
     //animation

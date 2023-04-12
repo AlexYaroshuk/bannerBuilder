@@ -28,6 +28,7 @@
       <i class="material-icons">add_circle_outline</i>
     </div>
     <div
+      @mouseleave="handleDehover"
       v-for="(container, index) in containers"
       :key="index"
       @dragstart="
@@ -58,17 +59,15 @@
         :draggable="containers.length > 1"
         :container="container"
         @contextmenu.prevent="
-          showContextMenu($event, container), selectItem(container)
+          showContextMenu($event, container), viewModel.selectItem(container)
         "
         @onContextMenu="
           ($event, child) => {
             showContextMenu($event, child);
-            selectItem(child);
+            viewModel.selectItem(child);
           }
         "
-        @item-hover="hoverItem"
         @widget-drop="handleWidgetDrop"
-        @select-item="selectItem"
       />
     </div>
     <div
@@ -118,11 +117,8 @@ export default {
     "handleContainerDrop",
     "handleDeleteContainer",
     "handleDeleteKeyPress",
-
     "handleWidgetDrop",
-
     "showContextMenu",
-
     "updateHoverIndex",
     "widget-drop",
   ],
@@ -195,11 +191,9 @@ export default {
       }
     },
 
-    /* handleClickOutside() {
-      if (this.contextMenu.isVisible) {
-        this.contextMenu.isVisible = false;
-      }
-    }, */
+    handleDehover() {
+      this.viewModel.dehover();
+    },
 
     updateHoverIndex(index) {
       /* viewModel.updateHoverIndex(index, this.$emit); */
@@ -219,24 +213,6 @@ export default {
         this.viewModel.hoverIndex = null;
       }
     },
-
-    //
-    ///select, hover
-    selectItem(item) {
-      this.$emit("select-item", item);
-    },
-
-    hoverItem(item) {
-      this.$emit("hover-item", item);
-    },
-
-    /*     selectItem(item) {
-      this.viewModel.selectItem(item);
-    },
-
-    hoverItem(item) {
-      this.viewModel.hoverItem(item);
-    }, */
 
     //
     /// drag

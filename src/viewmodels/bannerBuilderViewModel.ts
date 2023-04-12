@@ -71,15 +71,26 @@ class BannerBuilderViewModel {
 
 
     //UI events
-    /*     selectItem(item: Container | Text, callback: (eventName: string, payload: any) => void) {
-            this.selectedItem = item;
-    
-        }
-    
-        hoverItem(item: Container | Text, callback: (eventName: string, payload: any) => void) {
-            this.hoveredItem = item;
-    
-        } */
+    selectItem(item: object | Text, callback: (eventName: string, payload: any) => void) {
+        this.selectedItem = item;
+        console.log(this.selectedItem)
+
+    }
+
+    deselect() {
+        this.selectedItem = null;
+    }
+
+    hoverItem(item: object | Text, callback: (eventName: string, payload: any) => void) {
+        this.hoveredItem = item;
+
+    }
+
+    dehover() {
+        this.hoveredItem = null;
+    }
+
+
 
 
 

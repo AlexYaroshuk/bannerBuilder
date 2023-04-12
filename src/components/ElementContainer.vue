@@ -3,11 +3,12 @@
     :container="container"
     class="container"
     :class="{
-      'container--selected': container.isSelected,
-      'container--hovered': container.isHovered,
+      'container--selected': viewModel.selectedItem === container,
+      'container--hovered': viewModel.hoveredItem === container,
     }"
     :border="
-      container.isSelected || container.isHovered
+      viewModel.selectedItem === container ||
+      viewModel.hoveredItem === container
         ? `${container.borderWidth}px solid ${container.borderColor}`
         : '2px solid transparent'
     "
@@ -20,27 +21,27 @@
       backgroundSize: 'cover',
     }"
     @click.stop="selectItem(container)"
-    @mouseover="handleItemHover(container)"
-    @dragover.stop.prevent="handleItemHover(container)"
+    @mouseover="hoverItem(container)"
+    @dragover.stop.prevent="hoverItem(container)"
     @mouseleave="handleContainerDehover"
     @drop="handleWidgetDrop(container)"
   >
-    <div class="name" v-if="container.isSelected">
+    <div class="name" v-if="viewModel.selectedItem === container">
       {{ container.name }}
     </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
         class="child-item"
         :class="{
-          'child-item--selected': child.isSelected,
-          'child-item--hovered': child.isHovered,
+          'child-item--selected': viewModel.selectedItem === child,
+          'child-item--hovered': viewModel.hoveredItem === child,
         }"
         v-for="(child, index) in container.children"
         :key="index"
         :data-key="index"
         @click.stop="selectItem(child)"
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
-        @mouseover.stop="handleItemHover(child)"
+        @mouseover.stop="hoverItem(child)"
       >
         <ElementText
           v-if="child && child.type === 'text'"
@@ -55,7 +56,10 @@
       </div>
       <div
         class="widget-dropzone"
-        v-show="this.viewModel.isDraggingWidgetElement && container.isHovered"
+        v-show="
+          viewModel.isDraggingWidgetElement &&
+          viewModel.hoveredItem === container
+        "
       ></div>
     </div>
   </div>
@@ -77,14 +81,14 @@ export default {
       required: true,
     },
   },
-  emits: ["select-item", "item-hover", "widget-drop"],
+  emits: ["widget-drop"],
 
   methods: {
     selectItem(item) {
-      this.$emit("select-item", item);
+      this.viewModel.selectItem(item);
     },
-    handleItemHover(item) {
-      this.$emit("item-hover", item);
+    hoverItem(item) {
+      this.viewModel.hoverItem(item);
     },
     handleWidgetDrop(container) {
       if (this.viewModel.draggedElement.type === "container") return;

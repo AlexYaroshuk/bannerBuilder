@@ -11,8 +11,6 @@ abstract class CustomElement implements Typography {
   fontWeight: number | null;
   fontSize: number | null;
   parentContainer: ElementContainer | null;
-  isSelected: boolean;
-  isHovered: boolean;
 
   constructor() {
     this.color = null;
@@ -20,8 +18,6 @@ abstract class CustomElement implements Typography {
     this.fontWeight = null;
     this.fontSize = null;
     this.parentContainer = null;
-    this.isSelected = false;
-    this.isHovered = false;
   }
 
   abstract addChild(child: CustomElement): void;

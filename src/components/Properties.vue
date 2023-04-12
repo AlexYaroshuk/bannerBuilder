@@ -12,12 +12,14 @@
           <div class="ripple"></div>
         </header>
       </div>
-      <div v-if="!selectedItem">
+      <div v-if="!viewModel.selectedItem">
         <h3>Nothing selected</h3>
         <br />
         When you select an element, you'll see its properties here.
       </div>
-      <h3 v-if="selectedItem">selected:{{ selectedItem.type }}</h3>
+      <h3 v-if="viewModel.selectedItem">
+        selected:{{ viewModel.selectedItem.type }}
+      </h3>
 
       <div
         class="popup-content"
@@ -27,8 +29,9 @@
         <!-- text/link settings -->
         <div
           v-if="
-            (selectedItem?.type ?? '') === 'text' ||
-            (selectedItem?.type ?? '') === 'link'
+            viewModel.selectedItem &&
+            ((viewModel.selectedItem.type ?? '' === 'text') ||
+              (viewModel.selectedItem.type ?? '' === 'link'))
           "
         >
           <div class="form-group">
@@ -42,52 +45,62 @@
           </div>
         </div>
         <!-- link settings -->
-        <div v-if="selectedItem && selectedItem.type === 'link'">
+        <div
+          v-if="
+            viewModel.selectedItem && viewModel.selectedItem.type === 'link'
+          "
+        >
           <div class="form-group">
             <label for="text-field">URL:</label>
             <input
               @input="updateChildText"
               id="text-field"
               type="text"
-              v-model="selectedItem.URL"
+              v-model="viewModel.selectedItem.URL"
             />
           </div>
         </div>
       </div>
       <!-- hybrid settings -->
-      <h3 v-if="selectedItem && selectedItem.type === 'link'">
+      <h3
+        v-if="viewModel.selectedItem && viewModel.selectedItem.type === 'link'"
+      >
         Link styles are WIP
       </h3>
       <div
         class="popup-content"
-        v-if="selectedItem && selectedItem.type != 'link'"
+        v-if="viewModel.selectedItem && viewModel.selectedItem.type != 'link'"
       >
         <h3 @click="expandableGroups.typography = !expandableGroups.typography">
-          Typography ({{ selectedItem.type }})
+          Typography ({{ viewModel.selectedItem.type }})
           <i class="material-icons">
             {{ expandableGroups.typography ? "expand_less" : "expand_more" }}
           </i>
         </h3>
         <div v-if="expandableGroups.typography">
           <div style="border: 1px solid black">
-            <div class="status-text" v-if="selectedItem.parentContainer">
+            <div
+              class="status-text"
+              v-if="viewModel.selectedItem.parentContainer"
+            >
               <p
-                v-if="selectedItem.parentContainer"
+                v-if="viewModel.selectedItem.parentContainer"
                 class="status-text"
                 :class="
-                  selectedItem.fontSize
+                  viewModel.selectedItem.fontSize
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
                 {{
-                  selectedItem.fontSize
+                  viewModel.selectedItem.fontSize
                     ? "Custom font size"
-                    : "Inheriting from " + selectedItem.parentContainer.name
+                    : "Inheriting from " +
+                      viewModel.selectedItem.parentContainer.name
                 }}
               </p>
               <button
-                v-if="selectedItem.fontSize"
+                v-if="viewModel.selectedItem.fontSize"
                 @click.stop="resetStyle('fontSize')"
                 class="reset-button"
               >
@@ -105,24 +118,28 @@
           </div>
 
           <div style="border: 1px solid black; margin-top: 4px">
-            <div class="status-text" v-if="selectedItem.parentContainer">
+            <div
+              class="status-text"
+              v-if="viewModel.selectedItem.parentContainer"
+            >
               <p
-                v-if="selectedItem.parentContainer"
+                v-if="viewModel.selectedItem.parentContainer"
                 class="status-text"
                 :class="
-                  selectedItem.fontFamily
+                  viewModel.selectedItem.fontFamily
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
                 {{
-                  selectedItem.fontFamily
+                  viewModel.selectedItem.fontFamily
                     ? "Custom font family"
-                    : "Inheriting from " + selectedItem.parentContainer.name
+                    : "Inheriting from " +
+                      viewModel.selectedItem.parentContainer.name
                 }}
               </p>
               <button
-                v-if="selectedItem.fontFamily"
+                v-if="viewModel.selectedItem.fontFamily"
                 @click.stop="resetStyle('fontFamily')"
                 class="reset-button"
               >
@@ -141,24 +158,28 @@
             </select>
           </div>
           <div style="border: 1px solid black; margin-top: 4px">
-            <div class="status-text" v-if="selectedItem.parentContainer">
+            <div
+              class="status-text"
+              v-if="viewModel.selectedItem.parentContainer"
+            >
               <p
-                v-if="selectedItem.parentContainer"
+                v-if="viewModel.selectedItem.parentContainer"
                 class="status-text"
                 :class="
-                  selectedItem.color
+                  viewModel.selectedItem.color
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
                 {{
-                  selectedItem.color
+                  viewModel.selectedItem.color
                     ? "Custom color"
-                    : "Inheriting from " + selectedItem.parentContainer.name
+                    : "Inheriting from " +
+                      viewModel.selectedItem.parentContainer.name
                 }}
               </p>
               <button
-                v-if="selectedItem.color"
+                v-if="viewModel.selectedItem.color"
                 @click.stop="resetStyle('color')"
                 class="reset-button"
               >
@@ -169,15 +190,15 @@
               <label for="color-picker">Color:</label>
               <div
                 class="color-square"
-                :style="{ backgroundColor: selectedItemColor }"
+                :style="{ backgroundColor: viewModel.selectedItemColor }"
                 @click="showColorPicker = !showColorPicker"
               ></div>
-              <span class="hex-code">{{ selectedItemColor }}</span>
+              <span class="hex-code">{{ viewModel.selectedItemColor }}</span>
             </div>
             <ColorPicker
               default-format="hex"
               v-if="showColorPicker"
-              v-model="selectedItemColor"
+              v-model="viewModel.selectedItemColor"
               @color-change="updateTypographyColor"
             />
           </div>
@@ -194,7 +215,10 @@
         <h3
           @click="expandableGroups.background = !expandableGroups.background"
           style="margin-top: 16px"
-          v-if="selectedItem && selectedItem.type === 'container'"
+          v-if="
+            viewModel.selectedItem &&
+            viewModel.selectedItem.type === 'container'
+          "
         >
           Backgrounds
           <i class="material-icons">
@@ -203,22 +227,27 @@
         </h3>
         <div
           v-if="
-            expandableGroups.background && selectedItem.type === 'container'
+            expandableGroups.background &&
+            viewModel.selectedItem.type === 'container'
           "
         >
           <div class="color-display-container">
             <label for="color-picker">Color:</label>
             <div
               class="color-square"
-              :style="{ backgroundColor: selectedItem.backgroundColor }"
+              :style="{
+                backgroundColor: viewModel.selectedItem.backgroundColor,
+              }"
               @click="showBGColorPicker = !showBGColorPicker"
             ></div>
-            <span class="hex-code">{{ selectedItem.backgroundColor }}</span>
+            <span class="hex-code">{{
+              viewModel.selectedItem.backgroundColor
+            }}</span>
           </div>
           <ColorPicker
             default-format="hex"
             v-if="showBGColorPicker"
-            :color="selectedItem.backgroundColor"
+            :color="viewModel.selectedItem.backgroundColor"
             @color-change="updateColor"
           />
         </div>
@@ -230,6 +259,7 @@
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
 import FIleUploader from "./FIleUploader.vue";
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
   components: {
@@ -237,6 +267,10 @@ export default {
     FIleUploader,
   },
   props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: null,
+    },
     selectedItem: {
       type: Object,
       default: null,
@@ -275,53 +309,55 @@ export default {
     },
     inputText: {
       get() {
-        return this.selectedItem ? this.selectedItem.value : "";
+        return this.viewModel.selectedItem
+          ? this.viewModel.selectedItem.value
+          : "";
       },
       set(newValue) {
-        if (this.selectedItem) {
-          this.selectedItem.value = newValue;
+        if (this.viewModel.selectedItem) {
+          this.viewModel.selectedItem.value = newValue;
         }
       },
     },
     fontSize: {
       get() {
-        return this.selectedItem.fontSize !== null
-          ? this.selectedItem.fontSize
-          : this.selectedItem.parentContainer
-          ? this.selectedItem.parentContainer.fontSize
+        return this.viewModel.selectedItem.fontSize !== null
+          ? this.viewModel.selectedItem.fontSize
+          : this.viewModel.selectedItem.parentContainer
+          ? this.viewModel.selectedItem.parentContainer.fontSize
           : null;
       },
       set(fontSize) {
-        this.selectedItem.fontSize = fontSize;
+        this.viewModel.selectedItem.fontSize = fontSize;
       },
     },
     fontFamily: {
       get() {
-        return this.selectedItem.fontFamily !== null
-          ? this.selectedItem.fontFamily
-          : this.selectedItem.parentContainer
-          ? this.selectedItem.parentContainer.fontFamily
+        return this.viewModel.selectedItem.fontFamily !== null
+          ? this.viewModel.selectedItem.fontFamily
+          : this.viewModel.selectedItem.parentContainer
+          ? this.viewModel.selectedItem.parentContainer.fontFamily
           : null;
       },
       set(fontFamily) {
-        this.selectedItem.fontFamily = fontFamily;
+        this.viewModel.selectedItem.fontFamily = fontFamily;
       },
     },
 
     selectedItemColor: {
       get() {
-        return this.selectedItem.color !== null
-          ? this.selectedItem.color
-          : this.selectedItem.parentContainer
-          ? this.selectedItem.parentContainer.color
+        return this.viewModel.selectedItem.color !== null
+          ? this.viewModel.selectedItem.color
+          : this.viewModel.selectedItem.parentContainer
+          ? this.viewModel.selectedItem.parentContainer.color
           : null;
       },
       set(newColor) {
-        this.selectedItem.color = newColor;
+        this.viewModel.selectedItem.color = newColor;
       },
     },
     paragraphBgColor() {
-      return this.selectedItem.color ? "red" : "green";
+      return this.viewModel.selectedItem.color ? "red" : "green";
     },
   },
 
@@ -334,25 +370,24 @@ export default {
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
       this.$emit("set-typography-color", {
-        item: this.selectedItem,
+        item: this.viewModel.selectedItem,
         color: eventData.cssColor,
       });
     },
 
     updateTypographyFontsize() {
-      console.log("size", this.selectedTextSize);
       this.$emit("set-typography-fontsize", {
-        item: this.selectedItem,
+        item: this.viewModel.selectedItem,
         size: this.selectedTextSize,
       });
     },
     updateTypographyFontfamily() {
-      this.selectedItem.fontfamily = this.selectedTextFont;
+      this.viewModel.selectedItem.fontfamily = this.selectedTextFont;
     },
 
     updateColor(eventData) {
       this.$emit("set-bg-color", {
-        item: this.selectedItem,
+        item: this.viewModel.selectedItem,
         color: eventData.cssColor,
       });
     },
@@ -360,7 +395,7 @@ export default {
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     resetStyle(type) {
       this.$emit("reset-style", {
-        item: this.selectedItem,
+        item: this.viewModel.selectedItem,
         type: type,
       });
     },
