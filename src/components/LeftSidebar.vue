@@ -18,9 +18,7 @@
         @element-drag-end="dragEnd" />
       <Widgets v-if="activeTab === 'widgets'" @widget-drag-start="emitWidgetDragStart($event)"
         @widget-drag-end="dragEnd" />
-      <Tree :viewModel="this.viewModel" :containers="containers" :selectedItem="selectedItem" @contextmenu="handleContextMenu"
-        @dehover="handleDehover" @drag-start="handleDragStart" @drop="handleDrop" @item-hover="handleItemHover"
-        @mouseleave="handleTreeDehover" @select-item="handleSelectItem" v-if="activeTab === 'layers'" />
+      <Tree :viewModel="this.viewModel" />
     </div>
   </aside>
 </template>
@@ -45,7 +43,7 @@ export default {
   props: {
     viewModel: {
       type: BannerBuilderViewModel,
-      default: null,
+      required: true,
     },
 
     containers: {

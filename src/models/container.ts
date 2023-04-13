@@ -9,8 +9,8 @@ class Container extends Element {
     borderWidth: number;
     BGImage: string | null;
 
-    constructor({ name, children, color = 'black', backgroundColor = 'teal', borderColor = 'transparent', parentContainer = null }
-        : { name: string, children: Element[], backgroundColor?: string, color?: string, borderColor?: string, parentContainer?: Container | null }) {
+    constructor({ name, children=[], color = 'black', backgroundColor = 'teal', borderColor = 'transparent', parentContainer = null }
+        : { name: string, children?: Element[], backgroundColor?: string, color?: string, borderColor?: string, parentContainer?: Container | null }) {
 
         super({ name: name, backgroundColor: backgroundColor, color: color, borderColor: borderColor, parentContainer: parentContainer });
 
@@ -24,6 +24,10 @@ class Container extends Element {
 
     }
 
+    getChildren(): Element[] {
+        return this.children;
+    }
+    
     addChild(child: Element): void {
         this.children.push(child);
         child.parentContainer = this; // Set the parentContainer property of the child
@@ -36,12 +40,14 @@ class Container extends Element {
         }
     }
 
-    getChildren(): Element[] {
-        return this.children;
-    }
+    swapChildren(childOne: Element, childTwo: Element): void {
+        var fromId: number = 0;
+        var toId: number = 0;
 
-    get isLeaf(): boolean {
-        return false;
+        fromId = this.children.indexOf(childOne);
+        toId = this.children.indexOf(childTwo);
+
+        [this.children[fromId], this.children[toId]] = [this.children[toId], this.children[fromId]]; 
     }
 }
 

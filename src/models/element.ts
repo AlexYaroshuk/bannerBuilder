@@ -1,6 +1,6 @@
 import { Container } from "@/models/container";
 
-abstract class Element {
+class Element {
   name: string
   color: string;
   backgroundColor: string;

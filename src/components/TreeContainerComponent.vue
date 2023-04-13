@@ -1,26 +1,37 @@
 <template>
-    <div class="tree-container-component">
-        {{ element?.getName() }}
-        <div style="margin-left: 10px;">
-            <component v-for="el in element!.children" :is="getComponent(el)" :element="el" />
+    <div draggable="true" @drag="viewModel.handleDragStart(element)" @dragover="viewModel.handleDragOver(element)"
+        @dragenter.prevent @dragover.prevent>
+        <div style="margin: 5px;">
+            <div>
+                {{ element.getName() }}
+            </div>
+            <div style="margin-left: 10px;" v-for="el in element.getChildren()" :key="el.getName()">
+                <component :is="getComponent(el)" :viewModel="viewModel" :element="el" />
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import TreeTextComponent from './TreeTextComponent.vue';
-import TreeContainerComponent from './TreeContainerComponent.vue';
 import { Element } from '@/models/element';
 import { Container } from '@/models/container';
 import { Text } from '@/models/text';
+import { BannerBuilderViewModel } from '@/viewmodels/bannerBuilderViewModel';
+
+import TreeTextComponent from './TreeTextComponent.vue';
+import TreeContainerComponent from './TreeContainerComponent.vue';
 
 export default {
     props: {
         element: {
             type: Container,
+            required: true,
         },
+        viewModel: {
+            type: BannerBuilderViewModel,
+            required: true,
+        }
     },
-
     methods: {
         getComponent(element: Element) {
             if (element instanceof Container) {
@@ -31,10 +42,6 @@ export default {
                 return TreeTextComponent;
             }
         },
-
-        onHover() {
-            console.log(this.element?.getName());
-        }
     }
 };
 </script>
