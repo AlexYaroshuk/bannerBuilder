@@ -1,6 +1,10 @@
 <template>
-    <p class="tree-text-component">
-        {{ element?.getText() }}</p>
+    <div class="tree-text-component" :class="{ 'hovered-element': viewModel.getCurrentHoveredElement() == element }"
+        @mouseover="viewModel.handleHover(element)" @mouseleave="viewModel.handleDehover()">
+        <span class="material-icons">text_format</span>
+        <p>
+            {{ element?.getText() }}</p>
+    </div>
 </template>
 
 <script lang="ts">
@@ -25,10 +29,12 @@ export default {
 
 <style scoped>
 .tree-text-component {
-    cursor: default;
+    display: flex;
+    gap: 5;
 }
 
-/* :hover {
-    border: 2px solid hsl(212, 100%, 54%);
-} */
+.hovered-element {
+    border-style: solid;
+    border-color: blue;
+}
 </style>

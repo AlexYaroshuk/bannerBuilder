@@ -1,14 +1,19 @@
 <template>
-    <div draggable="true" @drag="viewModel.handleDragStart(element)" @dragover="viewModel.handleDragOver(element)"
-        @dragenter.prevent @dragover.prevent>
-        <div style="margin: 5px;">
-            <div>
-                {{ element.getName() }}
-            </div>
-            <div style="margin-left: 10px;" v-for="el in element.getChildren()" :key="el.getName()">
-                <component :is="getComponent(el)" :viewModel="viewModel" :element="el" />
-            </div>
+    <div>
+        <div v-if="element != viewModel.getRootContainer()" class="tree-container-component-text"
+            :class="{ 'hovered-element': viewModel.getCurrentHoveredElement() == element }"
+            @mouseover="viewModel.handleHover(element)" @mouseleave="viewModel.handleDehover()">
+            <span class="material-icons">check_box_outline_blank</span>
+            <p>{{ element.getName() }}</p>
         </div>
+        <draggable :list="element.getChildren()" group="{{ element.getName() }}">
+            <div v-for="el in element.getChildren()" :key="el.getName()">
+                <div>
+                    <component :class="[element != viewModel.getRootContainer() ? 'children-container' : '']"
+                        :is="getComponent(el)" :viewModel="viewModel" :element="el" />
+                </div>
+            </div>
+        </draggable>
     </div>
 </template>
 
@@ -17,11 +22,15 @@ import { Element } from '@/models/element';
 import { Container } from '@/models/container';
 import { Text } from '@/models/text';
 import { BannerBuilderViewModel } from '@/viewmodels/bannerBuilderViewModel';
+import { VueDraggableNext } from 'vue-draggable-next';
 
 import TreeTextComponent from './TreeTextComponent.vue';
 import TreeContainerComponent from './TreeContainerComponent.vue';
 
 export default {
+    components: {
+        draggable: VueDraggableNext,
+    },
     props: {
         element: {
             type: Container,
@@ -47,11 +56,18 @@ export default {
 </script>
 
 <style scoped>
-.tree-container-component {
-    cursor: default;
+.tree-container-component-text {
+    display: flex;
+    margin-bottom: 10px;
 }
 
-/* :hover {
-    border: 2px solid hsl(212, 100%, 54%);
-} */
+.children-container {
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+
+.hovered-element {
+    border-style: solid;
+    border-color: blue;
+}
 </style>
