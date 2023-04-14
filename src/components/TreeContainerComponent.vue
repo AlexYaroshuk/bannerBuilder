@@ -58,7 +58,9 @@ export default {
 <style scoped>
 .tree-container-component-text {
     display: flex;
+    cursor: default;
     margin-bottom: 10px;
+    border: solid transparent;
 }
 
 .children-container {
@@ -67,7 +69,6 @@ export default {
 }
 
 .hovered-element {
-    border-style: solid;
-    border-color: blue;
+    border: solid #1482ff80;
 }
 </style>

@@ -61,7 +61,6 @@ class BannerBuilderViewModel {
 
     handleHover(element: Element): void {
         this.currentHoveredElement = element;
-        console.log(this.currentHoveredElement.getName())
     }
 
     handleDehover(): void {

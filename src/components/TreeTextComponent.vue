@@ -30,11 +30,11 @@ export default {
 <style scoped>
 .tree-text-component {
     display: flex;
-    gap: 5;
+    cursor: default;
+    border: solid transparent;
 }
 
 .hovered-element {
-    border-style: solid;
-    border-color: blue;
+    border: solid #1482ff80;
 }
 </style>
