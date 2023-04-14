@@ -77,7 +77,6 @@
 </template>
 
 <script>
-import DragDropTest from "./DragDropTest.vue";
 import ElementContainer from "./ElementContainer.vue";
 import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
@@ -92,7 +91,6 @@ export default {
     Properties,
     LeftSidebar,
     LayoutCanvas,
-    DragDropTest,
   },
 
   mixins: [appSetup, newContainerMixin],
