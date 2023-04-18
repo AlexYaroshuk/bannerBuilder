@@ -18,17 +18,11 @@
       </button>
     </div>
 
-    <div class="tab-content">
-      <Assets
-        v-if="activeTab === 'assets'"
-        @element-drag-start="emitElementDragStart($event)"
-        @element-drag-end="dragEnd"
-        :viewModel="this.viewModel"
-      />
+    <div>
+      <Assets v-if="activeTab === 'assets'" :viewModel="this.viewModel" />
       <Widgets v-if="activeTab === 'widgets'" :viewModel="this.viewModel" />
       <Tree
         :viewModel="this.viewModel"
-        :containers="containers"
         @contextmenu="handleContextMenu"
         @drag-start="handleDragStart"
         @drop="handleDrop"
@@ -55,11 +49,6 @@ export default {
       type: BannerBuilderViewModel,
       default: null,
     },
-
-    containers: {
-      type: Array,
-      default: () => [],
-    },
   },
   emits: [
     "element-drag-start",
@@ -67,6 +56,7 @@ export default {
     "drag-start",
     "drop",
     "contextmenu",
+    "mouseleave",
   ],
   data() {
     return {
@@ -92,18 +82,9 @@ export default {
       draggableElement: null,
     };
   },
-  computed: {
-    indicatorTransform() {
-      const index = this.tabs.findIndex((tab) => tab.name === this.activeTab);
-      return `translateX(${index * 100}%)`;
-    },
-  },
 
   methods: {
     // internal control
-    emitElementDragStart(eventData) {
-      this.$emit("element-drag-start", eventData);
-    },
 
     toggleVisibility() {
       this.isVisible = !this.isVisible;
@@ -116,15 +97,6 @@ export default {
     // externall control
     setActiveTab(tabName) {
       this.activeTab = tabName;
-    },
-
-    //drag
-    emitElementDragStart(eventData) {
-      this.$emit("element-drag-start", eventData);
-    },
-
-    dragEnd(event) {
-      this.$emit("element-drag-end", event);
     },
 
     //treedrag

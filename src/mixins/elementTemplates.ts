@@ -10,7 +10,7 @@ export default {
     };
   },
   methods: {
-    createNewElementContainer(totalContainers: number) {
+    /* createNewElementContainer(totalContainers: number) {
       const newContainerName = `Container ${totalContainers + 1}`;
 
       const getRandomColor = () => {
@@ -30,7 +30,7 @@ export default {
       newContainer.addChild(text2);
 
       return newContainer;
-    },
+    }, */
 
     createNewElementText(container: ElementContainer): ElementText {
       const newTextElement = new ElementText();

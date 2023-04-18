@@ -12,14 +12,7 @@
         ? `${container.borderWidth}px solid ${container.borderColor}`
         : '2px solid transparent'
     "
-    :style="{
-      backgroundColor: container.backgroundColor,
-
-      backgroundImage: `url(${container.BGImage})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundSize: 'cover',
-    }"
+    :style="{ ...containerStyle, ...borderColorStyle }"
     @click.stop="selectItem(container)"
     @mouseover="hoverItem(container)"
     @dragover.stop.prevent="hoverItem(container)"
@@ -48,6 +41,7 @@
           style="padding: 4px"
           :child="child"
         />
+
         <ElementLink
           v-if="child && child.type === 'link'"
           style="padding: 4px"
@@ -68,12 +62,11 @@
 <script>
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
-import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
   props: {
     viewModel: {
-      type: BannerBuilderViewModel,
+      type: Object,
       default: null,
     },
     container: {
@@ -91,13 +84,39 @@ export default {
       this.viewModel.hoverItem(item);
     },
     handleWidgetDrop(container) {
-      if (this.viewModel.draggedElement.type === "container") return;
+      if (
+        !this.viewModel.draggedElement ||
+        this.viewModel.draggedElement.type === "container"
+      )
+        return;
       this.$emit("widget-drop", container);
     },
     onContextMenu(event, type, item) {
       event.preventDefault();
       this.$emit("context-menu", event, type, item);
       this.$emit("select-item", item); // Add this line
+    },
+  },
+  computed: {
+    containerStyle() {
+      const styles = this.container.getEffectiveStyles();
+      return {
+        backgroundColor: styles.backgroundColor,
+        backgroundImage: styles.backgroundImage,
+        backgroundRepeat: styles.backgroundRepeat,
+        backgroundPosition: styles.backgroundPosition,
+        backgroundSize: styles.backgroundSize,
+      };
+    },
+    borderColorStyle() {
+      const isSelectedOrHovered =
+        this.viewModel.selectedItem === this.container ||
+        this.viewModel.hoveredItem === this.container;
+      return {
+        border: isSelectedOrHovered
+          ? `${this.container.borderWidth}px solid ${this.container.borderColor}`
+          : "2px solid transparent",
+      };
     },
   },
 
@@ -121,6 +140,8 @@ export default {
   right: 0;
   bottom: 0;
   border: 2px solid transparent;
+  min-width: 8px;
+  min-height: 8px;
 }
 .container[data-has-image="true"] {
   background-image: url(BGImage);

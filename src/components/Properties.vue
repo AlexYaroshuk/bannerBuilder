@@ -17,8 +17,22 @@
         <br />
         When you select an element, you'll see its properties here.
       </div>
-      <h3 v-if="viewModel.selectedItem">
+      <h3
+        v-if="
+          viewModel.selectedItem &&
+          viewModel.selectedItem.parentContainer != null
+        "
+      >
         selected:{{ viewModel.selectedItem.type }}
+      </h3>
+      <h3
+        style="background-color: gold"
+        v-if="
+          viewModel.selectedItem &&
+          viewModel.selectedItem.parentContainer === null
+        "
+      >
+        selected: rootContainer
       </h3>
 
       <div
@@ -30,8 +44,8 @@
         <div
           v-if="
             viewModel.selectedItem &&
-            ((viewModel.selectedItem.type ?? '' === 'text') ||
-              (viewModel.selectedItem.type ?? '' === 'link'))
+            (viewModel.selectedItem.type === 'text' ||
+              viewModel.selectedItem.type === 'link')
           "
         >
           <div class="form-group">
@@ -72,33 +86,48 @@
         v-if="viewModel.selectedItem && viewModel.selectedItem.type != 'link'"
       >
         <h3 @click="expandableGroups.typography = !expandableGroups.typography">
-          Typography ({{ viewModel.selectedItem.type }})
+          Typography({{
+            viewModel.selectedItem.parentContainer
+              ? viewModel.selectedItem.type
+              : ""
+          }}{{ viewModel.selectedItem.parentContainer ? "" : "root" }})
           <i class="material-icons">
             {{ expandableGroups.typography ? "expand_less" : "expand_more" }}
           </i>
         </h3>
         <div v-if="expandableGroups.typography">
-          <div style="border: 1px solid black">
+          <div class="prop-section">
             <div
               class="status-text"
               v-if="viewModel.selectedItem.parentContainer"
             >
-              <p
+              <div
                 v-if="viewModel.selectedItem.parentContainer"
-                class="status-text"
                 :class="
                   viewModel.selectedItem.fontSize
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                {{
-                  viewModel.selectedItem.fontSize
-                    ? "Custom font size"
-                    : "Inheriting from " +
-                      viewModel.selectedItem.parentContainer.name
-                }}
-              </p>
+                <p v-if="viewModel.selectedItem.fontSize">Custom font size</p>
+
+                <div
+                  class="status-text"
+                  v-if="!viewModel.selectedItem.fontSize"
+                >
+                  Inheriting from
+                  <p
+                    class="link-text"
+                    @click="
+                      this.viewModel.selectItem(
+                        viewModel.selectedItem.parentContainer
+                      )
+                    "
+                  >
+                    {{ viewModel.selectedItem.parentContainer.name }}
+                  </p>
+                </div>
+              </div>
               <button
                 v-if="viewModel.selectedItem.fontSize"
                 @click.stop="resetStyle('fontSize')"
@@ -116,28 +145,92 @@
               v-model="fontSize"
             />
           </div>
-
-          <div style="border: 1px solid black; margin-top: 4px">
+          <div class="prop-section">
             <div
               class="status-text"
               v-if="viewModel.selectedItem.parentContainer"
             >
-              <p
+              <div
                 v-if="viewModel.selectedItem.parentContainer"
-                class="status-text"
+                :class="
+                  viewModel.selectedItem.fontWeight
+                    ? 'status-text-selected-color'
+                    : 'status-text-inherited-color'
+                "
+              >
+                <p v-if="viewModel.selectedItem.fontWeight">
+                  Custom font weight
+                </p>
+
+                <div
+                  class="status-text"
+                  v-if="!viewModel.selectedItem.fontWeight"
+                >
+                  Inheriting from
+                  <p
+                    class="link-text"
+                    @click="
+                      this.viewModel.selectItem(
+                        viewModel.selectedItem.parentContainer
+                      )
+                    "
+                  >
+                    {{ viewModel.selectedItem.parentContainer.name }}
+                  </p>
+                </div>
+              </div>
+              <button
+                v-if="viewModel.selectedItem.fontWeight"
+                @click.stop="resetStyle('fontWeight')"
+                class="reset-button"
+              >
+                Reset
+              </button>
+            </div>
+            <label for="fontWeight">Font weight:</label>
+            <input
+              id="fontWeight"
+              type="number"
+              min="1"
+              step="1"
+              v-model="fontWeight"
+            />
+          </div>
+
+          <div class="prop-section">
+            <div
+              class="status-text"
+              v-if="viewModel.selectedItem.parentContainer"
+            >
+              <div
+                v-if="viewModel.selectedItem.parentContainer"
                 :class="
                   viewModel.selectedItem.fontFamily
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                {{
-                  viewModel.selectedItem.fontFamily
-                    ? "Custom font family"
-                    : "Inheriting from " +
-                      viewModel.selectedItem.parentContainer.name
-                }}
-              </p>
+                <p v-if="viewModel.selectedItem.fontFamily">
+                  Custom font family
+                </p>
+
+                <div
+                  class="status-text"
+                  v-if="!viewModel.selectedItem.fontFamily"
+                >
+                  Inheriting from
+                  <p
+                    class="link-text"
+                    @click="
+                      this.viewModel.selectItem(
+                        viewModel.selectedItem.parentContainer
+                      )
+                    "
+                  >
+                    {{ viewModel.selectedItem.parentContainer.name }}
+                  </p>
+                </div>
+              </div>
               <button
                 v-if="viewModel.selectedItem.fontFamily"
                 @click.stop="resetStyle('fontFamily')"
@@ -152,32 +245,41 @@
               v-model="fontFamily"
               @change="updateTypographyFontfamily"
             >
-              <option value="Arial, sans-serif">Arial</option>
+              <option value="Arial">Arial</option>
               <option value="Times New Roman">Times New Roman</option>
               <option value="Helvetica">Helvetica</option>
+              <option value="Roboto">Roboto</option>
             </select>
           </div>
-          <div style="border: 1px solid black; margin-top: 4px">
+          <div class="prop-section">
             <div
               class="status-text"
               v-if="viewModel.selectedItem.parentContainer"
             >
-              <p
+              <div
                 v-if="viewModel.selectedItem.parentContainer"
-                class="status-text"
                 :class="
                   viewModel.selectedItem.color
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                {{
-                  viewModel.selectedItem.color
-                    ? "Custom color"
-                    : "Inheriting from " +
-                      viewModel.selectedItem.parentContainer.name
-                }}
-              </p>
+                <p v-if="viewModel.selectedItem.color">Custom color</p>
+
+                <div class="status-text" v-if="!viewModel.selectedItem.color">
+                  Inheriting from
+                  <p
+                    class="link-text"
+                    @click="
+                      this.viewModel.selectItem(
+                        viewModel.selectedItem.parentContainer
+                      )
+                    "
+                  >
+                    {{ viewModel.selectedItem.parentContainer.name }}
+                  </p>
+                </div>
+              </div>
               <button
                 v-if="viewModel.selectedItem.color"
                 @click.stop="resetStyle('color')"
@@ -190,15 +292,15 @@
               <label for="color-picker">Color:</label>
               <div
                 class="color-square"
-                :style="{ backgroundColor: viewModel.selectedItemColor }"
+                :style="{ backgroundColor: selectedItemColor }"
                 @click="showColorPicker = !showColorPicker"
               ></div>
-              <span class="hex-code">{{ viewModel.selectedItemColor }}</span>
+              <span class="hex-code">{{ selectedItemColor }}</span>
             </div>
             <ColorPicker
               default-format="hex"
               v-if="showColorPicker"
-              v-model="viewModel.selectedItemColor"
+              v-model="selectedItemColor"
               @color-change="updateTypographyColor"
             />
           </div>
@@ -231,25 +333,68 @@
             viewModel.selectedItem.type === 'container'
           "
         >
-          <div class="color-display-container">
-            <label for="color-picker">Color:</label>
+          <div class="prop-section">
             <div
-              class="color-square"
-              :style="{
-                backgroundColor: viewModel.selectedItem.backgroundColor,
-              }"
-              @click="showBGColorPicker = !showBGColorPicker"
-            ></div>
-            <span class="hex-code">{{
-              viewModel.selectedItem.backgroundColor
-            }}</span>
+              class="status-text"
+              v-if="viewModel.selectedItem.parentContainer"
+            >
+              <div
+                v-if="viewModel.selectedItem.parentContainer"
+                :class="
+                  viewModel.selectedItem.backgroundColor
+                    ? 'status-text-selected-color'
+                    : 'status-text-inherited-color'
+                "
+              >
+                <p v-if="viewModel.selectedItem.backgroundColor">
+                  Custom background color
+                </p>
+
+                <div
+                  class="status-text"
+                  v-if="!viewModel.selectedItem.backgroundColor"
+                >
+                  Inheriting from
+                  <p
+                    class="link-text"
+                    @click="
+                      this.viewModel.selectItem(
+                        viewModel.selectedItem.parentContainer
+                      )
+                    "
+                  >
+                    {{ viewModel.selectedItem.parentContainer.name }}
+                  </p>
+                </div>
+              </div>
+              <button
+                v-if="viewModel.selectedItem.backgroundColor"
+                @click.stop="resetStyle('backgroundColor')"
+                class="reset-button"
+              >
+                Reset
+              </button>
+            </div>
+            <div class="color-display-container">
+              <label for="color-picker">Color:</label>
+              <div
+                class="color-square"
+                :style="{
+                  backgroundColor: viewModel.selectedItem.backgroundColor,
+                }"
+                @click="showBGColorPicker = !showBGColorPicker"
+              ></div>
+              <span class="hex-code">{{
+                viewModel.selectedItem.backgroundColor
+              }}</span>
+            </div>
+            <ColorPicker
+              default-format="hex"
+              v-if="showBGColorPicker"
+              v-model="selectedItemBackgroundColor"
+              @color-change="updateColor"
+            />
           </div>
-          <ColorPicker
-            default-format="hex"
-            v-if="showBGColorPicker"
-            :color="viewModel.selectedItem.backgroundColor"
-            @color-change="updateColor"
-          />
         </div>
       </div>
     </aside>
@@ -310,15 +455,73 @@ export default {
     inputText: {
       get() {
         return this.viewModel.selectedItem
-          ? this.viewModel.selectedItem.value
+          ? this.viewModel.selectedItem.text
           : "";
       },
       set(newValue) {
         if (this.viewModel.selectedItem) {
-          this.viewModel.selectedItem.value = newValue;
+          this.viewModel.selectedItem.text = newValue;
         }
       },
     },
+    /* selectedItemFontSize: {
+      get() {
+        const selectedItem = this.viewModel.selectedItem;
+        if (selectedItem) {
+          if (selectedItem.fontSize !== null) {
+            return selectedItem.fontSize;
+          } else if (
+            selectedItem.parentContainer &&
+            selectedItem.parentContainer.fontSize !== null
+          ) {
+            return selectedItem.parentContainer.fontSize;
+          }
+        }
+        return null;
+      },
+      set(fontSize) {
+        this.viewModel.selectedItem.fontSize = selectedItemFontSize;
+      },
+    },
+    selectedItemFontFamily: {
+      get() {
+        const selectedItem = this.viewModel.selectedItem;
+        if (selectedItem) {
+          if (selectedItem.fontFamily !== null) {
+            return selectedItem.fontFamily;
+          } else if (
+            selectedItem.parentContainer &&
+            selectedItem.parentContainer.fontFamily !== null
+          ) {
+            return selectedItem.parentContainer.fontFamily;
+          }
+        }
+        return null;
+      },
+      set(selectedItemFontFamily) {
+        this.viewModel.selectedItem.fontFamily = selectedItemFontFamily;
+      },
+    },
+    selectedItemFontWeight: {
+      get() {
+        const selectedItem = this.viewModel.selectedItem;
+        if (selectedItem) {
+          if (selectedItem.selectedItemFontWeight !== null) {
+            return selectedItem.selectedItemFontWeight;
+          } else if (
+            selectedItem.parentContainer &&
+            selectedItem.parentContainer.selectedItemFontWeight !== null
+          ) {
+            return selectedItem.parentContainer.selectedItemFontWeight;
+          }
+        }
+        return null;
+      },
+      set(selectedItemFontWeight) {
+        this.viewModel.selectedItem.fontWeight = selectedItemFontWeight;
+      },
+    }, */
+
     fontSize: {
       get() {
         return this.viewModel.selectedItem.fontSize !== null
@@ -343,6 +546,18 @@ export default {
         this.viewModel.selectedItem.fontFamily = fontFamily;
       },
     },
+    fontWeight: {
+      get() {
+        return this.viewModel.selectedItem.fontWeight !== null
+          ? this.viewModel.selectedItem.fontWeight
+          : this.viewModel.selectedItem.parentContainer
+          ? this.viewModel.selectedItem.parentContainer.fontWeight
+          : null;
+      },
+      set(fontWeight) {
+        this.viewModel.selectedItem.fontWeight = fontWeight;
+      },
+    },
 
     selectedItemColor: {
       get() {
@@ -352,8 +567,21 @@ export default {
           ? this.viewModel.selectedItem.parentContainer.color
           : null;
       },
-      set(newColor) {
-        this.viewModel.selectedItem.color = newColor;
+      set(selectedItemColor) {
+        this.viewModel.selectedItem.color = selectedItemColor;
+      },
+    },
+    selectedItemBackgroundColor: {
+      get() {
+        return this.viewModel.selectedItem.backgroundColor !== null
+          ? this.viewModel.selectedItem.backgroundColor
+          : this.viewModel.selectedItem.parentContainer
+          ? this.viewModel.selectedItem.parentContainer.backgroundColor
+          : null;
+      },
+      set(selectedItemBackgroundColor) {
+        this.viewModel.selectedItem.backgroundColor =
+          selectedItemBackgroundColor;
       },
     },
     paragraphBgColor() {
@@ -369,27 +597,23 @@ export default {
     //hybrid settings
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
-      this.$emit("set-typography-color", {
-        item: this.viewModel.selectedItem,
-        color: eventData.cssColor,
-      });
+      this.viewModel.selectedItem.color = eventData.cssColor;
+      console.log(this.viewModel.selectedItem.color);
     },
 
-    updateTypographyFontsize() {
+    /*     updateTypographyFontsize() {
       this.$emit("set-typography-fontsize", {
         item: this.viewModel.selectedItem,
         size: this.selectedTextSize,
       });
-    },
+    }, */
     updateTypographyFontfamily() {
       this.viewModel.selectedItem.fontfamily = this.selectedTextFont;
     },
 
     updateColor(eventData) {
-      this.$emit("set-bg-color", {
-        item: this.viewModel.selectedItem,
-        color: eventData.cssColor,
-      });
+      (this.viewModel.selectedItem.backgroundColor = eventData.cssColor),
+        console.log(this.viewModel.selectedItem.backgroundColor);
     },
 
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
@@ -443,8 +667,16 @@ export default {
 }
 .status-text {
   display: flex;
+
+  font-size: small;
+}
+.link-text {
+  margin-left: 4px;
+  display: flex;
   font-weight: 600;
   font-size: small;
+  text-decoration: underline;
+  cursor: pointer;
   /*   padding-left: 4px;
   padding-right: 4px; */
 }
@@ -475,5 +707,11 @@ export default {
 
 .hex-code {
   margin-right: 4px;
+}
+
+.prop-section {
+  border-top: 1px solid lightgray;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 </style>

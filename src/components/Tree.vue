@@ -5,7 +5,7 @@
     When you add a component, you'll see it here.
   </div>
   <div
-    v-for="(container, index) in this.containers"
+    v-for="(container, index) in viewModel.rootContainer.children"
     :key="'container-' + index"
     class="tree-item-wrapper"
     @mouseleave="handleDehover"
@@ -41,7 +41,7 @@
     </li>
     <div v-if="container.children">
       <li
-        v-for="(child, childIndex) in container.children"
+        v-for="(child, index) in container.children"
         :key="'child-' + childIndex"
         class="tree-item"
         :class="{
@@ -67,10 +67,10 @@
           "
           class="drop-indicator"
         ></div>
-        <!-- <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
+        <!--         <span class="tree-item__icon-wrapper" style="padding-left: 1rem">
           <span class="material-icons">{{ iconMap[child.type] }}</span>
         </span> -->
-        {{ child.value }}
+        {{ child.text }}
       </li>
       <div v-if="isLastChildHovered(index)" class="drop-indicator"></div>
     </div>
@@ -87,12 +87,15 @@ export default {
       type: BannerBuilderViewModel,
       default: null,
     },
-    containers: {
-      type: Array,
-      default: null,
-    },
   },
-  emits: ["drag-start", "drag-end", "drag-over", "drop", "contextmenu"],
+  emits: [
+    "drag-start",
+    "drag-end",
+    "drag-over",
+    "drop",
+    "contextmenu",
+    "mouseleave",
+  ],
   data() {
     return {
       dragging: false,
@@ -103,7 +106,6 @@ export default {
       containerElementPosition: null,
       topPosition: null,
     };
-    s;
   },
   methods: {
     selectItem(item) {
@@ -186,20 +188,21 @@ export default {
     },
   },
   computed: {
-    /* dropIndicatorStyles() {
-          if (this.dropIndicator === null || this.topPosition === null) {
-            return {};
-          }
-    
-          return {
-            top: `${this.topPosition}px`,
-          };
-        }, */
+    dropIndicatorStyles() {
+      if (this.dropIndicator === null || this.topPosition === null) {
+        return {};
+      }
+
+      return {
+        top: `${this.topPosition}px`,
+      };
+    },
     isLastChildHovered() {
       return (containerIndex) => {
         if (!this.dragging || this.draggedItemType !== "child") return false;
         const lastChildIndex =
-          this.containers[containerIndex].children.length - 1;
+          this.viewModel.rootContainer.children[containerIndex].children
+            .length - 1;
         return (
           this.dropIndicator === lastChildIndex + 1 &&
           this.hoveredContainerIndex === containerIndex

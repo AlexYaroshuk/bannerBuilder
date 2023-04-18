@@ -1,6 +1,6 @@
 <template>
-  <div class="element-text" :style="typographyStyle">
-    <span>{{ child.value }}</span>
+  <div :style="textStyle">
+    <span>{{ child.text }}</span>
   </div>
 </template>
 
@@ -8,18 +8,22 @@
 export default {
   props: {
     child: {
-      type: Object,
+      type: Text,
+      required: true,
+    },
+    // Add a key prop to force re-rendering when the parent container's color changes
+    key: {
+      type: String,
       required: true,
     },
   },
   computed: {
-    typographyStyle() {
+    textStyle() {
       const styles = this.child.getEffectiveStyles();
       return {
-        color: styles.color,
-        fontFamily: styles.fontFamily,
-        fontWeight: styles.fontWeight,
-        fontSize: `${styles.fontSize}px`,
+        fontFamily: styles.fontFamily || "inherit",
+        fontSize: styles.fontSize ? `${styles.fontSize}px` : "inherit",
+        color: styles.color || "inherit",
       };
     },
   },

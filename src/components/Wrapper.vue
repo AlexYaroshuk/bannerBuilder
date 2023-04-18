@@ -1,10 +1,9 @@
 <template>
   <div class="wrapper" ref="wrapper">
     <LayoutCanvas
-      :containers="containers"
       :viewModel="this.viewModel"
       @delete-key-press="deleteContainer"
-      @delete-container="deleteContainer"
+      @delete-container="deleteElement"
       @handleContainerDrop="handleContainerDrop($event)"
       @handleWidgetDrop="handleWidgetDrop($event.container, $event.widget)"
       ref="layoutcanvas"
@@ -21,9 +20,7 @@
 
     <LeftSidebar
       :viewModel="this.viewModel"
-      :containers="containers"
       @contextmenu="showContextMenu"
-      @dehover="dehoverAll"
       @drag-start="
         handleDragStart(
           {
@@ -36,17 +33,7 @@
           'tree'
         )
       "
-      @element-drag-start="
-        handleDragStart(
-          { item: $event.item, index: $event.index, type: $event.type },
-          $event.event,
-          'assets'
-        )
-      "
       @drop="handleTreeDrop"
-      @element-drag-end="handleDragEnd"
-      @hover-item="hoverItem"
-      @tree-dehover="dehoverAll"
       ref="leftsidebar"
     />
   </div>
@@ -71,7 +58,7 @@ import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
 import newContainerMixin from "../mixins/elementTemplates";
-import appSetup from "../mixins/appSetup";
+/* import appSetup from "../mixins/appSetup"; */
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
@@ -82,13 +69,12 @@ export default {
     LayoutCanvas,
   },
 
-  mixins: [appSetup, newContainerMixin],
+  /* mixins: [appSetup, newContainerMixin], */
 
   data() {
-    const { containers } = appSetup.setup();
+    /* const { containers } = appSetup.setup(); */
     return {
       viewModel: new BannerBuilderViewModel(),
-      containers,
       //context
       contextMenu: {
         isVisible: false,
@@ -109,6 +95,7 @@ export default {
   mounted() {
     /* window.addEventListener("keydown", this.handleDeleteKeyPress); */
     document.addEventListener("click", this.handleClickOutside);
+    this.viewModel.selectItem(this.viewModel.rootContainer);
   },
 
   beforeUnmount() {
@@ -264,28 +251,6 @@ export default {
       if (!containerElement) return;
     },
 
-    handleDragEnd() {
-      this.draggedElement = null;
-      this.draggedWidget = null;
-      this.isDraggingExistingElement = false;
-      this.isDraggingAssetsElement = false;
-      this.isDraggingWidgetsElement = false;
-      this.hoverIndex = null;
-      this.dragSource = null;
-      this.draggedContainerIndex = null;
-
-      if (this.floatingContainer) {
-        this.floatingContainer.remove();
-        this.floatingContainer = null;
-      }
-
-      const containerElements =
-        this.$refs.wrapper.querySelectorAll(".container");
-      containerElements.forEach((containerElement) => {
-        containerElement.style.display = "";
-      });
-    },
-
     updateFloatingContainerPosition(event) {
       if (this.floatingContainer) {
         const containerWidth = this.floatingContainer.offsetWidth;
@@ -346,14 +311,24 @@ export default {
 
     // || DATA MUTATIONS
     //
-    /// modify containers array
+    /// delete element
 
-    deleteContainer() {
-      this.containers = this.containers.filter(
-        (container) => !this.viewModel.selectedItem
-      );
+    deleteElement() {
+      if (this.viewModel.selectedItem.type === "container") {
+        this.containers = this.containers.filter(
+          (container) => container !== this.viewModel.selectedItem
+        );
+      } else {
+        this.containers.forEach((container) => {
+          container.children = container.children.filter(
+            (child) => child != this.viewModel.selectedItem
+          );
+        });
+      }
       this.contextMenu.isVisible = false;
     },
+
+    /// add an element
 
     addNewContainer(containerIndex) {
       const newContainer = this.createNewElementContainer(
@@ -361,6 +336,16 @@ export default {
       );
       this.containers.splice(containerIndex, 0, newContainer);
     },
+
+    handleWidgetDrop(container, widget) {
+      const newElement = this.createNewElement(
+        container,
+        this.viewModel.draggedElement.type
+      );
+      this.viewModel.selectItem(newElement);
+    },
+
+    /// move an element
 
     moveExistingContainer(
       targetIndex,
@@ -421,26 +406,6 @@ export default {
       item.children.push(draggedChild);
     },
 
-    // create a new child and add it to container
-    handleWidgetDrop(container, widget) {
-      const newElement = this.createNewElement(
-        container,
-        this.viewModel.draggedElement.type
-      );
-      this.viewModel.selectItem(newElement);
-    },
-
-    // delete a child
-
-    deleteChild() {
-      this.containers.forEach((container) => {
-        container.children = container.children.filter(
-          (child) => !child.isSelected
-        );
-      });
-      this.contextMenu.isVisible = false;
-    },
-
     //
     /// modify child object (text)
 
@@ -462,6 +427,7 @@ export default {
       item.backgroundColor = color;
     },
     onUpdateTypographyColor({ item, color }) {
+      console.log(item, color);
       this.$nextTick(() => {
         item.color = color;
       });

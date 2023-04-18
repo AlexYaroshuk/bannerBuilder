@@ -1,28 +1,85 @@
-import { Element } from "@/models/element";
+import { Element, ContainerStyles, HybridStyles } from "@/models/element";
+
 
 class Container extends Element {
-    isHovered: boolean;
-    isSelected: boolean;
+
+    getEffectiveStyles(): HybridStyles & ContainerStyles {
+        const parent = this.parentContainer;
+        const root = this.getRootContainer();
+
+        return {
+            color: this.color || (parent && parent.color) || (root && root.color) || null,
+            fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
+            fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
+            fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
+            backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
+            backgroundImage: this.backgroundImage || (parent && parent.backgroundImage) || (root && root.backgroundImage) || null,
+            backgroundRepeat: this.backgroundRepeat || (parent && parent.backgroundRepeat) || (root && root.backgroundRepeat) || null,
+            backgroundPosition: this.backgroundPosition || (parent && parent.backgroundPosition) || (root && root.backgroundPosition) || null,
+            backgroundSize: this.backgroundSize || (parent && parent.backgroundSize) || (root && root.backgroundSize) || null,
+        };
+    }
+
+
+    readonly type: string;
     isWidgetDropzonesShown: boolean;
     children: Element[];
     borderRadius: number;
     borderWidth: number;
+    backgroundImage: null;
+    backgroundRepeat: string | null;
+    backgroundPosition: string | null;
+    backgroundSize: string | null;
+
     BGImage: string | null;
 
-    constructor({ name, children, color = 'black', backgroundColor = 'teal', borderColor = 'transparent', parentContainer = null }
-        : { name: string, children: Element[], backgroundColor?: string, color?: string, borderColor?: string, parentContainer?: Container | null }) {
+    constructor({
+        name,
+        children,
+        backgroundColor = 'transparent',
+        color = 'black',
+        fontFamily = 'Arial',
+        fontSize = 16,
+        fontWeight = 400,
+        borderColor = 'transparent',
+        parentContainer = null,
+        backgroundImage = null,
+    }: {
+        name: string;
+        children: Element[];
+        backgroundColor?: string;
+        fontFamily?: string;
+        fontSize?: number;
+        fontWeight?: number;
+        color?: string;
+        borderColor?: string;
+        parentContainer?: Container | null;
+        backgroundImage?: string | null;
+    }) {
+        super({
+            name: name,
+            color: color,
+            borderColor: borderColor,
+            parentContainer: parentContainer,
+            fontFamily: fontFamily,
+            fontSize: fontSize,
+            backgroundColor: backgroundColor,
 
-        super({ name: name, backgroundColor: backgroundColor, color: color, borderColor: borderColor, parentContainer: parentContainer });
+        });
 
         this.children = children;
-        this.isHovered = false;
-        this.isSelected = false;
+        this.type = 'container';
         this.isWidgetDropzonesShown = false;
         this.borderRadius = 0;
         this.borderWidth = 0;
-        this.BGImage = null;
+        this.backgroundImage = null;
+        this.backgroundRepeat = 'no-repeat';
+        this.backgroundPosition = 'center';
+        this.backgroundSize = 'cover';
 
+        this.BGImage = null;
     }
+
 
     addChild(child: Element): void {
         this.children.push(child);
@@ -38,6 +95,10 @@ class Container extends Element {
 
     getChildren(): Element[] {
         return this.children;
+    }
+
+    getBackgroundImage(): string | null {
+        return this.BGImage ? `url(${this.BGImage})` : null;
     }
 
     get isLeaf(): boolean {
