@@ -1,6 +1,7 @@
 import { Text } from "@/models/text";
 import { Container } from "@/models/container";
 import { Element } from "@/models/element";
+import { Link } from "@/models/link";
 
 class BannerBuilderViewModel {
 
@@ -38,7 +39,7 @@ class BannerBuilderViewModel {
 
         //reworked setup to assign parentContainer to each element:
         const container11 = new Container({
-            name: 'Container 1-1', children: [
+            name: 'Container 1-1', backgroundColor: 'pink', children: [
                 new Text({ name: "Text 1-1", text: "das" }),
                 new Text({ name: "Text 1-2", text: "mor" }),
             ]
@@ -51,7 +52,7 @@ class BannerBuilderViewModel {
         const container1 = new Container({
             name: 'Container 1', backgroundColor: "gold", color: '', fontFamily: 'Roboto', fontWeight: 700, children: [
                 new Text({ name: "Text 1", text: "foo" }),
-                new Text({ name: "Text 2", text: "bar" }),
+                new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" }),
                 new Text({ name: "Text 3", text: "sac" }),
                 container11,
             ]
@@ -121,7 +122,7 @@ class BannerBuilderViewModel {
     //UI events
     selectItem(item: Element) {
         this.selectedItem = item;
-        console.log(this.selectedItem)
+        console.log(this.selectedItem.parentContainer)
 
     }
 
@@ -251,7 +252,7 @@ class BannerBuilderViewModel {
                 newElement = new Text({ name: "Text 3", text: "new" });
                 break;
             case "link":
-                newElement = new Text({ name: "Text 3", text: "new" });
+                newElement = new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" });
                 break;
             default:
                 throw new Error(`Unsupported element type: ${type}`);

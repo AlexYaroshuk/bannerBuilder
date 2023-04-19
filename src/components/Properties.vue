@@ -54,7 +54,7 @@
               @input="updateChildText"
               id="text-field"
               type="text"
-              v-model="inputText"
+              v-model="viewModel.selectedItem.label"
             />
           </div>
         </div>
@@ -70,7 +70,7 @@
               @input="updateChildText"
               id="text-field"
               type="text"
-              v-model="viewModel.selectedItem.URL"
+              v-model="viewModel.selectedItem.url"
             />
           </div>
         </div>

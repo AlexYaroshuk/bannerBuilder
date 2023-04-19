@@ -1,16 +1,18 @@
 <template>
   <div class="element-link">
-    <a :href="child.URL" target="_blank" :style="typographyStyle">
-      {{ child.value }}
+    <a :href="child.url" target="_blank">
+      {{ child.label }}
     </a>
   </div>
 </template>
 
 <script>
+import { Link } from "@/models/link";
+
 export default {
   props: {
     child: {
-      type: Object,
+      type: Link,
       required: true,
     },
   },
@@ -29,7 +31,6 @@ export default {
 </script>
 
 <style scoped>
-/* .element-link a {
-  color: inherit;
-} */
+.element-link a {
+}
 </style>

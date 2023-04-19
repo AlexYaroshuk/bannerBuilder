@@ -47,6 +47,13 @@
           style="padding: 4px"
           :child="child"
         />
+
+        <ElementContainer
+          v-if="child && child.type === 'container'"
+          style="padding: 4px"
+          :container="child"
+          :viewModel="viewModel"
+        />
       </div>
       <div
         class="widget-dropzone"
@@ -63,11 +70,11 @@
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
 
-export default {
+const ElementContainer = {
   props: {
     viewModel: {
       type: Object,
-      default: null,
+      default: () => ({}),
     },
     container: {
       type: Object,
@@ -75,6 +82,73 @@ export default {
     },
   },
   emits: ["widget-drop"],
+  methods: {
+    selectItem(item) {
+      this.viewModel.selectItem(item);
+    },
+    hoverItem(item) {
+      this.viewModel.hoverItem(item);
+    },
+    handleWidgetDrop(container) {
+      if (
+        !this.viewModel.draggedElement ||
+        this.viewModel.draggedElement.type === "container"
+      )
+        return;
+      this.$emit("widget-drop", container);
+    },
+    onContextMenu(event, type, item) {
+      event.preventDefault();
+      this.$emit("context-menu", event, type, item);
+      this.$emit("select-item", item);
+    },
+  },
+  computed: {
+    containerStyle() {
+      const styles = this.container.getEffectiveStyles();
+      return {
+        backgroundColor: styles.backgroundColor,
+        backgroundImage: styles.backgroundImage,
+        backgroundRepeat: styles.backgroundRepeat,
+        backgroundPosition: styles.backgroundPosition,
+        backgroundSize: styles.backgroundSize,
+      };
+    },
+    borderColorStyle() {
+      const isSelectedOrHovered =
+        this.viewModel.selectedItem === this.container ||
+        this.viewModel.hoveredItem === this.container;
+      return {
+        border: isSelectedOrHovered
+          ? `${this.container.borderWidth}px solid ${this.container.borderColor}`
+          : "2px solid transparent",
+      };
+    },
+  },
+};
+
+export default {
+  components: {
+    ElementText: ElementText,
+    ElementLink: ElementLink,
+    ElementContainer: ElementContainer,
+  },
+
+  props: {
+    viewModel: {
+      type: Object,
+      default: () => ({}),
+    },
+    container: {
+      type: Object,
+      required: true,
+    },
+  },
+  emits: ["widget-drop"],
+
+  beforeCreate() {
+    this.$options.components.ElementContainer = this.$options;
+  },
 
   methods: {
     selectItem(item) {
@@ -118,11 +192,6 @@ export default {
           : "2px solid transparent",
       };
     },
-  },
-
-  components: {
-    ElementText: ElementText,
-    ElementLink: ElementLink,
   },
 };
 </script>
