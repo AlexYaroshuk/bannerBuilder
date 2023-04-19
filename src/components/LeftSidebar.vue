@@ -5,8 +5,13 @@
   <aside @click.stop :class="['sidebar', { hidden: !isVisible }]">
     <button @click="toggleVisibility">&lt; Hide</button>
     <div class="tab-bar">
-      <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === tab.name }"
-        @click="activeTab = tab.name" @mousedown="startRipple($event)">
+      <button
+        v-for="(tab, index) in tabs"
+        :key="index"
+        :class="{ active: activeTab === tab.name }"
+        @click="activeTab = tab.name"
+        @mousedown="startRipple($event)"
+      >
         <i class="material-icons"> {{ tab.icon }}</i>
         <span class="tab-text">{{ tab.label }}</span>
         <div class="ripple"></div>
@@ -14,11 +19,9 @@
     </div>
 
     <div class="tab-content">
-      <Assets v-if="activeTab === 'assets'" @element-drag-start="emitElementDragStart($event)"
-        @element-drag-end="dragEnd" />
-      <Widgets v-if="activeTab === 'widgets'" @widget-drag-start="emitWidgetDragStart($event)"
-        @widget-drag-end="dragEnd" />
-      <Tree :viewModel="this.viewModel" />
+      <Assets v-if="activeTab === 'assets'" :viewModel="this.viewModel" />
+      <Widgets v-if="activeTab === 'widgets'" :viewModel="this.viewModel" />
+      <Tree v-if="activeTab === 'layers'" :viewModel="this.viewModel" />
     </div>
   </aside>
 </template>
@@ -29,12 +32,6 @@ import Widgets from "./Widgets.vue";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
 export default {
-  created() {
-    console.log('created');
-    console.log('lsb');
-    console.log(this.viewModel);
-    console.log('lsb');
-  },
   components: {
     Tree,
     Assets,
@@ -45,29 +42,14 @@ export default {
       type: BannerBuilderViewModel,
       required: true,
     },
-
-    containers: {
-      type: Array,
-      default: () => [],
-    },
-
-    selectedItem: {
-      type: Object,
-      default: null,
-    },
   },
   emits: [
     "element-drag-start",
     "element-drag-end",
-    "widget-drag-start",
-    "widget-drag-end",
     "drag-start",
     "drop",
-    "select-item",
-    "hover-item",
-    "tree-dehover",
-    "dehover",
     "contextmenu",
+    "mouseleave",
   ],
   data() {
     return {
@@ -93,21 +75,9 @@ export default {
       draggableElement: null,
     };
   },
-  computed: {
-    indicatorTransform() {
-      const index = this.tabs.findIndex((tab) => tab.name === this.activeTab);
-      return `translateX(${index * 100}%)`;
-    },
-  },
 
   methods: {
     // internal control
-    emitElementDragStart(eventData) {
-      this.$emit("element-drag-start", eventData);
-    },
-    emitWidgetDragStart(eventData) {
-      this.$emit("widget-drag-start", eventData);
-    },
 
     toggleVisibility() {
       this.isVisible = !this.isVisible;
@@ -122,15 +92,6 @@ export default {
       this.activeTab = tabName;
     },
 
-    //drag
-    emitElementDragStart(eventData) {
-      this.$emit("element-drag-start", eventData);
-    },
-
-    dragEnd(event) {
-      this.$emit("element-drag-end", event);
-    },
-
     //treedrag
 
     handleDragStart(event) {
@@ -141,17 +102,8 @@ export default {
       this.$emit("drop", event);
     },
     //tree
-    handleSelectItem(item) {
-      this.$emit("select-item", item);
-    },
-    handleItemHover(item) {
-      this.$emit("hover-item", item);
-    },
     handleTreeDehover() {
-      this.$emit("tree-dehover");
-    },
-    handleDehover() {
-      this.$emit("dehover");
+      this.viewModel.dehover();
     },
 
     //animation

@@ -245,7 +245,6 @@ a,
 .widgets-container {
   padding: 0px;
   display: flex;
-  width: 33%;
   justify-content: center;
 }
 
@@ -254,4 +253,43 @@ a,
   display: flex;
   width: 100%;
   justify-content: center;
+}
+
+.draggable-element {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+  cursor: grab;
+  padding: 10px;
+  user-select: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  transition: background-color 0.2s ease;
+}
+
+.draggable-element:hover {
+  background-color: #ededed;
+}
+
+.draggable-element:active {
+  cursor: grabbing;
+}
+
+.draggable-element::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+}
+
+.draggable-element:active::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.8);
+  transition: none;
 }

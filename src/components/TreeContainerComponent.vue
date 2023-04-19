@@ -1,15 +1,15 @@
 <template>
     <div>
         <div 
-            v-if="element != viewModel.getRootContainer()"
+            v-if="element != viewModel.getRootContainer()" 
+            @click="viewModel.handleElementSelected(element)" 
+            @mouseover="viewModel.handleElementHovered(element)" 
+            @mouseleave="viewModel.handleElementDehovered()"
             :class="{ 
                 'tree-container-component-text': true, 
-                'selected-element': viewModel.getCurrentSelectedElement() == element,
-                'hovered-element': viewModel.getCurrentHoveredElement() == element,
+                'selected-element': viewModel.getSelectedElement() == element,
+                'hovered-element': viewModel.getHoveredElement() == element,
             }"
-            @mouseover="viewModel.handleHover(element)" 
-            @mouseleave="viewModel.handleDehover()"
-            @click="viewModel.handleElementSelect(element)"
         >
             <span class="material-icons">check_box_outline_blank</span>
             <p>{{ element.getName() }}</p>

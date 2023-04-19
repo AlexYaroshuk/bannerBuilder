@@ -1,13 +1,14 @@
 <template>
     <div 
+        @click="viewModel.handleElementSelected(element)" 
+        @mouseover="viewModel.handleElementHovered(element)"
+        @mouseleave="viewModel.handleElementDehovered()" 
+        @dragstart="viewModel.handleDragStart()"
         :class="{ 
             'tree-text-component': true, 
-            'selected-element': viewModel.getCurrentSelectedElement() == element,
-            'hovered-element': viewModel.getCurrentHoveredElement() == element
+            'selected-element': viewModel.getSelectedElement() == element,
+            'hovered-element': viewModel.getHoveredElement() == element
         }"
-        @mouseover="viewModel.handleHover(element)" 
-        @mouseleave="viewModel.handleDehover()"
-        @click="viewModel.handleElementSelect(element)"
     >
         <span class="material-icons">text_format</span>
         <p>
