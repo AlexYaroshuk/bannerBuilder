@@ -615,7 +615,7 @@ export default {
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     resetStyle(type) {
       this.$emit("reset-style", {
-        item: this.viewModel.selectedItem,
+        item: this.viewModel.getSelectedElement(),
         type: type,
       });
     },
