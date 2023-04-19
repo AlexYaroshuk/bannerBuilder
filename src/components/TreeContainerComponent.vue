@@ -1,8 +1,16 @@
 <template>
     <div>
-        <div v-if="element != viewModel.getRootContainer()" class="tree-container-component-text"
-            :class="{ 'hovered-element': viewModel.getCurrentHoveredElement() == element }"
-            @mouseover="viewModel.handleHover(element)" @mouseleave="viewModel.handleDehover()">
+        <div 
+            v-if="element != viewModel.getRootContainer()"
+            :class="{ 
+                'tree-container-component-text': true, 
+                'selected-element': viewModel.getCurrentSelectedElement() == element,
+                'hovered-element': viewModel.getCurrentHoveredElement() == element,
+            }"
+            @mouseover="viewModel.handleHover(element)" 
+            @mouseleave="viewModel.handleDehover()"
+            @click="viewModel.handleElementSelect(element)"
+        >
             <span class="material-icons">check_box_outline_blank</span>
             <p>{{ element.getName() }}</p>
         </div>
@@ -70,5 +78,9 @@ export default {
 
 .hovered-element {
     border: solid #1482ff80;
+}
+
+.selected-element {
+    border: solid #1482ff;
 }
 </style>

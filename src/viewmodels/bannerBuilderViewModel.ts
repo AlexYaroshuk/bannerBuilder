@@ -6,10 +6,12 @@ import { ref } from "vue";
 class BannerBuilderViewModel {
     rootContainer: any;
     rootContainerSnapshot: Container | null;
+    currentSelectedElement: Element | null;
     currentHoveredElement: Element | null;
 
     constructor() {
         this.rootContainerSnapshot = null;
+        this.currentSelectedElement = null;
         this.currentHoveredElement = null;
 
         this.rootContainer = ref(
@@ -55,12 +57,20 @@ class BannerBuilderViewModel {
         return this.rootContainer;
     }
 
+    getCurrentSelectedElement(): Element | null {
+        return this.currentSelectedElement;
+    }
+
     getCurrentHoveredElement(): Element | null {
         return this.currentHoveredElement;
     }
 
     handleHover(element: Element): void {
         this.currentHoveredElement = element;
+    }
+
+    handleElementSelect(element: Element): void {
+        this.currentSelectedElement = element;
     }
 
     handleDehover(): void {

@@ -1,6 +1,14 @@
 <template>
-    <div class="tree-text-component" :class="{ 'hovered-element': viewModel.getCurrentHoveredElement() == element }"
-        @mouseover="viewModel.handleHover(element)" @mouseleave="viewModel.handleDehover()">
+    <div 
+        :class="{ 
+            'tree-text-component': true, 
+            'selected-element': viewModel.getCurrentSelectedElement() == element,
+            'hovered-element': viewModel.getCurrentHoveredElement() == element
+        }"
+        @mouseover="viewModel.handleHover(element)" 
+        @mouseleave="viewModel.handleDehover()"
+        @click="viewModel.handleElementSelect(element)"
+    >
         <span class="material-icons">text_format</span>
         <p>
             {{ element?.getText() }}</p>
@@ -36,5 +44,9 @@ export default {
 
 .hovered-element {
     border: solid #1482ff80;
+}
+
+.selected-element {
+    border: solid #1482ff;
 }
 </style>
