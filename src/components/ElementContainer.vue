@@ -3,50 +3,45 @@
     :container="container"
     class="container"
     :class="{
-      'container--selected': container.isSelected,
-      'container--hovered': container.isHovered,
+      'container--selected': viewModel.getSelectedElement() === container,
+      'container--hovered': viewModel.getHoveredElement() === container,
     }"
     :border="
-      container.isSelected || container.isHovered
+      viewModel.getSelectedElement() === container ||
+      viewModel.getHoveredElement() === container
         ? `${container.borderWidth}px solid ${container.borderColor}`
         : '2px solid transparent'
     "
-    :style="{
-      backgroundColor: container.backgroundColor,
-
-      backgroundImage: `url(${container.BGImage})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundSize: 'cover',
-    }"
+    :style="{ ...containerStyle, ...borderColorStyle }"
     @click.stop="selectItem(container)"
-    @mouseover="handleItemHover(container)"
-    @dragover.stop.prevent="handleItemHover(container)"
+    @mouseover="hoverItem(container)"
+    @dragover.stop.prevent="hoverItem(container)"
     @mouseleave="handleContainerDehover"
     @drop="handleWidgetDrop(container)"
   >
-    <div class="name" v-if="container.isSelected">
+    <div class="name" v-if="viewModel.getSelectedElement() === container">
       {{ container.name }}
     </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
         class="child-item"
         :class="{
-          'child-item--selected': child.isSelected,
-          'child-item--hovered': child.isHovered,
+          'child-item--selected': viewModel.getSelectedElement() === child,
+          'child-item--hovered': viewModel.getHoveredElement() === child,
         }"
         v-for="(child, index) in container.children"
         :key="index"
         :data-key="index"
         @click.stop="selectItem(child)"
         @contextmenu.prevent="onContextMenu($event, 'child', child)"
-        @mouseover.stop="handleItemHover(child)"
+        @mouseover.stop="hoverItem(child)"
       >
         <ElementText
           v-if="child && child.type === 'text'"
           style="padding: 4px"
           :child="child"
         />
+
         <ElementLink
           v-if="child && child.type === 'link'"
           style="padding: 4px"
@@ -55,7 +50,10 @@
       </div>
       <div
         class="widget-dropzone"
-        v-show="container.isWidgetDropzoneShown && container.isHovered"
+        v-show="
+          viewModel.isDraggingWidgetElement &&
+          viewModel.getHoveredElement() === container
+        "
       ></div>
     </div>
   </div>
@@ -64,29 +62,63 @@
 <script>
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
+import { Container } from "@/models/container";
+import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
 export default {
   props: {
+    viewModel: {
+      type: BannerBuilderViewModel,
+      default: true,
+    },
     container: {
-      type: Object,
+      type: Container,
       required: true,
     },
   },
-  emits: ["select-item", "item-hover", "widget-drop"],
+  emits: ["widget-drop"],
+
   methods: {
     selectItem(item) {
-      this.$emit("select-item", item);
+      this.viewModel.handleElementSelected(item);
     },
-    handleItemHover(item) {
-      this.$emit("item-hover", item);
+    hoverItem(item) {
+      this.viewModel.handleElementHovered(item);
     },
     handleWidgetDrop(container) {
+      if (
+        !this.viewModel.draggedElement ||
+        this.viewModel.draggedElement.type === "container"
+      )
+        return;
       this.$emit("widget-drop", container);
     },
     onContextMenu(event, type, item) {
       event.preventDefault();
       this.$emit("context-menu", event, type, item);
       this.$emit("select-item", item); // Add this line
+    },
+  },
+  computed: {
+    containerStyle() {
+      const styles = this.container.getEffectiveStyles();
+      return {
+        backgroundColor: styles.backgroundColor,
+        backgroundImage: styles.backgroundImage,
+        backgroundRepeat: styles.backgroundRepeat,
+        backgroundPosition: styles.backgroundPosition,
+        backgroundSize: styles.backgroundSize,
+      };
+    },
+    borderColorStyle() {
+      const isSelectedOrHovered =
+        this.viewModel.getSelectedElement() === this.container ||
+        this.viewModel.getHoveredElement() === this.container;
+      return {
+        border: isSelectedOrHovered
+          ? `${this.container.borderWidth}px solid ${this.container.borderColor}`
+          : "2px solid transparent",
+      };
     },
   },
 
@@ -110,6 +142,8 @@ export default {
   right: 0;
   bottom: 0;
   border: 2px solid transparent;
+  min-width: 8px;
+  min-height: 8px;
 }
 .container[data-has-image="true"] {
   background-image: url(BGImage);

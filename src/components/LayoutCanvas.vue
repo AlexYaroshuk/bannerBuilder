@@ -1,7 +1,7 @@
 <template>
   <div class="layout-canvas" ref="layoutcanvas">
     <div
-      v-if="containers.length === 0"
+      v-if="viewModel.rootContainer.children.length === 0"
       style="text-align: center; color: white"
     >
       <h1>
@@ -20,18 +20,23 @@
         'dropzone--hovered': dropzoneHovered,
       }"
       v-show="
-        (isDraggingExistingElement || isDraggingAssetsElement) &&
-        dragSource != 'tree' &&
-        containers.length <= 1
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
+        viewModel.rootContainer.children.length <= 1
       "
     >
       <i class="material-icons">add_circle_outline</i>
     </div>
     <div
-      v-for="(container, index) in containers"
+      @mouseleave="handleDehover"
+      v-for="(container, index) in viewModel.rootContainer.children"
       :key="index"
       @dragstart="
-        handleDragStart({ item, index, type: 'container' }, $event, 'main')
+        handleDragStart(
+          { element: container, type: 'container', containerIndex: index },
+          $event,
+          'main'
+        )
       "
       @drag="updateFloatingContainerPosition"
       @dragend="handleDragEnd"
@@ -44,49 +49,46 @@
           'dropzone--hovered': dropzoneHovered(index),
         }"
         v-show="
-          (isDraggingExistingElement || isDraggingAssetsElement) &&
-          dragSource != 'tree' &&
-          containers.length > 1 &&
-          draggedContainerIndex !== index
+          (this.viewModel.isDraggingExistingElement ||
+            this.viewModel.isDraggingAssetsElement) &&
+          viewModel.rootContainer.children.length > 1 &&
+          this.viewModel.draggedContainerIndex !== index
         "
       >
         <i class="material-icons">add_circle_outline</i>
       </div>
 
       <ElementContainer
-        :draggable="containers.length > 1"
-        :class="{
-          'container--dragging':
-            isDraggingExistingElement &&
-            draggedElement &&
-            draggedElement.index === index,
-        }"
+        :viewModel="this.viewModel"
+        :draggable="viewModel.rootContainer.children.length > 1"
         :container="container"
-        @contextmenu.prevent="
-          showContextMenu($event, container), selectItem(container)
-        "
+        @contextmenu.prevent="showContextMenu($event, container)"
         @onContextMenu="
           ($event, child) => {
             showContextMenu($event, child);
-            selectItem(child);
+            viewModel.handleElementSelected(child);
           }
         "
-        @item-hover="hoverItem"
-        @widget-drop="handleWidgetDrop"
-        @select-item="selectItem"
+        @widget-drop="handleWidgetDrop(container)"
       />
     </div>
     <div
-      @dragover.stop.prevent="updateHoverIndex(containers.length)"
-      @drop="handleContainerDrop($event, containers.length)"
+      @dragover.stop.prevent="
+        updateHoverIndex(viewModel.rootContainer.children.length)
+      "
+      @drop="
+        handleContainerDrop($event, viewModel.rootContainer.children.length)
+      "
       class="dropzone"
       :class="{
-        'dropzone--hovered': dropzoneHovered(containers.length),
+        'dropzone--hovered': dropzoneHovered(
+          viewModel.rootContainer.children.length
+        ),
       }"
       v-show="
-        (isDraggingExistingElement || isDraggingAssetsElement) &&
-        dragSource != 'tree' &&
-        containers.length > 0
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
+        viewModel.rootContainer.children.length > 0
       "
     >
       <i class="material-icons">add_circle_outline</i>
@@ -100,7 +102,7 @@
       display: contextMenu.isVisible ? 'block' : 'none',
     }"
   >
-    <div class="context-menu-row" @click="handleDeleteContainer">
+    <div class="context-menu-row" @click="handleDeleteElement">
       <span class="action">Delete</span>
       <span class="hotkey">Ctrl+D</span>
     </div>
@@ -108,6 +110,8 @@
 </template>
 <script>
 import ElementContainer from "./ElementContainer.vue";
+import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
+
 export default {
   components: {
     ElementContainer: ElementContainer,
@@ -116,56 +120,25 @@ export default {
     "addNewContainer",
     "container-drop",
     "delete-container",
+    "delete-key-press",
     "handleClickOutside",
     "handleContainerDrop",
-    "handleDeleteContainer",
+    "handleDeleteElement",
     "handleDeleteKeyPress",
-    "handleDragEnd",
-    "handleDragStart",
     "handleWidgetDrop",
-    "hover-item",
-    "select-item",
     "showContextMenu",
-    "updateDraggedElement",
-    "update-floating-container",
     "updateHoverIndex",
     "widget-drop",
   ],
   props: {
-    containers: {
-      type: Array,
-      default: () => [],
-    },
-
-    isDraggingAssetsElement: {
-      type: Boolean,
-      required: true,
-    },
-    isDraggingWidgetsElement: {
-      type: Boolean,
-      required: true,
-    },
-    draggedWidget: {
+    viewModel: {
       type: Object,
-      required: false,
+      default: null,
     },
   },
 
   data() {
     return {
-      //selection
-
-      //dragging
-      draggedElement: null,
-      floatingContainer: null,
-      isDraggingExistingElement: false,
-
-      dragSource: null,
-
-      hoverIndex: null,
-      draggedContainerIndex: null,
-      originalContainerIndex: null,
-
       //context
       contextMenu: {
         isVisible: false,
@@ -178,13 +151,10 @@ export default {
 
   computed: {
     dropzoneHovered() {
-      if (this.isDraggingAssetsElement) {
-        this.dragSource = "assets";
-      }
-
       return (index) =>
-        (this.isDraggingExistingElement || this.isDraggingAssetsElement) &&
-        this.hoverIndex === index;
+        (this.viewModel.isDraggingExistingElement ||
+          this.viewModel.isDraggingAssetsElement) &&
+        this.viewModel.hoverIndex === index;
     },
   },
 
@@ -202,8 +172,22 @@ export default {
     // || UI CONTROL
     //
     /// globals
+    updateHoverIndex(index) {
+      /* viewModel.updateHoverIndex(index, this.$emit); */
+
+      if (
+        this.viewModel.isDraggingExistingElement ||
+        this.viewModel.isDraggingAssetsElement
+      ) {
+        this.viewModel.hoverIndex = index;
+      } else {
+        this.viewModel.hoverIndex = null;
+      }
+      console.log("hover index", this.viewModel.hoverIndex);
+    },
 
     showContextMenu(event, container) {
+      this.viewModel.selectItem(container);
       event.preventDefault();
 
       this.contextMenu.isVisible = true;
@@ -212,8 +196,11 @@ export default {
       this.contextMenu.container = container;
     },
 
-    handleDeleteContainer() {
-      this.$emit("delete-container");
+    handleClickOutside() {
+      this.contextMenu.isVisible = false;
+    },
+    handleDeleteElement() {
+      this.$emit("delete-element");
       this.contextMenu.isVisible = false;
     },
     handleDeleteKeyPress(event) {
@@ -223,60 +210,25 @@ export default {
       }
     },
 
-    handleClickOutside() {
-      if (this.contextMenu.isVisible) {
-        this.contextMenu.isVisible = false;
-      }
-    },
-
-    updateHoverIndex(index) {
-      if (this.isDraggingExistingElement || this.isDraggingAssetsElement) {
-        if (
-          this.dragSource === "main" &&
-          this.draggedElement.containerIndex < index
-        ) {
-          index--;
-        }
-        this.hoverIndex = index;
-      } else {
-        this.hoverIndex = null;
-      }
-    },
-
-    //
-    ///select, hover, deselect, dehover
-
-    selectItem(item) {
-      this.$emit("select-item", item);
-    },
-
-    hoverItem(item) {
-      this.$emit("hover-item", item);
+    handleDehover() {
+      this.viewModel.dehover();
     },
 
     //
     /// drag
-    handleDragStart({ item, index, type, containerIndex }, event, source) {
-      this.draggedContainerIndex = index;
+    handleDragStart({ element, type, containerIndex }, event, source) {
+      console.log(type);
+      this.viewModel.existingElementDragStart(
+        { element, type, containerIndex },
+        event,
+        source,
+        this.$emit
+      );
 
-      this.originalContainerIndex = index;
       if (event && event.dataTransfer) {
         event.dataTransfer.setData("text/plain", ""); // for Firefox compatibility
       }
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-      } // for Firefox compatibility
-      this.draggedElement = { item, index, type, containerIndex };
-      if (type === "container") {
-        this.draggedContainerIndex = index;
-        this.originalContainerIndex = index; // Store the original index
-      }
 
-      this.draggedElement = { item, index, type, containerIndex };
-      this.isDraggingExistingElement = true;
-      this.dragSource = source;
-      this.$emit("updateDraggedElement", this.draggedElement);
       let containerElement;
 
       if (source === "main") {
@@ -309,26 +261,27 @@ export default {
       // Assign the floating container
 
       this.floatingContainer = floatingContainer;
-      this.$emit("update-floating-container", floatingContainer);
 
       requestAnimationFrame(() => {
         containerElement.style.display = "none";
       });
     },
-    onElementDragStart(event, item, index, type, containerIndex, source) {
-      this.handleDragStart(
-        { item, index, type, containerIndex },
-        event,
-        source
-      );
+
+    handleContainerDrop() {
+      this.viewModel.dropContainer();
+    },
+
+    /// widget
+
+    handleWidgetDrop(container) {
+      this.viewModel.dropWidget(container);
     },
 
     handleDragEnd() {
-      this.draggedElement = null;
-      this.isDraggingExistingElement = false;
+      this.viewModel.handleDragEnd();
       this.hoverIndex = null;
-      this.dragSource = null;
-      this.draggedContainerIndex = null;
+      /* this.dragSource = null;
+      this.draggedContainerIndex = null; */
 
       if (this.floatingContainer) {
         this.floatingContainer.remove();
@@ -350,70 +303,6 @@ export default {
         const y = event.clientY - containerHeight / 2;
         this.floatingContainer.style.left = x + "px";
         this.floatingContainer.style.top = y + "px";
-      }
-    },
-
-    handleContainerDrop(event, containerIndex) {
-      this.$emit("handleContainerDrop", {
-        event,
-        containerIndex,
-        dragSource: this.dragSource,
-        draggedContainerIndex: this.draggedContainerIndex,
-      });
-    },
-
-    handleWidgetDrop(container) {
-      if (this.isDraggingWidgetsElement) {
-        this.$emit("handleWidgetDrop", {
-          container,
-          widget: this.draggedWidget,
-        });
-      }
-    },
-
-    handleTreeDrop({ item, index, type, containerIndex }) {
-      if (!this.draggedElement) return;
-
-      const from = this.draggedElement;
-
-      // Handle container drag and drop
-      if (from.type === "container" && type === "container") {
-        this.$emit("moveExistingContainer", {
-          targetIndex: index,
-          fromTree: true,
-          draggedContainerIndex: this.draggedContainerIndex,
-        });
-      }
-      // Handle child drag and drop within the same container
-      else if (
-        from.type === "child" &&
-        type === "child" &&
-        from.containerIndex === containerIndex
-      ) {
-        this.$emit("moveChildWithinContainer", {
-          from: from,
-          targetIndex: index,
-          containerIndex: containerIndex,
-        });
-      }
-      // Handle child drag and drop between different containers
-      else if (
-        from.type === "child" &&
-        type === "child" &&
-        from.containerIndex !== containerIndex
-      ) {
-        this.$emit("moveChildBetweenContainers", {
-          from: from,
-          targetIndex: index,
-          targetContainerIndex: containerIndex,
-        });
-      }
-      // Handle child drag and drop onto container
-      else if (from.type === "child" && type === "container") {
-        this.$emit("moveChildToContainer", {
-          from: from,
-          targetContainer: item,
-        });
       }
     },
   },

@@ -1,8 +1,8 @@
 <template>
     <div 
         @click="viewModel.handleElementSelected(element)" 
-        @mouseover="viewModel.handleHover(element)"
-        @mouseleave="viewModel.handleDehover()" 
+        @mouseover="viewModel.handleElementHovered(element)"
+        @mouseleave="viewModel.handleElementDehovered()" 
         @dragstart="viewModel.handleDragStart()"
         :class="{ 
             'tree-text-component': true,

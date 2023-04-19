@@ -3,8 +3,8 @@
         <div 
             v-if="element != viewModel.getRootContainer()" 
             @click="viewModel.handleElementSelected(element)" 
-            @mouseover="viewModel.handleHover(element)" 
-            @mouseleave="viewModel.handleDehover()"
+            @mouseover="viewModel.handleElementHovered(element)" 
+            @mouseleave="viewModel.handleElementDehovered()"
             :class="{ 
                 'tree-container-component-text': true, 
                 'hovered-element': viewModel.getHoveredElement() == element, 
