@@ -1,29 +1,16 @@
 <template>
     <div>
-        <div 
-            v-if="element != viewModel.getRootContainer()" 
-            @click="viewModel.handleElementSelected(element)" 
-            @mouseover="viewModel.handleHover(element)" 
-            @mouseleave="viewModel.handleDehover()"
-            :class="{ 
-                'tree-container-component-text': true, 
-                'hovered-element': viewModel.getHoveredElement() == element, 
-                'selected-element': viewModel.getSelectedElement() == element 
-            }"
-            >
+        <div v-if="element != viewModel.getRootContainer()" class="tree-container-component-text"
+            :class="{ 'hovered-element': viewModel.getCurrentHoveredElement() == element }"
+            @mouseover="viewModel.handleHover(element)" @mouseleave="viewModel.handleDehover()">
             <span class="material-icons">check_box_outline_blank</span>
             <p>{{ element.getName() }}</p>
         </div>
         <draggable :list="element.getChildren()" group="{{ element.getName() }}">
             <div v-for="el in element.getChildren()" :key="el.getName()">
                 <div>
-                    <component 
-                        :is="getComponent(el)" 
-                        :viewModel="viewModel" 
-                        :element="el" 
-                        :class="{ 
-                            'children-container': element != viewModel.getRootContainer() 
-                        }" />
+                    <component :class="[element != viewModel.getRootContainer() ? 'children-container' : '']"
+                        :is="getComponent(el)" :viewModel="viewModel" :element="el" />
                 </div>
             </div>
         </draggable>
@@ -83,9 +70,5 @@ export default {
 
 .hovered-element {
     border: solid #1482ff80;
-}
-
-.selected-element {
-    border: solid #1482ff;
 }
 </style>
