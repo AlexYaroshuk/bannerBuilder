@@ -3,12 +3,12 @@
     :container="container"
     class="container"
     :class="{
-      'container--selected': viewModel.selectedItem === container,
-      'container--hovered': viewModel.hoveredItem === container,
+      'container--selected': viewModel.getSelectedElement() === container,
+      'container--hovered': viewModel.getHoveredElement() === container,
     }"
     :border="
-      viewModel.selectedItem === container ||
-      viewModel.hoveredItem === container
+      viewModel.getSelectedElement() === container ||
+      viewModel.getHoveredElement() === container
         ? `${container.borderWidth}px solid ${container.borderColor}`
         : '2px solid transparent'
     "
@@ -19,15 +19,15 @@
     @mouseleave="handleContainerDehover"
     @drop="handleWidgetDrop(container)"
   >
-    <div class="name" v-if="viewModel.selectedItem === container">
+    <div class="name" v-if="viewModel.getSelectedElement() === container">
       {{ container.name }}
     </div>
     <div class="child" v-if="container.children && container.children.length">
       <div
         class="child-item"
         :class="{
-          'child-item--selected': viewModel.selectedItem === child,
-          'child-item--hovered': viewModel.hoveredItem === child,
+          'child-item--selected': viewModel.getSelectedElement() === child,
+          'child-item--hovered': viewModel.getHoveredElement() === child,
         }"
         v-for="(child, index) in container.children"
         :key="index"
@@ -59,7 +59,7 @@
         class="widget-dropzone"
         v-show="
           viewModel.isDraggingWidgetElement &&
-          viewModel.hoveredItem === container
+          viewModel.getHoveredElement() === container
         "
       ></div>
     </div>
@@ -69,15 +69,17 @@
 <script>
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
+import { Container } from "@/models/container";
+import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
 const ElementContainer = {
   props: {
     viewModel: {
-      type: Object,
-      default: () => ({}),
+      type: BannerBuilderViewModel,
+      default: true,
     },
     container: {
-      type: Object,
+      type: Container,
       required: true,
     },
   },
@@ -152,10 +154,10 @@ export default {
 
   methods: {
     selectItem(item) {
-      this.viewModel.selectItem(item);
+      this.viewModel.handleElementSelected(item);
     },
     hoverItem(item) {
-      this.viewModel.hoverItem(item);
+      this.viewModel.handleElementHovered(item);
     },
     handleWidgetDrop(container) {
       if (
@@ -184,8 +186,8 @@ export default {
     },
     borderColorStyle() {
       const isSelectedOrHovered =
-        this.viewModel.selectedItem === this.container ||
-        this.viewModel.hoveredItem === this.container;
+        this.viewModel.getSelectedElement() === this.container ||
+        this.viewModel.getHoveredElement() === this.container;
       return {
         border: isSelectedOrHovered
           ? `${this.container.borderWidth}px solid ${this.container.borderColor}`

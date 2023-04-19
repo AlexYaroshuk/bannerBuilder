@@ -1,26 +1,6 @@
 import { Element, ContainerStyles, HybridStyles } from "@/models/element";
 
-
 class Container extends Element {
-
-    getEffectiveStyles(): HybridStyles & ContainerStyles {
-        const parent = this.parentContainer;
-        const root = this.getRootContainer();
-
-        return {
-            color: this.color || (parent && parent.color) || (root && root.color) || null,
-            fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
-            fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
-            fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
-            backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
-            backgroundImage: this.backgroundImage || (parent && parent.backgroundImage) || (root && root.backgroundImage) || null,
-            backgroundRepeat: this.backgroundRepeat || (parent && parent.backgroundRepeat) || (root && root.backgroundRepeat) || null,
-            backgroundPosition: this.backgroundPosition || (parent && parent.backgroundPosition) || (root && root.backgroundPosition) || null,
-            backgroundSize: this.backgroundSize || (parent && parent.backgroundSize) || (root && root.backgroundSize) || null,
-        };
-    }
-
-
     readonly type: string;
     isWidgetDropzonesShown: boolean;
     children: Element[];
@@ -30,12 +10,11 @@ class Container extends Element {
     backgroundRepeat: string | null;
     backgroundPosition: string | null;
     backgroundSize: string | null;
-
     BGImage: string | null;
 
     constructor({
         name,
-        children,
+        children = [],
         backgroundColor = 'transparent',
         color = 'black',
         fontFamily = 'Arial',
@@ -46,7 +25,7 @@ class Container extends Element {
         backgroundImage = null,
     }: {
         name: string;
-        children: Element[];
+        children?: Element[];
         backgroundColor?: string;
         fontFamily?: string;
         fontSize?: number;
@@ -67,7 +46,6 @@ class Container extends Element {
 
         });
 
-        this.children = children;
         this.type = 'container';
         this.isWidgetDropzonesShown = false;
         this.borderRadius = 0;
@@ -76,14 +54,22 @@ class Container extends Element {
         this.backgroundRepeat = 'no-repeat';
         this.backgroundPosition = 'center';
         this.backgroundSize = 'cover';
-
         this.BGImage = null;
+
+        this.children = [];
+        for(var child of children) {
+            this.addChild(child);
+        }
     }
 
+    getChildren(): Element[] {
+        return this.children;
+    }
+    
 
     addChild(child: Element): void {
+        child.parentContainer = this;
         this.children.push(child);
-        child.parentContainer = this; // Set the parentContainer property of the child
     }
 
     removeChild(child: Element): void {
@@ -93,8 +79,14 @@ class Container extends Element {
         }
     }
 
-    getChildren(): Element[] {
-        return this.children;
+    swapChildren(childOne: Element, childTwo: Element): void {
+        var fromId: number = 0;
+        var toId: number = 0;
+
+        fromId = this.children.indexOf(childOne);
+        toId = this.children.indexOf(childTwo);
+
+        [this.children[fromId], this.children[toId]] = [this.children[toId], this.children[fromId]]; 
     }
 
     getBackgroundImage(): string | null {
@@ -104,6 +96,25 @@ class Container extends Element {
     get isLeaf(): boolean {
         return false;
     }
+
+    getEffectiveStyles(): HybridStyles & ContainerStyles {
+        const parent = this.parentContainer;
+        const root = this.getRootContainer();
+
+        return {
+            color: this.color || (parent && parent.color) || (root && root.color) || null,
+            fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
+            fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
+            fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
+            backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
+            backgroundImage: this.backgroundImage || (parent && parent.backgroundImage) || (root && root.backgroundImage) || null,
+            backgroundRepeat: this.backgroundRepeat || (parent && parent.backgroundRepeat) || (root && root.backgroundRepeat) || null,
+            backgroundPosition: this.backgroundPosition || (parent && parent.backgroundPosition) || (root && root.backgroundPosition) || null,
+            backgroundSize: this.backgroundSize || (parent && parent.backgroundSize) || (root && root.backgroundSize) || null,
+        };
+    }
+
+
 }
 
 export { Container }

@@ -5,8 +5,6 @@ import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
 
 class Text extends Element {
-
-
   getEffectiveStyles(): HybridStyles {
     return super.getEffectiveStyles();
   }
@@ -61,10 +59,6 @@ class Text extends Element {
 
   removeChild(child: Element): void {
     throw new InvalidOperationError("Cannot remove a child from a leaf element.");
-  }
-
-  get isLeaf(): boolean {
-    return true;
   }
 }
 

@@ -15,7 +15,6 @@ interface ContainerStyles {
   backgroundSize: string | null;
 }
 
-
 abstract class Element {
   name: string
   color: string | null;
@@ -95,11 +94,6 @@ abstract class Element {
 
     };
   }
-
-
-
-
-
 
   abstract addChild(child: Element): void;
 

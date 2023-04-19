@@ -1,52 +1,86 @@
 <template>
-  <div class="tree-container-component">
-    {{ element?.getName() }}
-    <div style="margin-left: 10px">
-      <component
-        v-for="el in element!.children"
-        :is="getComponent(el)"
-        :element="el"
-      />
+    <div>
+        <div 
+            v-if="element != viewModel.getRootContainer()" 
+            @click="viewModel.handleElementSelected(element)" 
+            @mouseover="viewModel.handleElementHovered(element)" 
+            @mouseleave="viewModel.handleElementDehovered()"
+            :class="{ 
+                'tree-container-component-text': true, 
+                'selected-element': viewModel.getSelectedElement() == element,
+                'hovered-element': viewModel.getHoveredElement() == element,
+            }"
+        >
+            <span class="material-icons">check_box_outline_blank</span>
+            <p>{{ element.getName() }}</p>
+        </div>
+        <draggable :list="element.getChildren()" group="{{ element.getName() }}">
+            <div v-for="el in element.getChildren()" :key="el.getName()">
+                <div>
+                    <component :class="[element != viewModel.getRootContainer() ? 'children-container' : '']"
+                        :is="getComponent(el)" :viewModel="viewModel" :element="el" />
+                </div>
+            </div>
+        </draggable>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
-import TreeTextComponent from "./TreeTextComponent.vue";
-import TreeContainerComponent from "./TreeContainerComponent.vue";
-import { Element } from "@/models/element";
-import { Container } from "@/models/container";
-import { Text } from "@/models/text";
+import { Element } from '@/models/element';
+import { Container } from '@/models/container';
+import { Text } from '@/models/text';
+import { BannerBuilderViewModel } from '@/viewmodels/bannerBuilderViewModel';
+import { VueDraggableNext } from 'vue-draggable-next';
+
+import TreeTextComponent from './TreeTextComponent.vue';
+import TreeContainerComponent from './TreeContainerComponent.vue';
 
 export default {
-  props: {
-    element: {
-      type: Container,
+    components: {
+        draggable: VueDraggableNext,
     },
-  },
-
-  methods: {
-    getComponent(element: Element) {
-      if (element instanceof Container) {
-        return TreeContainerComponent;
-      }
-
-      if (element instanceof Text) {
-        return TreeTextComponent;
-      }
+    props: {
+        element: {
+            type: Container,
+            required: true,
+        },
+        viewModel: {
+            type: BannerBuilderViewModel,
+            required: true,
+        }
     },
+    methods: {
+        getComponent(element: Element) {
+            if (element instanceof Container) {
+                return TreeContainerComponent;
+            }
 
-    onHover() {},
-  },
+            if (element instanceof Text) {
+                return TreeTextComponent;
+            }
+        },
+    }
 };
 </script>
 
 <style scoped>
-.tree-container-component {
-  cursor: default;
+.tree-container-component-text {
+    display: flex;
+    cursor: default;
+    margin-bottom: 10px;
+    border: solid transparent;
 }
 
-/* :hover {
-    border: 2px solid hsl(212, 100%, 54%);
-} */
+.children-container {
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+
+.hovered-element {
+    border: solid #1482ff80;
+}
+
+.selected-element {
+    border: solid #1482ff;
+}
 </style>

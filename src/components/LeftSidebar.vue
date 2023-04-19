@@ -18,17 +18,10 @@
       </button>
     </div>
 
-    <div>
+    <div class="tab-content">
       <Assets v-if="activeTab === 'assets'" :viewModel="this.viewModel" />
       <Widgets v-if="activeTab === 'widgets'" :viewModel="this.viewModel" />
-      <Tree
-        :viewModel="this.viewModel"
-        @contextmenu="handleContextMenu"
-        @drag-start="handleDragStart"
-        @drop="handleDrop"
-        @mouseleave="handleTreeDehover"
-        v-if="activeTab === 'layers'"
-      />
+      <Tree v-if="activeTab === 'layers'" :viewModel="this.viewModel" />
     </div>
   </aside>
 </template>
@@ -47,7 +40,7 @@ export default {
   props: {
     viewModel: {
       type: BannerBuilderViewModel,
-      default: null,
+      required: true,
     },
   },
   emits: [

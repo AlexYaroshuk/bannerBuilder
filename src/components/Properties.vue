@@ -19,17 +19,17 @@
       </div>
       <h3
         v-if="
-          viewModel.selectedItem &&
-          viewModel.selectedItem.parentContainer != null
+          viewModel.getSelectedElement() &&
+          viewModel.getSelectedElement().parentContainer != null
         "
       >
-        selected:{{ viewModel.selectedItem.type }}
+        selected:{{ viewModel.getSelectedElement().type }}
       </h3>
       <h3
         style="background-color: gold"
         v-if="
-          viewModel.selectedItem &&
-          viewModel.selectedItem.parentContainer === null
+          viewModel.getSelectedElement() &&
+          viewModel.getSelectedElement().parentContainer === null
         "
       >
         selected: rootContainer
@@ -43,9 +43,9 @@
         <!-- text/link settings -->
         <div
           v-if="
-            viewModel.selectedItem &&
-            (viewModel.selectedItem.type === 'text' ||
-              viewModel.selectedItem.type === 'link')
+            viewModel.getSelectedElement() &&
+            (viewModel.getSelectedElement().type === 'text' ||
+              viewModel.getSelectedElement().type === 'link')
           "
         >
           <div class="form-group">
@@ -61,7 +61,7 @@
         <!-- link settings -->
         <div
           v-if="
-            viewModel.selectedItem && viewModel.selectedItem.type === 'link'
+            viewModel.getSelectedElement() && viewModel.getSelectedElement().type === 'link'
           "
         >
           <div class="form-group">
@@ -70,27 +70,27 @@
               @input="updateChildText"
               id="text-field"
               type="text"
-              v-model="viewModel.selectedItem.url"
+              v-model="viewModel.getSelectedElement().url"
             />
           </div>
         </div>
       </div>
       <!-- hybrid settings -->
       <h3
-        v-if="viewModel.selectedItem && viewModel.selectedItem.type === 'link'"
+        v-if="viewModel.getSelectedElement() && viewModel.getSelectedElement().type === 'link'"
       >
         Link styles are WIP
       </h3>
       <div
         class="popup-content"
-        v-if="viewModel.selectedItem && viewModel.selectedItem.type != 'link'"
+        v-if="viewModel.getSelectedElement() && viewModel.getSelectedElement().type != 'link'"
       >
         <h3 @click="expandableGroups.typography = !expandableGroups.typography">
           Typography({{
-            viewModel.selectedItem.parentContainer
-              ? viewModel.selectedItem.type
+            viewModel.getSelectedElement().parentContainer
+              ? viewModel.getSelectedElement().type
               : ""
-          }}{{ viewModel.selectedItem.parentContainer ? "" : "root" }})
+          }}{{ viewModel.getSelectedElement().parentContainer ? "" : "root" }})
           <i class="material-icons">
             {{ expandableGroups.typography ? "expand_less" : "expand_more" }}
           </i>
@@ -99,37 +99,37 @@
           <div class="prop-section">
             <div
               class="status-text"
-              v-if="viewModel.selectedItem.parentContainer"
+              v-if="viewModel.getSelectedElement().parentContainer"
             >
               <div
-                v-if="viewModel.selectedItem.parentContainer"
+                v-if="viewModel.getSelectedElement().parentContainer"
                 :class="
-                  viewModel.selectedItem.fontSize
+                  viewModel.getSelectedElement().fontSize
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.selectedItem.fontSize">Custom font size</p>
+                <p v-if="viewModel.getSelectedElement().fontSize">Custom font size</p>
 
                 <div
                   class="status-text"
-                  v-if="!viewModel.selectedItem.fontSize"
+                  v-if="!viewModel.getSelectedElement().fontSize"
                 >
                   Inheriting from
                   <p
                     class="link-text"
                     @click="
                       this.viewModel.selectItem(
-                        viewModel.selectedItem.parentContainer
+                        viewModel.getSelectedElement().parentContainer
                       )
                     "
                   >
-                    {{ viewModel.selectedItem.parentContainer.name }}
+                    {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
               </div>
               <button
-                v-if="viewModel.selectedItem.fontSize"
+                v-if="viewModel.getSelectedElement().fontSize"
                 @click.stop="resetStyle('fontSize')"
                 class="reset-button"
               >
@@ -148,39 +148,39 @@
           <div class="prop-section">
             <div
               class="status-text"
-              v-if="viewModel.selectedItem.parentContainer"
+              v-if="viewModel.getSelectedElement().parentContainer"
             >
               <div
-                v-if="viewModel.selectedItem.parentContainer"
+                v-if="viewModel.getSelectedElement().parentContainer"
                 :class="
-                  viewModel.selectedItem.fontWeight
+                  viewModel.getSelectedElement().fontWeight
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.selectedItem.fontWeight">
+                <p v-if="viewModel.getSelectedElement().fontWeight">
                   Custom font weight
                 </p>
 
                 <div
                   class="status-text"
-                  v-if="!viewModel.selectedItem.fontWeight"
+                  v-if="!viewModel.getSelectedElement().fontWeight"
                 >
                   Inheriting from
                   <p
                     class="link-text"
                     @click="
                       this.viewModel.selectItem(
-                        viewModel.selectedItem.parentContainer
+                        viewModel.getSelectedElement().parentContainer
                       )
                     "
                   >
-                    {{ viewModel.selectedItem.parentContainer.name }}
+                    {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
               </div>
               <button
-                v-if="viewModel.selectedItem.fontWeight"
+                v-if="viewModel.getSelectedElement().fontWeight"
                 @click.stop="resetStyle('fontWeight')"
                 class="reset-button"
               >
@@ -200,39 +200,39 @@
           <div class="prop-section">
             <div
               class="status-text"
-              v-if="viewModel.selectedItem.parentContainer"
+              v-if="viewModel.getSelectedElement().parentContainer"
             >
               <div
-                v-if="viewModel.selectedItem.parentContainer"
+                v-if="viewModel.getSelectedElement().parentContainer"
                 :class="
-                  viewModel.selectedItem.fontFamily
+                  viewModel.getSelectedElement().fontFamily
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.selectedItem.fontFamily">
+                <p v-if="viewModel.getSelectedElement().fontFamily">
                   Custom font family
                 </p>
 
                 <div
                   class="status-text"
-                  v-if="!viewModel.selectedItem.fontFamily"
+                  v-if="!viewModel.getSelectedElement().fontFamily"
                 >
                   Inheriting from
                   <p
                     class="link-text"
                     @click="
                       this.viewModel.selectItem(
-                        viewModel.selectedItem.parentContainer
+                        viewModel.getSelectedElement().parentContainer
                       )
                     "
                   >
-                    {{ viewModel.selectedItem.parentContainer.name }}
+                    {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
               </div>
               <button
-                v-if="viewModel.selectedItem.fontFamily"
+                v-if="viewModel.getSelectedElement().fontFamily"
                 @click.stop="resetStyle('fontFamily')"
                 class="reset-button"
               >
@@ -254,34 +254,34 @@
           <div class="prop-section">
             <div
               class="status-text"
-              v-if="viewModel.selectedItem.parentContainer"
+              v-if="viewModel.getSelectedElement().parentContainer"
             >
               <div
-                v-if="viewModel.selectedItem.parentContainer"
+                v-if="viewModel.getSelectedElement().parentContainer"
                 :class="
-                  viewModel.selectedItem.color
+                  viewModel.getSelectedElement().color
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.selectedItem.color">Custom color</p>
+                <p v-if="viewModel.getSelectedElement().color">Custom color</p>
 
-                <div class="status-text" v-if="!viewModel.selectedItem.color">
+                <div class="status-text" v-if="!viewModel.getSelectedElement().color">
                   Inheriting from
                   <p
                     class="link-text"
                     @click="
                       this.viewModel.selectItem(
-                        viewModel.selectedItem.parentContainer
+                        viewModel.getSelectedElement().parentContainer
                       )
                     "
                   >
-                    {{ viewModel.selectedItem.parentContainer.name }}
+                    {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
               </div>
               <button
-                v-if="viewModel.selectedItem.color"
+                v-if="viewModel.getSelectedElement().color"
                 @click.stop="resetStyle('color')"
                 class="reset-button"
               >
@@ -319,7 +319,7 @@
           style="margin-top: 16px"
           v-if="
             viewModel.selectedItem &&
-            viewModel.selectedItem.type === 'container'
+            viewModel.getSelectedElement().type === 'container'
           "
         >
           Backgrounds
@@ -330,45 +330,45 @@
         <div
           v-if="
             expandableGroups.background &&
-            viewModel.selectedItem.type === 'container'
+            viewModel.getSelectedElement().type === 'container'
           "
         >
           <div class="prop-section">
             <div
               class="status-text"
-              v-if="viewModel.selectedItem.parentContainer"
+              v-if="viewModel.getSelectedElement().parentContainer"
             >
               <div
-                v-if="viewModel.selectedItem.parentContainer"
+                v-if="viewModel.getSelectedElement().parentContainer"
                 :class="
-                  viewModel.selectedItem.backgroundColor
+                  viewModel.getSelectedElement().backgroundColor
                     ? 'status-text-selected-color'
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.selectedItem.backgroundColor">
+                <p v-if="viewModel.getSelectedElement().backgroundColor">
                   Custom background color
                 </p>
 
                 <div
                   class="status-text"
-                  v-if="!viewModel.selectedItem.backgroundColor"
+                  v-if="!viewModel.getSelectedElement().backgroundColor"
                 >
                   Inheriting from
                   <p
                     class="link-text"
                     @click="
                       this.viewModel.selectItem(
-                        viewModel.selectedItem.parentContainer
+                        viewModel.getSelectedElement().parentContainer
                       )
                     "
                   >
-                    {{ viewModel.selectedItem.parentContainer.name }}
+                    {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
               </div>
               <button
-                v-if="viewModel.selectedItem.backgroundColor"
+                v-if="viewModel.getSelectedElement().backgroundColor"
                 @click.stop="resetStyle('backgroundColor')"
                 class="reset-button"
               >
@@ -380,12 +380,12 @@
               <div
                 class="color-square"
                 :style="{
-                  backgroundColor: viewModel.selectedItem.backgroundColor,
+                  backgroundColor: viewModel.getSelectedElement().backgroundColor,
                 }"
                 @click="showBGColorPicker = !showBGColorPicker"
               ></div>
               <span class="hex-code">{{
-                viewModel.selectedItem.backgroundColor
+                viewModel.getSelectedElement().backgroundColor
               }}</span>
             </div>
             <ColorPicker
@@ -414,12 +414,8 @@ export default {
   props: {
     viewModel: {
       type: BannerBuilderViewModel,
-      default: null,
-    },
-    selectedItem: {
-      type: Object,
-      default: null,
-    },
+      required: true
+    }
   },
 
   data() {
@@ -455,12 +451,12 @@ export default {
     inputText: {
       get() {
         return this.viewModel.selectedItem
-          ? this.viewModel.selectedItem.text
+          ? this.viewModel.getSelectedElement().text
           : "";
       },
       set(newValue) {
         if (this.viewModel.selectedItem) {
-          this.viewModel.selectedItem.text = newValue;
+          this.viewModel.getSelectedElement().text = newValue;
         }
       },
     },
@@ -468,124 +464,124 @@ export default {
       get() {
         const selectedItem = this.viewModel.selectedItem;
         if (selectedItem) {
-          if (selectedItem.fontSize !== null) {
-            return selectedItem.fontSize;
+          if (getSelectedElement().fontSize !== null) {
+            return getSelectedElement().fontSize;
           } else if (
-            selectedItem.parentContainer &&
-            selectedItem.parentContainer.fontSize !== null
+            getSelectedElement().parentContainer &&
+            getSelectedElement().parentContainer.fontSize !== null
           ) {
-            return selectedItem.parentContainer.fontSize;
+            return getSelectedElement().parentContainer.fontSize;
           }
         }
         return null;
       },
       set(fontSize) {
-        this.viewModel.selectedItem.fontSize = selectedItemFontSize;
+        this.viewModel.getSelectedElement().fontSize = selectedItemFontSize;
       },
     },
     selectedItemFontFamily: {
       get() {
         const selectedItem = this.viewModel.selectedItem;
         if (selectedItem) {
-          if (selectedItem.fontFamily !== null) {
-            return selectedItem.fontFamily;
+          if (getSelectedElement().fontFamily !== null) {
+            return getSelectedElement().fontFamily;
           } else if (
-            selectedItem.parentContainer &&
-            selectedItem.parentContainer.fontFamily !== null
+            getSelectedElement().parentContainer &&
+            getSelectedElement().parentContainer.fontFamily !== null
           ) {
-            return selectedItem.parentContainer.fontFamily;
+            return getSelectedElement().parentContainer.fontFamily;
           }
         }
         return null;
       },
       set(selectedItemFontFamily) {
-        this.viewModel.selectedItem.fontFamily = selectedItemFontFamily;
+        this.viewModel.getSelectedElement().fontFamily = selectedItemFontFamily;
       },
     },
     selectedItemFontWeight: {
       get() {
         const selectedItem = this.viewModel.selectedItem;
         if (selectedItem) {
-          if (selectedItem.selectedItemFontWeight !== null) {
-            return selectedItem.selectedItemFontWeight;
+          if (getSelectedElement().selectedItemFontWeight !== null) {
+            return getSelectedElement().selectedItemFontWeight;
           } else if (
-            selectedItem.parentContainer &&
-            selectedItem.parentContainer.selectedItemFontWeight !== null
+            getSelectedElement().parentContainer &&
+            getSelectedElement().parentContainer.selectedItemFontWeight !== null
           ) {
-            return selectedItem.parentContainer.selectedItemFontWeight;
+            return getSelectedElement().parentContainer.selectedItemFontWeight;
           }
         }
         return null;
       },
       set(selectedItemFontWeight) {
-        this.viewModel.selectedItem.fontWeight = selectedItemFontWeight;
+        this.viewModel.getSelectedElement().fontWeight = selectedItemFontWeight;
       },
     }, */
 
     fontSize: {
       get() {
-        return this.viewModel.selectedItem.fontSize !== null
-          ? this.viewModel.selectedItem.fontSize
-          : this.viewModel.selectedItem.parentContainer
-          ? this.viewModel.selectedItem.parentContainer.fontSize
+        return this.viewModel.getSelectedElement().fontSize !== null
+          ? this.viewModel.getSelectedElement().fontSize
+          : this.viewModel.getSelectedElement().parentContainer
+          ? this.viewModel.getSelectedElement().parentContainer.fontSize
           : null;
       },
       set(fontSize) {
-        this.viewModel.selectedItem.fontSize = fontSize;
+        this.viewModel.getSelectedElement().fontSize = fontSize;
       },
     },
     fontFamily: {
       get() {
-        return this.viewModel.selectedItem.fontFamily !== null
-          ? this.viewModel.selectedItem.fontFamily
-          : this.viewModel.selectedItem.parentContainer
-          ? this.viewModel.selectedItem.parentContainer.fontFamily
+        return this.viewModel.getSelectedElement().fontFamily !== null
+          ? this.viewModel.getSelectedElement().fontFamily
+          : this.viewModel.getSelectedElement().parentContainer
+          ? this.viewModel.getSelectedElement().parentContainer.fontFamily
           : null;
       },
       set(fontFamily) {
-        this.viewModel.selectedItem.fontFamily = fontFamily;
+        this.viewModel.getSelectedElement().fontFamily = fontFamily;
       },
     },
     fontWeight: {
       get() {
-        return this.viewModel.selectedItem.fontWeight !== null
-          ? this.viewModel.selectedItem.fontWeight
-          : this.viewModel.selectedItem.parentContainer
-          ? this.viewModel.selectedItem.parentContainer.fontWeight
+        return this.viewModel.getSelectedElement().fontWeight !== null
+          ? this.viewModel.getSelectedElement().fontWeight
+          : this.viewModel.getSelectedElement().parentContainer
+          ? this.viewModel.getSelectedElement().parentContainer.fontWeight
           : null;
       },
       set(fontWeight) {
-        this.viewModel.selectedItem.fontWeight = fontWeight;
+        this.viewModel.getSelectedElement().fontWeight = fontWeight;
       },
     },
 
     selectedItemColor: {
       get() {
-        return this.viewModel.selectedItem.color !== null
-          ? this.viewModel.selectedItem.color
-          : this.viewModel.selectedItem.parentContainer
-          ? this.viewModel.selectedItem.parentContainer.color
+        return this.viewModel.getSelectedElement().color !== null
+          ? this.viewModel.getSelectedElement().color
+          : this.viewModel.getSelectedElement().parentContainer
+          ? this.viewModel.getSelectedElement().parentContainer.color
           : null;
       },
       set(selectedItemColor) {
-        this.viewModel.selectedItem.color = selectedItemColor;
+        this.viewModel.getSelectedElement().color = selectedItemColor;
       },
     },
     selectedItemBackgroundColor: {
       get() {
-        return this.viewModel.selectedItem.backgroundColor !== null
-          ? this.viewModel.selectedItem.backgroundColor
-          : this.viewModel.selectedItem.parentContainer
-          ? this.viewModel.selectedItem.parentContainer.backgroundColor
+        return this.viewModel.getSelectedElement().backgroundColor !== null
+          ? this.viewModel.getSelectedElement().backgroundColor
+          : this.viewModel.getSelectedElement().parentContainer
+          ? this.viewModel.getSelectedElement().parentContainer.backgroundColor
           : null;
       },
       set(selectedItemBackgroundColor) {
-        this.viewModel.selectedItem.backgroundColor =
+        this.viewModel.getSelectedElement().backgroundColor =
           selectedItemBackgroundColor;
       },
     },
     paragraphBgColor() {
-      return this.viewModel.selectedItem.color ? "red" : "green";
+      return this.viewModel.getSelectedElement().color ? "red" : "green";
     },
   },
 
@@ -597,8 +593,8 @@ export default {
     //hybrid settings
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
-      this.viewModel.selectedItem.color = eventData.cssColor;
-      console.log(this.viewModel.selectedItem.color);
+      this.viewModel.getSelectedElement().color = eventData.cssColor;
+      console.log(this.viewModel.getSelectedElement().color);
     },
 
     /*     updateTypographyFontsize() {
@@ -608,12 +604,12 @@ export default {
       });
     }, */
     updateTypographyFontfamily() {
-      this.viewModel.selectedItem.fontfamily = this.selectedTextFont;
+      this.viewModel.getSelectedElement().fontfamily = this.selectedTextFont;
     },
 
     updateColor(eventData) {
-      (this.viewModel.selectedItem.backgroundColor = eventData.cssColor),
-        console.log(this.viewModel.selectedItem.backgroundColor);
+      (this.viewModel.getSelectedElement().backgroundColor = eventData.cssColor),
+        console.log(this.viewModel.getSelectedElement().backgroundColor);
     },
 
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)

@@ -1,9 +1,13 @@
+import { Element } from "@/models/element";
 import { Text } from "@/models/text";
 import { Container } from "@/models/container";
-import { Element } from "@/models/element";
 import { Link } from "@/models/link";
 
 class BannerBuilderViewModel {
+    rootContainer: Container;
+    rootContainerSnapshot: Container | null;
+    currentSelectedElement: Element | null;
+    currentHoveredElement: Element | null;
 
     //Select and hover
     selectedItem: Element | null = null;
@@ -21,12 +25,13 @@ class BannerBuilderViewModel {
     draggedElementindex: number | null = null;
     draggedContainerIndex: number | null = null;
 
-
-    rootContainer: Container;
-
     emits = ["delete-container",];
 
     constructor() {
+        this.rootContainerSnapshot = null;
+        this.currentSelectedElement = null;
+        this.currentHoveredElement = null;
+
         this.selectedItem = null;
         this.hoveredItem = null;
         this.draggedElement = null;
@@ -37,115 +42,83 @@ class BannerBuilderViewModel {
         this.hoverIndex = null;
         this.draggedContainerIndex = null;
 
-        //reworked setup to assign parentContainer to each element:
-        const container11 = new Container({
-            name: 'Container 1-1', backgroundColor: 'pink', children: [
-                new Text({ name: "Text 1-1", text: "das" }),
-                new Text({ name: "Text 1-2", text: "mor" }),
-            ]
-        });
-
-        container11.children.forEach(child => {
-            child.parentContainer = container11;
-        });
-
-        const container1 = new Container({
-            name: 'Container 1', backgroundColor: "gold", color: '', fontFamily: 'Roboto', fontWeight: 700, children: [
-                new Text({ name: "Text 1", text: "foo" }),
-                new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" }),
-                new Text({ name: "Text 3", text: "sac" }),
-                container11,
-            ]
-        });
-
-        container1.children.forEach(child => {
-            child.parentContainer = container1;
-        });
-
-        const container2 = new Container({
-            name: 'Container 2', backgroundColor: '', color: 'green', fontFamily: 'Helvetica', fontSize: 24, children: [
-                new Text({ name: "Text 3", text: "baz", }),
-                new Text({ name: "Text 4", text: "wee" }),
-            ]
-        });
-
-        container2.children.forEach(child => {
-            child.parentContainer = container2;
-        });
-
-        const rootContainer = new Container({
-            name: "Root", children: [
-                container1,
-                container2,
-            ],
-            backgroundColor: "salmon", color: "purple"
-        });
-
-        rootContainer.children.forEach(child => {
-            child.parentContainer = rootContainer;
-        });
-
-        this.rootContainer = rootContainer;
-
-
-        /* this.rootContainer = new Container({
-            name: "Root", children: [
+        this.rootContainer = new Container({
+            name: "Root",
+            children: [
                 new Container({
-                    name: 'Container 1', children: [
-                        new Text({ name: "Text 1", text: "foo", }),
-                        new Text({ name: "Text 2", text: "bar" }),
-                        new Text({ name: "Text 3", text: "sac" }),
+                    name: 'Container 1',
+                    backgroundColor: "white",
+                    color: "purple",
+                    children: [
+                        new Text({ name: "Text 1-1", text: "das" }),
+                        new Text({ name: "Text 1-2", text: "mor" }),
                         new Container({
-                            name: 'Container 1-1', children: [
-                                new Text({ name: "Text 1-1", text: "das" }),
-                                new Text({ name: "Text 1-2", text: "mor" }),
+                            name: 'Container 1-1',
+                            backgroundColor: '',
+                            color: 'green',
+                            fontFamily: 'Helvetica',
+                            fontSize: 24,
+                            children: [
+                                new Text({ name: "Text 1-1-1", text: "baz", }),
+                                new Text({ name: "Text 1-1-2", text: "wee" })
                             ]
                         })
                     ]
                 }),
                 new Container({
-                    name: 'Container 2', backgroundColor: "gray", children: [
-                        new Text({ name: "Text 3", text: "baz" }),
-                        new Text({ name: "Text 4", text: "wee" }),
+                    name: 'Container 2',
+                    backgroundColor: 'brown',
+                    color: 'green',
+                    fontFamily: 'Helvetica',
+                    fontSize: 24,
+                    children: [
+                        new Text({ name: "Text 1-1-1", text: "baz", }),
+                        new Text({ name: "Text 1-1-2", text: "wee" })
                     ]
                 }),
-            ]
-        }); */
+            ],
+        });
     }
 
     getRootContainer(): Container {
         return this.rootContainer;
     }
 
-
-
-    //UI events
-    selectItem(item: Element) {
-        this.selectedItem = item;
-        console.log(this.selectedItem.parentContainer)
-
+    getSelectedElement(): Element | null {
+        return this.currentSelectedElement;
     }
 
-    deselect() {
-        this.selectedItem = this.rootContainer;
+    getHoveredElement(): Element | null {
+        return this.currentHoveredElement;
+    }
+
+    handleElementSelected(element: Element): void {
+        this.currentSelectedElement = element;
+    }
+
+    handleElementHovered(element: Element): void {
+        this.currentHoveredElement = element;
+    }
+
+    handleElementDeselected() {
+        this.currentSelectedElement = this.rootContainer;
+    }
+
+    handleDragStart(): void {
+        this.currentHoveredElement = null;
+    }
+
+    handleElementDehovered(): void {
+        this.currentHoveredElement = null;
     }
 
     hoverItem(item: Element) {
-        this.hoveredItem = item;
-
+        this.currentHoveredElement = item;
     }
 
     dehover() {
-        this.hoveredItem = null;
+        this.currentHoveredElement = null;
     }
-
-
-
-
-
-    ////drag&drop
-    //hybrid objects
-
 
     existingElementDragStart(
         { element, type, containerIndex }: { element: Element; index: number; type: string; containerIndex: number },
@@ -237,7 +210,7 @@ class BannerBuilderViewModel {
             container,
             this.draggedElement!.type
         );
-        this.selectItem(newElement);
+        this.handleElementSelected(newElement);
         console.log(container)
     }
 
@@ -295,9 +268,6 @@ class BannerBuilderViewModel {
 
         return newContainer;
     }
-
-
-
 }
 
 export { BannerBuilderViewModel }

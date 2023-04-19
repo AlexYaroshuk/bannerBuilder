@@ -1,15 +1,35 @@
 <template>
-    <p class="tree-text-component">{{ element?.getText() }}</p>
+    <div 
+        @click="viewModel.handleElementSelected(element)" 
+        @mouseover="viewModel.handleElementHovered(element)"
+        @mouseleave="viewModel.handleElementDehovered()" 
+        @dragstart="viewModel.handleDragStart()"
+        :class="{ 
+            'tree-text-component': true, 
+            'selected-element': viewModel.getSelectedElement() == element,
+            'hovered-element': viewModel.getHoveredElement() == element
+        }"
+    >
+        <span class="material-icons">text_format</span>
+        <p>
+            {{ element?.getText() }}</p>
+    </div>
 </template>
 
 <script lang="ts">
 import { Text } from '@/models/text';
+import { BannerBuilderViewModel } from '@/viewmodels/bannerBuilderViewModel';
 
 export default {
     props: {
         element: {
             type: Text,
+            required: true,
         },
+        viewModel: {
+            type: BannerBuilderViewModel,
+            required: true,
+        }
     },
     methods: {
     }
@@ -18,10 +38,16 @@ export default {
 
 <style scoped>
 .tree-text-component {
+    display: flex;
     cursor: default;
+    border: solid transparent;
 }
 
-:hover {
-    border: 2px solid hsl(212, 100%, 54%);
+.hovered-element {
+    border: solid #1482ff80;
+}
+
+.selected-element {
+    border: solid #1482ff;
 }
 </style>

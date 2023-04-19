@@ -66,7 +66,7 @@
         @onContextMenu="
           ($event, child) => {
             showContextMenu($event, child);
-            viewModel.selectItem(child);
+            viewModel.handleElementSelected(child);
           }
         "
         @widget-drop="handleWidgetDrop(container)"

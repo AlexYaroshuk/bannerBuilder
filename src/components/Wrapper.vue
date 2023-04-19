@@ -57,8 +57,6 @@ import ElementContainer from "./ElementContainer.vue";
 import Properties from "./Properties.vue";
 import LeftSidebar from "./LeftSidebar.vue";
 import LayoutCanvas from "./LayoutCanvas.vue";
-import newContainerMixin from "../mixins/elementTemplates";
-/* import appSetup from "../mixins/appSetup"; */
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 
 export default {
@@ -95,7 +93,7 @@ export default {
   mounted() {
     /* window.addEventListener("keydown", this.handleDeleteKeyPress); */
     document.addEventListener("click", this.handleClickOutside);
-    this.viewModel.selectItem(this.viewModel.rootContainer);
+    this.viewModel.handleElementSelected(this.viewModel.rootContainer);
   },
 
   beforeUnmount() {
@@ -167,11 +165,11 @@ export default {
     ///select, hover, deselect, dehover
 
     deselectAll() {
-      this.viewModel.deselect();
+      this.viewModel.handleElementDeselected();
     },
 
     dehoverAll() {
-      this.viewModel.dehover();
+      this.viewModel.handleElementDehovered();
     },
 
     //
