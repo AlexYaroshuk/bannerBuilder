@@ -25,6 +25,7 @@ export default {
       widgets: [
         { type: "text", label: "Text", icon: "text_format" },
         { type: "link", label: "Link", icon: "link" },
+        { type: "image", label: "Image", icon: "image" },
       ],
     };
   },

@@ -61,7 +61,8 @@
         <!-- link settings -->
         <div
           v-if="
-            viewModel.getSelectedElement() && viewModel.getSelectedElement().type === 'link'
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().type === 'link'
           "
         >
           <div class="form-group">
@@ -77,13 +78,21 @@
       </div>
       <!-- hybrid settings -->
       <h3
-        v-if="viewModel.getSelectedElement() && viewModel.getSelectedElement().type === 'link'"
+        v-if="
+          viewModel.getSelectedElement() &&
+          (viewModel.getSelectedElement().type === 'link' ||
+            viewModel.getSelectedElement().type === 'image')
+        "
       >
-        Link styles are WIP
+        Link/image styles are WIP
       </h3>
       <div
         class="popup-content"
-        v-if="viewModel.getSelectedElement() && viewModel.getSelectedElement().type != 'link'"
+        v-if="
+          viewModel.getSelectedElement() &&
+          viewModel.getSelectedElement().type != 'link' &&
+          viewModel.getSelectedElement().type != 'image'
+        "
       >
         <h3 @click="expandableGroups.typography = !expandableGroups.typography">
           Typography({{
@@ -109,7 +118,9 @@
                     : 'status-text-inherited-color'
                 "
               >
-                <p v-if="viewModel.getSelectedElement().fontSize">Custom font size</p>
+                <p v-if="viewModel.getSelectedElement().fontSize">
+                  Custom font size
+                </p>
 
                 <div
                   class="status-text"
@@ -266,7 +277,10 @@
               >
                 <p v-if="viewModel.getSelectedElement().color">Custom color</p>
 
-                <div class="status-text" v-if="!viewModel.getSelectedElement().color">
+                <div
+                  class="status-text"
+                  v-if="!viewModel.getSelectedElement().color"
+                >
                   Inheriting from
                   <p
                     class="link-text"
@@ -380,7 +394,8 @@
               <div
                 class="color-square"
                 :style="{
-                  backgroundColor: viewModel.getSelectedElement().backgroundColor,
+                  backgroundColor:
+                    viewModel.getSelectedElement().backgroundColor,
                 }"
                 @click="showBGColorPicker = !showBGColorPicker"
               ></div>
@@ -414,8 +429,8 @@ export default {
   props: {
     viewModel: {
       type: BannerBuilderViewModel,
-      required: true
-    }
+      required: true,
+    },
   },
 
   data() {
@@ -608,7 +623,8 @@ export default {
     },
 
     updateColor(eventData) {
-      (this.viewModel.getSelectedElement().backgroundColor = eventData.cssColor),
+      (this.viewModel.getSelectedElement().backgroundColor =
+        eventData.cssColor),
         console.log(this.viewModel.getSelectedElement().backgroundColor);
     },
 

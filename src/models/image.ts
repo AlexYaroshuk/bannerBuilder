@@ -4,51 +4,41 @@ import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
 
 
-class Text extends Element {
-  getEffectiveStyles(): HybridStyles {
-    return super.getEffectiveStyles();
-  }
 
-
-  text: string;
+class Image extends Element {
+  url: string;
   readonly type: string;
-
-
 
   constructor({
     name,
-    text,
     color = null,
-    fontSize,
-    fontFamily,
-    borderColor = 'transparent',
-    parentContainer = null
-  }
-    : {
-      name: string,
-      text: string,
-      fontSize?: number,
-      fontFamily?: string,
-      color?: string | null;
-      borderColor?: string,
-      parentContainer?: Container | null
-    }) {
+    url,
+    borderColor = "transparent",
+    parentContainer = null,
+  }: {
+    name: string;
+    url: string;
+    borderColor?: string;
+    color?: string | null;
+    parentContainer?: Container | null;
+  }) {
     super({
       name: name,
       color: color,
       borderColor: borderColor,
       parentContainer: parentContainer,
-      fontFamily: fontFamily,
-      fontSize: fontSize
+
     });
 
-    this.type = 'text';
-    this.text = text;
+    this.type = "image";
+
+    this.url = url;
 
   }
 
-  getText(): string {
-    return this.text;
+
+  getUrl(): string {
+    return this.url;
   }
 
   addChild(child: Element): void {
@@ -64,4 +54,4 @@ class Text extends Element {
   }
 }
 
-export { Text }
+export { Image };

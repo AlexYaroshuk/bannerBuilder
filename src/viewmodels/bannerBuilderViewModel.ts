@@ -2,6 +2,7 @@ import { Element } from "@/models/element";
 import { Text } from "@/models/text";
 import { Container } from "@/models/container";
 import { Link } from "@/models/link";
+import { Image } from "@/models/image";
 
 class BannerBuilderViewModel {
     rootContainer: Container;
@@ -52,6 +53,7 @@ class BannerBuilderViewModel {
                     children: [
                         new Text({ name: "Text 1-1", text: "das" }),
                         new Text({ name: "Text 1-2", text: "mor" }),
+                        new Image({ name: "Image 1-3", url: "https://picsum.photos/200/300" }),
                         new Container({
                             name: 'Container 1-1',
                             backgroundColor: '',
@@ -226,6 +228,9 @@ class BannerBuilderViewModel {
                 break;
             case "link":
                 newElement = new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" });
+                break;
+            case "image":
+                newElement = new Image({ name: "Link 3", url: "https://wallabyjs.gallerycdn.vsassets.io/extensions/wallabyjs/console-ninja/0.0.109/1681888403493/Microsoft.VisualStudio.Services.Icons.Default" });
                 break;
             default:
                 throw new Error(`Unsupported element type: ${type}`);

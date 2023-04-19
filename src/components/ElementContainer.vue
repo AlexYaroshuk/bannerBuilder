@@ -47,6 +47,11 @@
           style="padding: 4px"
           :child="child"
         />
+        <ElementImage
+          v-if="child && child.type === 'image'"
+          style="padding: 4px"
+          :child="child"
+        />
 
         <ElementContainer
           v-if="child && child.type === 'container'"
@@ -69,6 +74,7 @@
 <script>
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
+import ElementImage from "./ElementImage.vue";
 import { Container } from "@/models/container";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
@@ -134,6 +140,7 @@ export default {
     ElementText: ElementText,
     ElementLink: ElementLink,
     ElementContainer: ElementContainer,
+    ElementImage: ElementImage,
   },
 
   props: {
@@ -202,7 +209,7 @@ export default {
 .container {
   flex-direction: column;
   width: 520px;
-  height: 96px;
+  min-height: 96px;
   display: flex;
   justify-content: space-between;
   position: relative;

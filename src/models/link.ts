@@ -9,8 +9,6 @@ class Link extends Element {
   label: string;
   url: string;
   readonly type: string;
-  isSelected: boolean;
-  isHovered: boolean;
 
   constructor({
     name,
@@ -43,8 +41,7 @@ class Link extends Element {
     this.type = "link";
     this.label = label;
     this.url = url;
-    this.isSelected = false;
-    this.isHovered = false;
+
   }
 
   getLabel(): string {
