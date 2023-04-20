@@ -119,6 +119,7 @@ export default {
   emits: [
     "addNewContainer",
     "container-drop",
+    "delete-element",
     "delete-container",
     "delete-key-press",
     "handleClickOutside",
@@ -186,14 +187,14 @@ export default {
       console.log("hover index", this.viewModel.hoverIndex);
     },
 
-    showContextMenu(event, container) {
-      this.viewModel.selectItem(container);
+    showContextMenu(event, item) {
+      console.log(item);
+      this.viewModel.handleElementSelected(item);
       event.preventDefault();
 
       this.contextMenu.isVisible = true;
       this.contextMenu.top = event.clientY + "px";
       this.contextMenu.left = event.clientX + "px";
-      this.contextMenu.container = container;
     },
 
     handleClickOutside() {

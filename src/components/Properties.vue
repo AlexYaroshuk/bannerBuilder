@@ -48,13 +48,26 @@
               viewModel.getSelectedElement().type === 'link')
           "
         >
-          <div class="form-group">
+          <div
+            class="form-group"
+            v-if="viewModel.getSelectedElement().type === 'text'"
+          >
             <label for="text-field">Text:</label>
             <input
-              @input="updateChildText"
               id="text-field"
               type="text"
-              v-model="viewModel.selectedItem.label"
+              v-model="viewModel.getSelectedElement().text"
+            />
+          </div>
+          <div
+            class="form-group"
+            v-if="viewModel.getSelectedElement().type === 'link'"
+          >
+            <label for="text-field">Label:</label>
+            <input
+              id="text-field"
+              type="text"
+              v-model="viewModel.getSelectedElement().label"
             />
           </div>
         </div>
@@ -62,13 +75,13 @@
         <div
           v-if="
             viewModel.getSelectedElement() &&
-            viewModel.getSelectedElement().type === 'link'
+            (viewModel.getSelectedElement().type === 'image' ||
+              viewModel.getSelectedElement().type === 'link')
           "
         >
           <div class="form-group">
             <label for="text-field">URL:</label>
             <input
-              @input="updateChildText"
               id="text-field"
               type="text"
               v-model="viewModel.getSelectedElement().url"

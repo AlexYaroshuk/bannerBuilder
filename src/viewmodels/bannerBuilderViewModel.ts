@@ -43,6 +43,10 @@ class BannerBuilderViewModel {
         this.hoverIndex = null;
         this.draggedContainerIndex = null;
 
+        //////////*
+        //* SETUP
+        //////////*
+
         this.rootContainer = new Container({
             name: "Root",
             children: [
@@ -56,13 +60,13 @@ class BannerBuilderViewModel {
                         new Image({ name: "Image 1-3", url: "https://picsum.photos/200/300" }),
                         new Container({
                             name: 'Container 1-1',
-                            backgroundColor: '',
+                            backgroundColor: 'pink',
                             color: 'green',
                             fontFamily: 'Helvetica',
                             fontSize: 24,
                             children: [
                                 new Text({ name: "Text 1-1-1", text: "baz", }),
-                                new Text({ name: "Text 1-1-2", text: "wee" })
+
                             ]
                         })
                     ]
@@ -75,7 +79,7 @@ class BannerBuilderViewModel {
                     fontSize: 24,
                     children: [
                         new Text({ name: "Text 1-1-1", text: "baz", }),
-                        new Text({ name: "Text 1-1-2", text: "wee" })
+                        new Link({ name: "Link", label: "Link 1-1-2", url: "https://example.com" })
                     ]
                 }),
             ],
@@ -221,7 +225,6 @@ class BannerBuilderViewModel {
         console.log(this.draggedElement!.type)
         console.log(type)
 
-
         switch (type) {
             case "text":
                 newElement = new Text({ name: "Text 3", text: "new" });
@@ -230,7 +233,7 @@ class BannerBuilderViewModel {
                 newElement = new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" });
                 break;
             case "image":
-                newElement = new Image({ name: "Link 3", url: "https://wallabyjs.gallerycdn.vsassets.io/extensions/wallabyjs/console-ninja/0.0.109/1681888403493/Microsoft.VisualStudio.Services.Icons.Default" });
+                newElement = new Image({ name: "Link 3", url: "https://picsum.photos/200/300" });
                 break;
             default:
                 throw new Error(`Unsupported element type: ${type}`);

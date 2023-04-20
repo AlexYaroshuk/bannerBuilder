@@ -2,6 +2,7 @@
   <div class="wrapper" ref="wrapper">
     <LayoutCanvas
       :viewModel="this.viewModel"
+      @delete-element="deleteElement"
       @delete-key-press="deleteContainer"
       @delete-container="deleteElement"
       @handleContainerDrop="handleContainerDrop($event)"
@@ -45,7 +46,7 @@
       display: contextMenu.isVisible ? 'block' : 'none',
     }"
   >
-    <div class="context-menu-row" @click="deleteContainer">
+    <div class="context-menu-row" @click="deleteElement">
       <span class="action">Delete</span>
       <span class="hotkey">Ctrl+D</span>
     </div>
@@ -312,16 +313,25 @@ export default {
     /// delete element
 
     deleteElement() {
-      if (this.viewModel.selectedItem.type === "container") {
-        this.containers = this.containers.filter(
-          (container) => container !== this.viewModel.selectedItem
-        );
-      } else {
-        this.containers.forEach((container) => {
-          container.children = container.children.filter(
-            (child) => child != this.viewModel.selectedItem
+      if (this.viewModel.getSelectedElement().type === "container") {
+        console.log(this.viewModel.getSelectedElement().type);
+
+        this.viewModel.rootContainer.children =
+          this.viewModel.rootContainer.children.filter(
+            (container) => container !== this.viewModel.getSelectedElement()
           );
-        });
+      } else {
+        console.log(this.viewModel.getSelectedElement().type);
+        this.viewModel
+          .getSelectedElement()
+          .parentContainer.children.forEach((container) => {
+            this.viewModel.getSelectedElement().parentContainer.children =
+              this.viewModel
+                .getSelectedElement()
+                .parentContainer.children.filter(
+                  (child) => child != this.viewModel.getSelectedElement()
+                );
+          });
       }
       this.contextMenu.isVisible = false;
     },

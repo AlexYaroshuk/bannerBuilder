@@ -89,13 +89,14 @@ const ElementContainer = {
       required: true,
     },
   },
-  emits: ["widget-drop"],
+  emits: ["widget-drop", "select-item", "context-menu"],
+
   methods: {
     selectItem(item) {
-      this.viewModel.selectItem(item);
+      this.viewModel.handleElementSelected(item);
     },
     hoverItem(item) {
-      this.viewModel.hoverItem(item);
+      this.viewModel.handleElementHovered(item);
     },
     handleWidgetDrop(container) {
       if (
@@ -107,8 +108,8 @@ const ElementContainer = {
     },
     onContextMenu(event, type, item) {
       event.preventDefault();
+      this.viewModel.handleElementSelected(item);
       this.$emit("context-menu", event, type, item);
-      this.$emit("select-item", item);
     },
   },
   computed: {
@@ -211,6 +212,7 @@ export default {
   width: 520px;
   min-height: 96px;
   display: flex;
+  overflow: hidden;
   justify-content: space-between;
   position: relative;
   top: 0;
