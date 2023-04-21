@@ -6,12 +6,11 @@ class Container extends Element {
     children: Element[];
     borderRadius: number;
     borderWidth: number;
-    backgroundImage: string | null;
-
+    backgroundImage: null;
     backgroundRepeat: string | null;
     backgroundPosition: string | null;
     backgroundSize: string | null;
-    BGImage: string | null;
+
 
     constructor({
         name,
@@ -55,7 +54,7 @@ class Container extends Element {
         this.backgroundRepeat = 'no-repeat';
         this.backgroundPosition = 'center';
         this.backgroundSize = 'cover';
-        this.BGImage = null;
+
 
         this.children = [];
         for (var child of children) {
@@ -91,7 +90,7 @@ class Container extends Element {
     }
 
     getBackgroundImage(): string | null {
-        return this.BGImage ? `url(${this.BGImage})` : null;
+        return this.backgroundImage ? `url(${this.backgroundImage})` : null;
     }
 
     get isLeaf(): boolean {
@@ -108,14 +107,12 @@ class Container extends Element {
             fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
             fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
             backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
-            backgroundImage: (parent && parent.backgroundImage) || this.backgroundImage || (root && root.backgroundImage) || null,
+            backgroundImage: this.backgroundImage ? `url(${this.backgroundImage})` : null,
             backgroundRepeat: this.backgroundRepeat || (parent && parent.backgroundRepeat) || (root && root.backgroundRepeat) || null,
             backgroundPosition: this.backgroundPosition || (parent && parent.backgroundPosition) || (root && root.backgroundPosition) || null,
             backgroundSize: this.backgroundSize || (parent && parent.backgroundSize) || (root && root.backgroundSize) || null,
         };
     }
-
-
 
 
 }

@@ -426,11 +426,7 @@
           >
             <label>Image:</label>
 
-            <FIleUploader
-              v-model="viewModel.getSelectedElement().backgroundImage"
-              @set-image="setBackgroundImage"
-              @clear-image="clearBackgroundImage"
-            />
+            <FIleUploader :view-model="viewModel" />
           </div>
         </div>
       </div>
@@ -657,13 +653,6 @@ export default {
         item: this.viewModel.getSelectedElement(),
         type: type,
       });
-    },
-
-    setBackgroundImage(image) {
-      this.viewModel.getSelectedElement().backgroundImage = image;
-    },
-    clearBackgroundImage() {
-      this.viewModel.getSelectedElement().backgroundImage = "";
     },
 
     handleSelectParent() {

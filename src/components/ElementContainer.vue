@@ -223,9 +223,7 @@ export default {
   min-width: 8px;
   min-height: 8px;
 }
-.container[data-has-image="true"] {
-  background-image: url(BGImage);
-}
+
 .container--selected {
   border: 2px solid #1280ff;
 }
