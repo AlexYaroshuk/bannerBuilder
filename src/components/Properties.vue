@@ -12,7 +12,7 @@
           <div class="ripple"></div>
         </header>
       </div>
-      <div v-if="!viewModel.selectedItem">
+      <div v-if="!viewModel.getSelectedElement()">
         <h3>Nothing selected</h3>
         <br />
         When you select an element, you'll see its properties here.
@@ -35,21 +35,33 @@
         selected: rootContainer
       </h3>
 
+      <!-- ! content settings -->
       <div
-        class="popup-content"
-        :class="popupContentClass"
-        style="margin-top: 16px"
+        class="prop-section-wrapper"
+        v-if="
+          viewModel.getSelectedElement() &&
+          viewModel.getSelectedElement().type != 'container'
+        "
       >
-        <!-- text/link settings -->
-        <div
-          v-if="
-            viewModel.getSelectedElement() &&
-            (viewModel.getSelectedElement().type === 'text' ||
-              viewModel.getSelectedElement().type === 'link')
-          "
+        <p
+          class="prop-section-title"
+          @click="expandableGroups.content = !expandableGroups.content"
         >
+          Content({{
+            viewModel.getSelectedElement().parentContainer
+              ? viewModel.getSelectedElement().type
+              : ""
+          }}{{ viewModel.getSelectedElement().parentContainer ? "" : "root" }})
+          <i
+            class="material-icons {{ expandableGroups.content ? 'expand-less' : 'expand-more' }}"
+          >
+            {{ expandableGroups.content ? "expand_more" : "chevron_right" }}
+          </i>
+        </p>
+
+        <div v-if="expandableGroups.content">
           <div
-            class="form-group"
+            class="prop-section"
             v-if="viewModel.getSelectedElement().type === 'text'"
           >
             <label for="text-field">Text:</label>
@@ -59,8 +71,9 @@
               v-model="viewModel.getSelectedElement().text"
             />
           </div>
+
           <div
-            class="form-group"
+            class="prop-section"
             v-if="viewModel.getSelectedElement().type === 'link'"
           >
             <label for="text-field">Label:</label>
@@ -70,16 +83,18 @@
               v-model="viewModel.getSelectedElement().label"
             />
           </div>
-        </div>
-        <!-- link settings -->
-        <div
-          v-if="
-            viewModel.getSelectedElement() &&
-            (viewModel.getSelectedElement().type === 'image' ||
-              viewModel.getSelectedElement().type === 'link')
-          "
-        >
-          <div class="form-group">
+          <div
+            class="section-divider"
+            v-if="viewModel.getSelectedElement().type === 'link'"
+          />
+          <div
+            class="prop-section"
+            v-if="
+              viewModel.getSelectedElement() &&
+              (viewModel.getSelectedElement().type === 'image' ||
+                viewModel.getSelectedElement().type === 'link')
+            "
+          >
             <label for="text-field">URL:</label>
             <input
               id="text-field"
@@ -88,35 +103,34 @@
             />
           </div>
         </div>
+
+        <!-- ! link settings -->
       </div>
-      <!-- hybrid settings -->
-      <h3
-        v-if="
-          viewModel.getSelectedElement() &&
-          (viewModel.getSelectedElement().type === 'link' ||
-            viewModel.getSelectedElement().type === 'image')
-        "
-      >
-        Link/image styles are WIP
-      </h3>
+      <!-- ! hybrid settings -->
       <div
-        class="popup-content"
+        class="prop-section-wrapper"
         v-if="
           viewModel.getSelectedElement() &&
           viewModel.getSelectedElement().type != 'link' &&
           viewModel.getSelectedElement().type != 'image'
         "
       >
-        <h3 @click="expandableGroups.typography = !expandableGroups.typography">
+        <p
+          class="prop-section-title"
+          @click="expandableGroups.typography = !expandableGroups.typography"
+        >
           Typography({{
             viewModel.getSelectedElement().parentContainer
               ? viewModel.getSelectedElement().type
               : ""
           }}{{ viewModel.getSelectedElement().parentContainer ? "" : "root" }})
-          <i class="material-icons">
-            {{ expandableGroups.typography ? "expand_less" : "expand_more" }}
+          <i
+            class="material-icons {{ expandableGroups.typography ? 'expand-less' : 'expand-more' }}"
+          >
+            {{ expandableGroups.typography ? "expand_more" : "chevron_right" }}
           </i>
-        </h3>
+        </p>
+
         <div v-if="expandableGroups.typography">
           <div class="prop-section">
             <div
@@ -140,14 +154,7 @@
                   v-if="!viewModel.getSelectedElement().fontSize"
                 >
                   Inheriting from
-                  <p
-                    class="link-text"
-                    @click="
-                      this.viewModel.selectItem(
-                        viewModel.getSelectedElement().parentContainer
-                      )
-                    "
-                  >
+                  <p class="link-text" @click.stop="handleSelectParent">
                     {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
@@ -169,6 +176,8 @@
               v-model="fontSize"
             />
           </div>
+          <div class="section-divider" />
+
           <div class="prop-section">
             <div
               class="status-text"
@@ -191,14 +200,7 @@
                   v-if="!viewModel.getSelectedElement().fontWeight"
                 >
                   Inheriting from
-                  <p
-                    class="link-text"
-                    @click="
-                      this.viewModel.selectItem(
-                        viewModel.getSelectedElement().parentContainer
-                      )
-                    "
-                  >
+                  <p class="link-text" @click.stop="handleSelectParent">
                     {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
@@ -220,6 +222,7 @@
               v-model="fontWeight"
             />
           </div>
+          <div class="section-divider" />
 
           <div class="prop-section">
             <div
@@ -243,14 +246,7 @@
                   v-if="!viewModel.getSelectedElement().fontFamily"
                 >
                   Inheriting from
-                  <p
-                    class="link-text"
-                    @click="
-                      this.viewModel.selectItem(
-                        viewModel.getSelectedElement().parentContainer
-                      )
-                    "
-                  >
+                  <p class="link-text" @click.stop="handleSelectParent">
                     {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
@@ -275,6 +271,8 @@
               <option value="Roboto">Roboto</option>
             </select>
           </div>
+          <div class="section-divider" />
+
           <div class="prop-section">
             <div
               class="status-text"
@@ -295,14 +293,7 @@
                   v-if="!viewModel.getSelectedElement().color"
                 >
                   Inheriting from
-                  <p
-                    class="link-text"
-                    @click="
-                      this.viewModel.selectItem(
-                        viewModel.getSelectedElement().parentContainer
-                      )
-                    "
-                  >
+                  <p class="link-text" @click.stop="handleSelectParent">
                     {{ viewModel.getSelectedElement().parentContainer.name }}
                   </p>
                 </div>
@@ -332,7 +323,8 @@
             />
           </div>
         </div>
-        <!--         <div class="popup-content" v-if="selectedChild">
+      </div>
+      <!--         <div class="popup-content" v-if="selectedChild">
           <h3>Typography color (child)</h3>
           <ColorPicker
             :color="selectedChild.color"
@@ -340,26 +332,28 @@
           />
         </div> -->
 
-        <!-- container settings -->
-        <h3
+      <!-- ! container settings -->
+
+      <div
+        class="prop-section-wrapper"
+        v-if="
+          viewModel.getSelectedElement() &&
+          viewModel.getSelectedElement().type === 'container'
+        "
+      >
+        <p
+          class="prop-section-title"
           @click="expandableGroups.background = !expandableGroups.background"
-          style="margin-top: 16px"
-          v-if="
-            viewModel.selectedItem &&
-            viewModel.getSelectedElement().type === 'container'
-          "
         >
           Backgrounds
-          <i class="material-icons">
-            {{ expandableGroups.background ? "expand_less" : "expand_more" }}
+          <i
+            class="material-icons {{ expandableGroups.background ? 'expand-less' : 'expand-more' }}"
+          >
+            {{ expandableGroups.background ? "expand_more" : "chevron_right" }}
           </i>
-        </h3>
-        <div
-          v-if="
-            expandableGroups.background &&
-            viewModel.getSelectedElement().type === 'container'
-          "
-        >
+        </p>
+
+        <div v-if="expandableGroups.background">
           <div class="prop-section">
             <div
               class="status-text"
@@ -402,6 +396,7 @@
                 Reset
               </button>
             </div>
+
             <div class="color-display-container">
               <label for="color-picker">Color:</label>
               <div
@@ -416,11 +411,25 @@
                 viewModel.getSelectedElement().backgroundColor
               }}</span>
             </div>
+
             <ColorPicker
               default-format="hex"
               v-if="showBGColorPicker"
               v-model="selectedItemBackgroundColor"
               @color-change="updateColor"
+            />
+          </div>
+          <div class="section-divider" />
+          <div
+            class="prop-section"
+            v-if="viewModel.getSelectedElement().parentContainer"
+          >
+            <label>Image:</label>
+
+            <FIleUploader
+              v-model="viewModel.getSelectedElement().backgroundImage"
+              @set-image="setBackgroundImage"
+              @clear-image="clearBackgroundImage"
             />
           </div>
         </div>
@@ -456,6 +465,7 @@ export default {
         },
       ],
       expandableGroups: {
+        content: true,
         typography: true,
         background: true,
       },
@@ -649,13 +659,16 @@ export default {
       });
     },
 
-    setImageAsBG(image) {
-      this.BGImage = image;
-      this.$emit("update-image-BG", this.BGImage);
+    setBackgroundImage(image) {
+      this.viewModel.getSelectedElement().backgroundImage = image;
     },
-    clearImage() {
-      this.BGImage = null;
-      this.$emit("clear-image-BG");
+    clearBackgroundImage() {
+      this.viewModel.getSelectedElement().backgroundImage = "";
+    },
+
+    handleSelectParent() {
+      const parent = this.viewModel.currentSelectedElement.parentContainer;
+      this.viewModel.handleElementSelected(parent);
     },
   },
 };
@@ -697,18 +710,22 @@ export default {
 }
 .link-text {
   margin-left: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 4px;
   display: flex;
-  font-weight: 600;
+
   font-size: small;
-  text-decoration: underline;
   cursor: pointer;
+  color: white;
+  background-color: rgb(154, 67, 253);
   /*   padding-left: 4px;
   padding-right: 4px; */
 }
 
 .status-text-inherited-color {
-  color: rgb(154, 67, 253);
-  background-color: rgba(154, 67, 253, 0.2);
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 .status-text-selected-color {
@@ -721,13 +738,13 @@ export default {
   align-items: center;
 }
 
-.color-square {
-  width: 24px;
-  height: 24px;
-  border: 1px solid black;
-  margin-left: 4px;
-  margin-right: 4px;
-  cursor: pointer;
+i.material-icons {
+  float: left;
+  margin-right: 4px; /* adjust the margin as needed */
+}
+
+.material-icons.expand-more {
+  transform: rotate(90deg);
 }
 
 .hex-code {
@@ -735,8 +752,25 @@ export default {
 }
 
 .prop-section {
-  border-top: 1px solid lightgray;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.prop-section-wrapper {
+  background-color: #edebeb;
+  padding: 2px;
+}
+
+.prop-section-title {
+  border-top: 1px solid rgb(184, 183, 183);
+  border-bottom: 1px solid rgb(184, 183, 183);
+  background-color: lightgray;
+  font-weight: 600;
+  font-size: medium;
+  cursor: default;
+}
+
+.section-divider {
+  background-color: lightgray;
+  height: 1px;
 }
 </style>

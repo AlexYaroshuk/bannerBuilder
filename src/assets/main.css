@@ -293,3 +293,12 @@ a,
   transform: translate(-50%, -50%) scale(1.8);
   transition: none;
 }
+
+.color-square {
+  width: 24px;
+  height: 24px;
+  border: 1px solid black;
+  margin-left: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+}

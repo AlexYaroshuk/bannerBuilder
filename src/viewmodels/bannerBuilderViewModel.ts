@@ -100,6 +100,7 @@ class BannerBuilderViewModel {
 
     handleElementSelected(element: Element): void {
         this.currentSelectedElement = element;
+        console.log(this.currentSelectedElement.parentContainer);
     }
 
     handleElementHovered(element: Element): void {

@@ -2,14 +2,13 @@
   <div>
     <input type="file" @change="handleFileUpload" />
     <img v-if="imageSource" :src="imageSource" alt="Image" />
-    <button @click="setImage">Set</button>
     <button @click="clearImage">Clear</button>
   </div>
 </template>
 
 <script>
 export default {
-  emits: ["set-image-bg"],
+  emits: ["set-image", "clear-image"],
   data() {
     return {
       imageSource: null,
@@ -22,12 +21,12 @@ export default {
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         this.imageSource = event.target.result;
+        this.$emit("set-image", this.imageSource);
       };
     },
-    setImage() {
-      this.$emit("set-image", this.imageSource);
-    },
+
     clearImage() {
+      this.imageSource = null;
       this.$emit("clear-image");
     },
   },

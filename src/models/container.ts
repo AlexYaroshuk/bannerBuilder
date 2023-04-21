@@ -6,7 +6,8 @@ class Container extends Element {
     children: Element[];
     borderRadius: number;
     borderWidth: number;
-    backgroundImage: null;
+    backgroundImage: string | null;
+
     backgroundRepeat: string | null;
     backgroundPosition: string | null;
     backgroundSize: string | null;
@@ -22,7 +23,7 @@ class Container extends Element {
         fontWeight = 400,
         borderColor = 'transparent',
         parentContainer = null,
-        backgroundImage = null,
+        backgroundImage = '',
     }: {
         name: string;
         children?: Element[];
@@ -57,7 +58,7 @@ class Container extends Element {
         this.BGImage = null;
 
         this.children = [];
-        for(var child of children) {
+        for (var child of children) {
             this.addChild(child);
         }
     }
@@ -65,7 +66,7 @@ class Container extends Element {
     getChildren(): Element[] {
         return this.children;
     }
-    
+
 
     addChild(child: Element): void {
         child.parentContainer = this;
@@ -86,7 +87,7 @@ class Container extends Element {
         fromId = this.children.indexOf(childOne);
         toId = this.children.indexOf(childTwo);
 
-        [this.children[fromId], this.children[toId]] = [this.children[toId], this.children[fromId]]; 
+        [this.children[fromId], this.children[toId]] = [this.children[toId], this.children[fromId]];
     }
 
     getBackgroundImage(): string | null {
@@ -107,12 +108,14 @@ class Container extends Element {
             fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
             fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
             backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
-            backgroundImage: this.backgroundImage || (parent && parent.backgroundImage) || (root && root.backgroundImage) || null,
+            backgroundImage: (parent && parent.backgroundImage) || this.backgroundImage || (root && root.backgroundImage) || null,
             backgroundRepeat: this.backgroundRepeat || (parent && parent.backgroundRepeat) || (root && root.backgroundRepeat) || null,
             backgroundPosition: this.backgroundPosition || (parent && parent.backgroundPosition) || (root && root.backgroundPosition) || null,
             backgroundSize: this.backgroundSize || (parent && parent.backgroundSize) || (root && root.backgroundSize) || null,
         };
     }
+
+
 
 
 }
