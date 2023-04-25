@@ -2,11 +2,7 @@
   <div>
     <input type="file" ref="fileInput" @change="handleFileUpload" />
 
-    <img
-      v-if="this.viewModel.currentSelectedElement.backgroundImage"
-      :src="this.viewModel.currentSelectedElement.backgroundImage"
-      :alt="this.viewModel.currentSelectedElement.backgroundImage"
-    />
+    <img v-if="backgroundImage" :src="backgroundImage" :alt="backgroundImage" />
 
     <button @click="clearImage">Clear</button>
   </div>
@@ -28,10 +24,22 @@ export default {
     },
   },
   computed: {
+    backgroundImage() {
+      const currentElement = this.viewModel.currentSelectedElement;
+      if (currentElement.background) {
+        const imageLayer = currentElement.background.find(
+          (layer) => layer.type === "image"
+        );
+        return imageLayer ? imageLayer.value : null;
+      }
+      return null;
+    },
+
     showImage() {
       return !!this.viewModel.currentSelectedElement.backgroundImage;
     },
   },
+
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
@@ -50,7 +58,13 @@ export default {
     },
 
     setImage() {
-      this.viewModel.currentSelectedElement.backgroundImage = this.imageSource;
+      const backgroundImageLayer = {
+        type: "image",
+        value: this.imageSource,
+      };
+      this.viewModel.currentSelectedElement.addBackgroundLayer(
+        backgroundImageLayer
+      );
       this.$refs.fileInput.value = null; // clear the input field
     },
   },

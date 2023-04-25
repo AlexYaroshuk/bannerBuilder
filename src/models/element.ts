@@ -1,18 +1,24 @@
 import { Container } from "@/models/container";
 
+type BackgroundLayer = {
+  type: "color" | "gradient" | "image";
+  value: string;
+  position?: string;
+  size?: string;
+  repeat?: string;
+  layerIndex: number;
+};
+
+
 interface HybridStyles {
   color: string | null;
   fontFamily: string | null;
   fontWeight: number | null;
   fontSize: number | null;
-  backgroundColor: string | null;
 }
 
 interface ContainerStyles {
-  backgroundImage: string | null;
-  backgroundRepeat: string | null;
-  backgroundPosition: string | null;
-  backgroundSize: string | null;
+  background: BackgroundLayer[] | null;
 }
 
 abstract class Element {
@@ -21,7 +27,7 @@ abstract class Element {
   fontFamily: string | null;
   fontWeight: number | null;
   fontSize: number | null;
-  backgroundColor: string | null;
+  background: BackgroundLayer[] | null;
   borderColor: string | null;
   parentContainer: Container | null;
 
@@ -32,7 +38,7 @@ abstract class Element {
     fontFamily = null,
     fontWeight = null,
     fontSize = null,
-    backgroundColor = null,
+    background = [],
     borderColor = null,
     parentContainer = null,
   }: {
@@ -41,7 +47,7 @@ abstract class Element {
     fontFamily?: string | null,
     fontWeight?: number | null,
     fontSize?: number | null,
-    backgroundColor?: string | null,
+    background?: BackgroundLayer[];
     borderColor?: string | null,
     parentContainer?: Container | null
   }) {
@@ -50,7 +56,7 @@ abstract class Element {
     this.fontFamily = fontFamily;
     this.fontWeight = fontWeight;
     this.fontSize = fontSize;
-    this.backgroundColor = backgroundColor;
+    this.background = background;
     this.borderColor = borderColor;
     this.parentContainer = parentContainer;
   }
@@ -66,9 +72,9 @@ abstract class Element {
     return this.color;
   }
 
-  getBackgroundColor(): string | null {
-    return this.backgroundColor;
-  }
+  /*   getBackgroundColor(): string | null {
+      return this.backgroundColor;
+    } */
 
   getRootContainer(): Container | null {
     let current: Container | null = this.parentContainer;
@@ -89,11 +95,10 @@ abstract class Element {
       fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
       fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
       fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
-      backgroundColor: this.backgroundColor || (parent && parent.backgroundColor) || (root && root.backgroundColor) || null,
-
-
     };
   }
+
+
 
   abstract addChild(child: Element): void;
 

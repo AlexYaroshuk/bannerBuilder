@@ -19,54 +19,62 @@
     @mouseleave="handleContainerDehover"
     @drop="handleWidgetDrop(container)"
   >
-    <div class="name" v-if="viewModel.getSelectedElement() === container">
-      {{ container.name }}
-    </div>
-    <div class="child" v-if="container.children && container.children.length">
-      <div
-        class="child-item"
-        :class="{
-          'child-item--selected': viewModel.getSelectedElement() === child,
-          'child-item--hovered': viewModel.getHoveredElement() === child,
-        }"
-        v-for="(child, index) in container.children"
-        :key="index"
-        :data-key="index"
-        @click.stop="selectItem(child)"
-        @contextmenu.prevent="onContextMenu($event, 'child', child)"
-        @mouseover.stop="hoverItem(child)"
-      >
-        <ElementText
-          v-if="child && child.type === 'text'"
-          style="padding: 4px"
-          :child="child"
-        />
+    <div
+      class="background-layer"
+      v-for="(backgroundLayer, layerIndex) in containerStyle.backgroundLayers"
+      :key="'layer-' + layerIndex"
+      :style="backgroundLayer"
+    ></div>
 
-        <ElementLink
-          v-if="child && child.type === 'link'"
-          style="padding: 4px"
-          :child="child"
-        />
-        <ElementImage
-          v-if="child && child.type === 'image'"
-          style="padding: 4px"
-          :child="child"
-        />
-
-        <ElementContainer
-          v-if="child && child.type === 'container'"
-          style="padding: 4px"
-          :container="child"
-          :viewModel="viewModel"
-        />
+    <div class="children-wrapper">
+      <div class="name" v-if="viewModel.getSelectedElement() === container">
+        {{ container.name }}
       </div>
-      <div
-        class="widget-dropzone"
-        v-show="
-          viewModel.isDraggingWidgetElement &&
-          viewModel.getHoveredElement() === container
-        "
-      ></div>
+      <div class="child" v-if="container.children && container.children.length">
+        <div
+          class="child-item"
+          :class="{
+            'child-item--selected': viewModel.getSelectedElement() === child,
+            'child-item--hovered': viewModel.getHoveredElement() === child,
+          }"
+          v-for="(child, index) in container.children"
+          :key="index"
+          :data-key="index"
+          @click.stop="selectItem(child)"
+          @contextmenu.prevent="onContextMenu($event, 'child', child)"
+          @mouseover.stop="hoverItem(child)"
+        >
+          <ElementText
+            v-if="child && child.type === 'text'"
+            style="padding: 4px"
+            :child="child"
+          />
+          <ElementLink
+            v-if="child && child.type === 'link'"
+            style="padding: 4px"
+            :child="child"
+          />
+          <ElementImage
+            v-if="child && child.type === 'image'"
+            style="padding: 4px"
+            :child="child"
+          />
+
+          <ElementContainer
+            v-if="child && child.type === 'container'"
+            style="padding: 4px"
+            :container="child"
+            :viewModel="viewModel"
+          />
+        </div>
+        <div
+          class="widget-dropzone"
+          v-show="
+            viewModel.isDraggingWidgetElement &&
+            viewModel.getHoveredElement() === container
+          "
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -112,17 +120,49 @@ const ElementContainer = {
       this.$emit("context-menu", event, type, item);
     },
   },
+
   computed: {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
+      const sortedBackgroundLayers = styles.background.sort(
+        (a, b) => a.layerIndex - b.layerIndex
+      );
+
+      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+        const layer = {
+          zIndex: bg.layerIndex,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        };
+
+        switch (bg.type) {
+          case "color":
+            layer.backgroundColor = bg.value;
+            break;
+          case "gradient":
+            layer.backgroundImage = `linear-gradient(${bg.value})`;
+            break;
+          case "image":
+            layer.backgroundImage = `url(${bg.value})`;
+            layer.backgroundRepeat = bg.repeat || "no-repeat";
+            layer.backgroundPosition = bg.position || "center";
+            layer.backgroundSize = bg.size || "cover";
+            break;
+          default:
+            throw new Error(`Unknown background type: ${bg.type}`);
+        }
+
+        return layer;
+      });
+
       return {
-        backgroundColor: styles.backgroundColor,
-        backgroundImage: styles.backgroundImage,
-        backgroundRepeat: styles.backgroundRepeat,
-        backgroundPosition: styles.backgroundPosition,
-        backgroundSize: styles.backgroundSize,
+        backgroundLayers,
       };
     },
+
     borderColorStyle() {
       const isSelectedOrHovered =
         this.viewModel.selectedItem === this.container ||
@@ -184,14 +224,45 @@ export default {
   computed: {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
+      const sortedBackgroundLayers = styles.background.sort(
+        (a, b) => a.layerIndex - b.layerIndex
+      );
+
+      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+        const layer = {
+          zIndex: bg.layerIndex,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        };
+
+        switch (bg.type) {
+          case "color":
+            layer.backgroundColor = bg.value;
+            break;
+          case "gradient":
+            layer.backgroundImage = `linear-gradient(${bg.value})`;
+            break;
+          case "image":
+            layer.backgroundImage = `url(${bg.value})`;
+            layer.backgroundRepeat = bg.repeat || "no-repeat";
+            layer.backgroundPosition = bg.position || "center";
+            layer.backgroundSize = bg.size || "cover";
+            break;
+          default:
+            throw new Error(`Unknown background type: ${bg.type}`);
+        }
+
+        return layer;
+      });
+
       return {
-        backgroundColor: styles.backgroundColor,
-        backgroundImage: styles.backgroundImage,
-        backgroundRepeat: styles.backgroundRepeat,
-        backgroundPosition: styles.backgroundPosition,
-        backgroundSize: styles.backgroundSize,
+        backgroundLayers,
       };
     },
+
     borderColorStyle() {
       const isSelectedOrHovered =
         this.viewModel.getSelectedElement() === this.container ||
@@ -222,6 +293,19 @@ export default {
   border: 2px solid transparent;
   min-width: 8px;
   min-height: 8px;
+}
+
+.background-color,
+.background-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.children-wrapper {
+  position: relative;
 }
 
 .container--selected {

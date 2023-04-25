@@ -47,21 +47,30 @@ class BannerBuilderViewModel {
         //* SETUP
         //////////*
 
+        ///////////*
+        //* SETUP
+        ///////////*/
+
         this.rootContainer = new Container({
             name: "Root",
             children: [
                 new Container({
                     name: 'Container 1',
-                    backgroundColor: "white",
-                    color: "purple",
+                    background: [
+                        { type: "color", value: "red", layerIndex: 0 },
+                        { type: "color", value: "white", layerIndex: 1 },
+
+                    ],
                     children: [
                         new Text({ name: "Text 1-1", text: "das" }),
                         new Text({ name: "Text 1-2", text: "mor" }),
                         new Image({ name: "Image 1-3", url: "https://picsum.photos/200/300" }),
                         new Container({
                             name: 'Container 1-1',
-                            backgroundColor: 'pink',
-                            color: 'green',
+                            background: [
+                                { type: "color", value: "pink", layerIndex: 1 },
+                                { type: "color", value: "hsla(0, 23%, 2%, 0.1)", layerIndex: 0 },
+                            ],
                             fontFamily: 'Helvetica',
                             fontSize: 24,
                             children: [
@@ -73,8 +82,10 @@ class BannerBuilderViewModel {
                 }),
                 new Container({
                     name: 'Container 2',
-                    backgroundColor: 'brown',
-                    color: 'green',
+                    background: [
+                        { type: "color", value: "red", layerIndex: 0 },
+                        { type: "color", value: "hsla(77, 23%, 2%, 0.5)", layerIndex: 1 },
+                    ],
                     fontFamily: 'Helvetica',
                     fontSize: 24,
                     children: [
@@ -82,8 +93,22 @@ class BannerBuilderViewModel {
                         new Link({ name: "Link", label: "Link 1-1-2", url: "https://example.com" })
                     ]
                 }),
+                new Container({
+                    name: 'Container 3',
+                    background: [
+                        { type: "image", value: "https://picsum.photos/200/300", layerIndex: 0 },
+
+                    ],
+                    children: [
+                        new Text({ name: "Text 3-1", text: "tex" }),
+                        new Text({ name: "Text 3-2", text: "text" }),
+                    ]
+
+                }),
             ],
         });
+
+
     }
 
     getRootContainer(): Container {
@@ -91,7 +116,9 @@ class BannerBuilderViewModel {
     }
 
     getSelectedElement(): Element | null {
+
         return this.currentSelectedElement;
+
     }
 
     getHoveredElement(): Element | null {
@@ -153,6 +180,21 @@ class BannerBuilderViewModel {
         this.draggedElement = { item, type };
         this.isDraggingAssetsElement = true;
     } */
+
+
+    //mutate element
+    removeBackground(background: { type: "image" | "color" | "gradient"; value: string; position?: string | undefined; size?: string | undefined; repeat?: string | undefined; layerIndex: number; }) {
+        const index = this.currentSelectedElement?.background?.indexOf(background);
+        if (index !== -1) {
+            this.currentSelectedElement?.background?.splice(background.layerIndex, 1);
+
+            // Update layerIndex values of remaining backgrounds
+            this.currentSelectedElement?.background?.forEach((bg, i) => {
+                bg.layerIndex = i;
+            });
+        }
+    }
+
 
 
 
@@ -256,7 +298,7 @@ class BannerBuilderViewModel {
             return randomColor;
         };
 
-        newContainer.backgroundColor = getRandomColor();
+        /* newContainer.backgroundColor = getRandomColor(); */
 
         this.rootContainer.children.splice(this.hoverIndex!, 0, newContainer);
     }

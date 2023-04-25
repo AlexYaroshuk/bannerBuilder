@@ -3,7 +3,10 @@
     <aside :class="['sidebar-button', { hidden: !isVisible }]">
       <button @click="toggleVisibility">&lt; Show sidebar</button>
     </aside>
-    <aside :class="['sidebar', { hidden: !isVisible }]">
+    <aside
+      :class="['sidebar', { hidden: !isVisible }]"
+      @click.stop="hideBackgroundSelector"
+    >
       <button @click="toggleVisibility">&gt; Hide</button>
       <div class="tab-bar">
         <header v-for="(tab, index) in tabs" :key="index">
@@ -11,6 +14,7 @@
           <span class="tab-text">{{ tab.label }}</span>
           <div class="ripple"></div>
         </header>
+        <button @click="test">test</button>
       </div>
       <div v-if="!viewModel.getSelectedElement()">
         <h3>Nothing selected</h3>
@@ -352,8 +356,93 @@
             {{ expandableGroups.background ? "expand_more" : "chevron_right" }}
           </i>
         </p>
-
+        <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
         <div v-if="expandableGroups.background">
+          <div class="prop-section">
+            <div>
+              Image or gradient
+              <button @click.stop="showBackgroundSelector(background)">
+                add
+              </button>
+
+              <i class="material-icons">add</i>
+            </div>
+            <draggable
+              class="background-list"
+              v-model="viewModel.getSelectedElement().background"
+              tag="div"
+              handle=".background-drag-handle"
+              @end="onEnd"
+              cursor="grabbing"
+            >
+              <div
+                class="background-selector"
+                v-if="isBackgroundSelectorVisible"
+                ref="backgroundSelector"
+                @click.stop
+              >
+                <FIleUploader :view-model="viewModel" />
+                test
+                <button @click="addColorBackground()">add color</button>
+              </div>
+              <div
+                v-for="(background, index) in viewModel.getSelectedElement()
+                  .background"
+                :key="index"
+                @mouseover="setBackgroundListHoverIndex(index)"
+                @mouseout="clearBackgroundListHoverIndex"
+              >
+                <div class="background-list-item">
+                  <div class="background-drag-handle">☰</div>
+                  <div
+                    class="color-square"
+                    :style="
+                      background.type === 'image'
+                        ? { backgroundImage: `url(${background.value})` }
+                        : { backgroundColor: background.value }
+                    "
+                  />
+
+                  <div class="background-list-type">
+                    {{ background.type
+                    }}<!-- ({{ background.value }}) -->
+                  </div>
+                  <button @click="removeBackground(background)">del</button>
+                  <div
+                    class="delete-icon"
+                    v-if="this.backgroundListHoverIndex === index"
+                    @click="removeBackground(background)"
+                  >
+                    <i class="material-icons">delete</i>
+                  </div>
+                </div>
+                <div
+                  class="section-divider"
+                  v-if="viewModel.getSelectedElement().background.length > 1"
+                />
+                <!-- <div
+                    class="background-list-color-square"
+                    v-if="background.type === 'color'"
+                    :style="{ backgroundColor: background.value }"
+                  ></div>
+                  <div
+                    class="background-list-gradient"
+                    v-if="background.type === 'gradient'"
+                    :style="{
+                      backgroundImage: `linear-gradient(${background.value})`,
+                    }"
+                  ></div>
+                  <div
+                    class="background-list-image"
+                    v-if="background.type === 'image'"
+                    :style="{ backgroundImage: `url(${background.value})` }"
+                  ></div> -->
+              </div>
+            </draggable>
+          </div>
+
+          <div class="section-divider" />
+
           <div class="prop-section">
             <div
               class="status-text"
@@ -419,17 +508,13 @@
               @color-change="updateColor"
             />
           </div>
-          <div class="section-divider" />
-          <div
-            class="prop-section"
-            v-if="viewModel.getSelectedElement().parentContainer"
-          >
-            <label>Image:</label>
-
-            <FIleUploader :view-model="viewModel" />
-          </div>
         </div>
       </div>
+      <div
+        class="sidebar-overlay"
+        v-if="isBackgroundSelectorVisible"
+        @click="dismissBackgroundSelector"
+      />
     </aside>
   </div>
 </template>
@@ -438,11 +523,13 @@
 import { ColorPicker } from "vue-accessible-color-picker";
 import FIleUploader from "./FIleUploader.vue";
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
+import { VueDraggableNext } from "vue-draggable-next";
 
 export default {
   components: {
     ColorPicker,
     FIleUploader,
+    draggable: VueDraggableNext,
   },
   props: {
     viewModel: {
@@ -473,6 +560,9 @@ export default {
       selectedTextFont: this.selectedTextFont,
       showColorPicker: false,
       showBGColorPicker: false,
+
+      backgroundListHoverIndex: null,
+      isBackgroundSelectorVisible: false,
     };
   },
 
@@ -659,6 +749,63 @@ export default {
       const parent = this.viewModel.currentSelectedElement.parentContainer;
       this.viewModel.handleElementSelected(parent);
     },
+
+    //test
+    test() {
+      console.log(
+        this.viewModel.getSelectedElement().background.length > 0
+          ? this.viewModel.getSelectedElement().background
+          : "Background not defined"
+      );
+    },
+
+    onEnd(evt) {
+      const draggedBackground =
+        this.viewModel.getSelectedElement().background[evt.oldIndex];
+      const targetBackground =
+        this.viewModel.getSelectedElement().background[evt.newIndex];
+      [draggedBackground.layerIndex, targetBackground.layerIndex] = [
+        targetBackground.layerIndex,
+        draggedBackground.layerIndex,
+      ];
+      this.viewModel
+        .getSelectedElement()
+        .background.sort((a, b) => a.layerIndex - b.layerIndex);
+    },
+
+    setBackgroundListHoverIndex(index) {
+      this.backgroundListHoverIndex = index;
+    },
+    clearBackgroundListHoverIndex() {
+      this.backgroundListHoverIndex = null;
+    },
+
+    removeBackground(background) {
+      const index =
+        this.viewModel.currentSelectedElement?.background?.indexOf(background);
+      if (index !== -1) {
+        this.viewModel.currentSelectedElement?.background?.splice(index, 1);
+      }
+    },
+
+    showBackgroundSelector() {
+      this.isBackgroundSelectorVisible = true;
+    },
+    hideBackgroundSelector() {
+      this.isBackgroundSelectorVisible = false;
+    },
+
+    addColorBackground() {
+      const backgroundColorLayer = {
+        type: "color",
+        //get random color
+        value: "#" + Math.floor(Math.random() * 16777215).toString(16),
+        layerIndex: this.viewModel.currentSelectedElement.background.length,
+      };
+      this.viewModel.currentSelectedElement.addBackgroundLayer(
+        backgroundColorLayer
+      );
+    },
   },
 };
 </script>
@@ -761,5 +908,57 @@ i.material-icons {
 .section-divider {
   background-color: lightgray;
   height: 1px;
+}
+
+.background-list {
+  background-color: #c7c7c7;
+  margin: 8px;
+}
+.background-list-item {
+  display: flex;
+  padding: 4px;
+}
+
+.draggable-dragging {
+  opacity: 0.5;
+}
+
+.draggable-ghost {
+  opacity: 0.5;
+}
+
+.delete-icon {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 24px;
+  color: rgb(2, 1, 1);
+}
+.delete-icon:hover {
+  color: red;
+}
+
+.background-list-item:hover .delete-icon {
+  display: block;
+}
+
+.background-selector {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 </style>

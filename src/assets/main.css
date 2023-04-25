@@ -1,5 +1,10 @@
 @import './base.css';
 
+* {
+  user-select: none;
+}
+
+
 #app {
   width: 100vw;
 
