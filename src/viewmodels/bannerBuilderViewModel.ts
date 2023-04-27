@@ -1,6 +1,6 @@
 import { Element } from "@/models/element";
 import { Text } from "@/models/text";
-import { Container } from "@/models/container";
+import { Container, BackgroundLayer } from "@/models/container";
 import { Link } from "@/models/link";
 import { Image } from "@/models/image";
 
@@ -96,7 +96,7 @@ class BannerBuilderViewModel {
                 new Container({
                     name: 'Container 3',
                     background: [
-                        { type: "image", value: "https://picsum.photos/200/300", layerIndex: 0 },
+                        { type: "image", value: "https://picsum.photos/200/300", fileName: 'random_picsum_mage', layerIndex: 0, size: 'custom', width: 'auto', height: 'auto' },
 
                     ],
                     children: [
@@ -117,7 +117,9 @@ class BannerBuilderViewModel {
 
     getSelectedElement(): Element | null {
 
+
         return this.currentSelectedElement;
+
 
     }
 
@@ -127,7 +129,7 @@ class BannerBuilderViewModel {
 
     handleElementSelected(element: Element): void {
         this.currentSelectedElement = element;
-        console.log(this.currentSelectedElement.parentContainer);
+        console.log(element.background)
     }
 
     handleElementHovered(element: Element): void {
@@ -183,7 +185,7 @@ class BannerBuilderViewModel {
 
 
     //mutate element
-    removeBackground(background: { type: "image" | "color" | "gradient"; value: string; position?: string | undefined; size?: string | undefined; repeat?: string | undefined; layerIndex: number; }) {
+    removeBackground(background: BackgroundLayer) {
         const index = this.currentSelectedElement?.background?.indexOf(background);
         if (index !== -1) {
             this.currentSelectedElement?.background?.splice(background.layerIndex, 1);
@@ -194,6 +196,7 @@ class BannerBuilderViewModel {
             });
         }
     }
+
 
 
 
@@ -288,20 +291,17 @@ class BannerBuilderViewModel {
 
 
     addNewContainer() {
-        const newContainer = this.createNewElementContainer(
-            this.rootContainer.children.length
-        );
-
-        const getRandomColor = () => {
-            const randomColor =
-                "#" + Math.floor(Math.random() * 16777215).toString(16);
-            return randomColor;
+        const newContainer = this.createNewElementContainer(this.rootContainer.children.length);
+        const backgroundColorLayer: BackgroundLayer = {
+            type: "color",
+            value: "#" + Math.floor(Math.random() * 16777215).toString(16),
+            layerIndex: 0,
         };
-
-        /* newContainer.backgroundColor = getRandomColor(); */
-
+        newContainer.addBackgroundLayer(backgroundColorLayer);
         this.rootContainer.children.splice(this.hoverIndex!, 0, newContainer);
     }
+
+
 
     createNewElementContainer(totalContainers: number) {
         const newContainerName = `Container ${totalContainers + 1}`;

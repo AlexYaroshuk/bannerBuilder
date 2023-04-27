@@ -19,12 +19,14 @@
     @mouseleave="handleContainerDehover"
     @drop="handleWidgetDrop(container)"
   >
-    <div
-      class="background-layer"
-      v-for="(backgroundLayer, layerIndex) in containerStyle.backgroundLayers"
-      :key="'layer-' + layerIndex"
-      :style="backgroundLayer"
-    ></div>
+    <div class="background-container">
+      <div
+        class="background-layer"
+        v-for="(backgroundLayer, layerIndex) in containerStyle.backgroundLayers"
+        :key="'layer-' + layerIndex"
+        :style="backgroundLayer"
+      ></div>
+    </div>
 
     <div class="children-wrapper">
       <div class="name" v-if="viewModel.getSelectedElement() === container">
@@ -250,6 +252,11 @@ export default {
             layer.backgroundRepeat = bg.repeat || "no-repeat";
             layer.backgroundPosition = bg.position || "center";
             layer.backgroundSize = bg.size || "cover";
+
+            if (bg.size === "custom" && bg.width && bg.height) {
+              layer.width = `${bg.width}px`;
+              layer.height = `${bg.height}px`;
+            }
             break;
           default:
             throw new Error(`Unknown background type: ${bg.type}`);
@@ -295,7 +302,6 @@ export default {
   min-height: 8px;
 }
 
-.background-color,
 .background-layer {
   position: absolute;
   top: 0;
@@ -304,8 +310,18 @@ export default {
   bottom: 0;
 }
 
+.background-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
 .children-wrapper {
   position: relative;
+  z-index: 2;
 }
 
 .container--selected {
@@ -349,7 +365,7 @@ export default {
 .floating-container {
   position: fixed;
   pointer-events: none;
-  z-index: 5;
+  z-index: 3;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
   opacity: 0.9;
 }

@@ -2,9 +2,11 @@
   <div>
     <input type="file" ref="fileInput" @change="handleFileUpload" />
 
-    <img v-if="backgroundImage" :src="backgroundImage" :alt="backgroundImage" />
-
-    <button @click="clearImage">Clear</button>
+    <img
+      v-if="backgroundImage"
+      :src="selectedBackground.value"
+      :alt="backgroundImage"
+    />
   </div>
 </template>
 
@@ -22,6 +24,7 @@ export default {
       type: BannerBuilderViewModel,
       required: true,
     },
+    selectedBackground: null,
   },
   computed: {
     backgroundImage() {
@@ -45,26 +48,21 @@ export default {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(file);
+      const fileName = file.name;
       reader.onload = (event) => {
         this.imageSource = event.target.result;
-        this.setImage();
+        this.setImage(fileName);
         this.imageSource = null; // clear the imageSource variable
       };
     },
 
-    clearImage() {
-      this.imageSource = null;
-      this.viewModel.currentSelectedElement.backgroundImage = "";
-    },
+    setImage(fileName) {
+      this.selectedBackground.type = "image";
+      this.selectedBackground.fileName = fileName;
+      /*       this.selectedBackground.size = 'custom';
+      this.selectedBackground.fileName = fileName; */
+      this.selectedBackground.value = this.imageSource;
 
-    setImage() {
-      const backgroundImageLayer = {
-        type: "image",
-        value: this.imageSource,
-      };
-      this.viewModel.currentSelectedElement.addBackgroundLayer(
-        backgroundImageLayer
-      );
       this.$refs.fileInput.value = null; // clear the input field
     },
   },
@@ -73,7 +71,7 @@ export default {
 
 <style scoped>
 img {
-  max-width: 100%;
-  height: auto;
+  width: 64px;
+  height: 64px;
 }
 </style>

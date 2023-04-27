@@ -4,11 +4,13 @@ type BackgroundLayer = {
   type: "color" | "gradient" | "image";
   value: string;
   position?: string;
-  size?: string;
+  size?: "custom" | "contain" | "cover";
+  width?: number | "auto";
+  height?: number | "auto";
   repeat?: string;
   layerIndex: number;
+  fileName?: string;
 };
-
 
 interface HybridStyles {
   color: string | null;
@@ -30,7 +32,6 @@ abstract class Element {
   background: BackgroundLayer[] | null;
   borderColor: string | null;
   parentContainer: Container | null;
-
 
   constructor({
     name,
@@ -56,11 +57,16 @@ abstract class Element {
     this.fontFamily = fontFamily;
     this.fontWeight = fontWeight;
     this.fontSize = fontSize;
-    this.background = background;
     this.borderColor = borderColor;
     this.parentContainer = parentContainer;
+    this.background = background.map((bg) => ({
+      ...bg,
+      position: bg.position || "center",
+      size: bg.size || "custom",
+      width: bg.width || "auto",
+      height: bg.height || "auto",
+    }));
   }
-
 
   abstract readonly type: string;
 
@@ -71,10 +77,6 @@ abstract class Element {
   getColor(): string | null {
     return this.color;
   }
-
-  /*   getBackgroundColor(): string | null {
-      return this.backgroundColor;
-    } */
 
   getRootContainer(): Container | null {
     let current: Container | null = this.parentContainer;
@@ -98,14 +100,11 @@ abstract class Element {
     };
   }
 
-
-
   abstract addChild(child: Element): void;
 
   abstract removeChild(child: Element): void;
 
   abstract get isLeaf(): boolean;
-
 }
 
 export { Element, ContainerStyles, HybridStyles };

@@ -1,32 +1,35 @@
 import { Element, HybridStyles } from "@/models/element";
 
+type BackgroundSize = "custom" | "contain" | "cover";
+
 type BackgroundLayer = {
     type: "color" | "gradient" | "image";
     value: string;
     position?: string;
-    size?: string;
+    size?: "custom" | "contain" | "cover";
+    width?: number | "auto";
+    height?: number | "auto";
     repeat?: string;
     layerIndex: number;
+    fileName?: string;
 };
 
 
-const DEFAULT_BACKGROUND_SIZE = "cover";
+const DEFAULT_BACKGROUND_SIZE: BackgroundSize = "custom";
 const DEFAULT_BACKGROUND_POSITION = "centered";
 
 interface ContainerStyles {
     background: BackgroundLayer[];
     backgroundRepeat?: string;
     backgroundPosition?: string;
-    backgroundSize?: string;
+    backgroundSize?: BackgroundSize;
 }
-
 
 class Container extends Element {
     readonly type: string;
     isWidgetDropzonesShown: boolean;
     children: Element[];
     borderRadius: number;
-    borderWidth: number;
     background: BackgroundLayer[] = [];
 
     constructor({
@@ -38,7 +41,6 @@ class Container extends Element {
         fontWeight = 400,
         color = "black",
         parentContainer = null,
-
     }: {
         name: string;
         children?: Element[];
@@ -46,7 +48,6 @@ class Container extends Element {
         fontFamily?: string;
         fontSize?: number;
         fontWeight?: number;
-
         color?: string;
         parentContainer?: Container | null;
     }) {
@@ -62,7 +63,6 @@ class Container extends Element {
         this.type = "container";
         this.isWidgetDropzonesShown = false;
         this.borderRadius = 0;
-        this.borderWidth = 0;
         this.background = background;
 
         this.children = [];
@@ -76,23 +76,33 @@ class Container extends Element {
         const root = this.getRootContainer();
 
         const styles: HybridStyles & ContainerStyles = {
-            color: this.color || (parent && parent.color) || (root && root.color) || null,
-            fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
-            fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
-            fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
+            color:
+                this.color || (parent && parent.color) || (root && root.color) || null,
+            fontFamily:
+                this.fontFamily ||
+                (parent && parent.fontFamily) ||
+                (root && root.fontFamily) ||
+                null,
+            fontWeight:
+                this.fontWeight ||
+                (parent && parent.fontWeight) ||
+                (root && root.fontWeight) ||
+                null,
+            fontSize:
+                this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
             background: this.background || null,
         };
 
-        if (this.background.some(bg => bg.type === "image")) {
+        if (this.background.some((bg) => bg.type === "image")) {
             styles.backgroundRepeat =
-                this.background.find(bg => bg.type === "image")?.repeat || "no-repeat";
+                this.background.find((bg) => bg.type === "image")?.repeat || "no-repeat";
             styles.backgroundPosition =
-                this.background.find(bg => bg.type === "image")?.position || DEFAULT_BACKGROUND_POSITION;
+                this.background.find((bg) => bg.type === "image")?.position || DEFAULT_BACKGROUND_POSITION;
             styles.backgroundSize =
-                this.background.find(bg => bg.type === "image")?.size || DEFAULT_BACKGROUND_SIZE;
+                this.background.find((bg) => bg.type === "image")?.size || DEFAULT_BACKGROUND_SIZE;
         }
 
-        if (this.background.some(bg => bg.type === "gradient")) {
+        if (this.background.some((bg) => bg.type === "gradient")) {
             styles.backgroundRepeat = undefined;
             styles.backgroundPosition = undefined;
             styles.backgroundSize = undefined;
@@ -101,8 +111,7 @@ class Container extends Element {
         return styles;
     }
 
-
-    // * backgrounds
+    // backgrounds
 
     getBackground(): BackgroundLayer[] {
         return this.background;
@@ -115,8 +124,6 @@ class Container extends Element {
     addBackgroundLayer(layer: BackgroundLayer): void {
         this.background.push(layer);
     }
-
-
 
     moveBackgroundLayer(layerIndex: number, newIndex: number): void {
         if (newIndex >= this.background.length) {
@@ -159,4 +166,4 @@ class Container extends Element {
     }
 }
 
-export { Container };
+export { Container, BackgroundLayer };

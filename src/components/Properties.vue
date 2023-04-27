@@ -7,328 +7,345 @@
       :class="['sidebar', { hidden: !isVisible }]"
       @click.stop="hideBackgroundSelector"
     >
-      <button @click="toggleVisibility">&gt; Hide</button>
-      <div class="tab-bar">
-        <header v-for="(tab, index) in tabs" :key="index">
-          <i class="material-icons"> {{ tab.icon }}</i>
-          <span class="tab-text">{{ tab.label }}</span>
-          <div class="ripple"></div>
-        </header>
-        <button @click="test">test</button>
-      </div>
-      <div v-if="!viewModel.getSelectedElement()">
-        <h3>Nothing selected</h3>
-        <br />
-        When you select an element, you'll see its properties here.
-      </div>
-      <h3
-        v-if="
-          viewModel.getSelectedElement() &&
-          viewModel.getSelectedElement().parentContainer != null
-        "
-      >
-        selected:{{ viewModel.getSelectedElement().type }}
-      </h3>
-      <h3
-        style="background-color: gold"
-        v-if="
-          viewModel.getSelectedElement() &&
-          viewModel.getSelectedElement().parentContainer === null
-        "
-      >
-        selected: rootContainer
-      </h3>
-
-      <!-- ! content settings -->
-      <div
-        class="prop-section-wrapper"
-        v-if="
-          viewModel.getSelectedElement() &&
-          viewModel.getSelectedElement().type != 'container'
-        "
-      >
-        <p
-          class="prop-section-title"
-          @click="expandableGroups.content = !expandableGroups.content"
+      <div class="prop-section-wrapper">
+        <button @click="toggleVisibility">&gt; Hide</button>
+        <div class="tab-bar">
+          <header v-for="(tab, index) in tabs" :key="index">
+            <i class="material-icons"> {{ tab.icon }}</i>
+            <span class="tab-text">{{ tab.label }}</span>
+            <div class="ripple"></div>
+          </header>
+          <button @click="test">test</button>
+        </div>
+        <div v-if="!viewModel.getSelectedElement()">
+          <h3>Nothing selected</h3>
+          <br />
+          When you select an element, you'll see its properties here.
+        </div>
+        <h3
+          v-if="
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().parentContainer != null
+          "
         >
-          Content({{
-            viewModel.getSelectedElement().parentContainer
-              ? viewModel.getSelectedElement().type
-              : ""
-          }}{{ viewModel.getSelectedElement().parentContainer ? "" : "root" }})
-          <i
-            class="material-icons {{ expandableGroups.content ? 'expand-less' : 'expand-more' }}"
-          >
-            {{ expandableGroups.content ? "expand_more" : "chevron_right" }}
-          </i>
-        </p>
+          selected:{{ viewModel.getSelectedElement().type }}
+        </h3>
+        <h3
+          style="background-color: gold"
+          v-if="
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().parentContainer === null
+          "
+        >
+          selected: rootContainer
+        </h3>
 
-        <div v-if="expandableGroups.content">
-          <div
-            class="prop-section"
-            v-if="viewModel.getSelectedElement().type === 'text'"
+        <!-- ! content settings -->
+        <div
+          v-if="
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().type != 'container'
+          "
+        >
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.content = !expandableGroups.content"
           >
-            <label for="text-field">Text:</label>
-            <input
-              id="text-field"
-              type="text"
-              v-model="viewModel.getSelectedElement().text"
+            Content({{
+              viewModel.getSelectedElement().parentContainer
+                ? viewModel.getSelectedElement().type
+                : ""
+            }}{{
+              viewModel.getSelectedElement().parentContainer ? "" : "root"
+            }})
+            <i
+              class="material-icons {{ expandableGroups.content ? 'expand-less' : 'expand-more' }}"
+            >
+              {{ expandableGroups.content ? "expand_more" : "chevron_right" }}
+            </i>
+          </p>
+
+          <div v-if="expandableGroups.content">
+            <div
+              class="prop-section"
+              v-if="viewModel.getSelectedElement().type === 'text'"
+            >
+              <label for="text-field">Text:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().text"
+              />
+            </div>
+
+            <div
+              class="prop-section"
+              v-if="viewModel.getSelectedElement().type === 'link'"
+            >
+              <label for="text-field">Label:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().label"
+              />
+            </div>
+            <div
+              class="section-divider"
+              v-if="viewModel.getSelectedElement().type === 'link'"
             />
+            <div
+              class="prop-section"
+              v-if="
+                viewModel.getSelectedElement() &&
+                (viewModel.getSelectedElement().type === 'image' ||
+                  viewModel.getSelectedElement().type === 'link')
+              "
+            >
+              <label for="text-field">URL:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().url"
+              />
+            </div>
           </div>
 
-          <div
-            class="prop-section"
-            v-if="viewModel.getSelectedElement().type === 'link'"
+          <!-- ! link settings -->
+        </div>
+        <!-- ! hybrid settings -->
+        <div
+          v-if="
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().type != 'link' &&
+            viewModel.getSelectedElement().type != 'image'
+          "
+        >
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.typography = !expandableGroups.typography"
           >
-            <label for="text-field">Label:</label>
-            <input
-              id="text-field"
-              type="text"
-              v-model="viewModel.getSelectedElement().label"
-            />
-          </div>
-          <div
-            class="section-divider"
-            v-if="viewModel.getSelectedElement().type === 'link'"
-          />
-          <div
-            class="prop-section"
-            v-if="
-              viewModel.getSelectedElement() &&
-              (viewModel.getSelectedElement().type === 'image' ||
-                viewModel.getSelectedElement().type === 'link')
-            "
-          >
-            <label for="text-field">URL:</label>
-            <input
-              id="text-field"
-              type="text"
-              v-model="viewModel.getSelectedElement().url"
-            />
+            Typography({{
+              viewModel.getSelectedElement().parentContainer
+                ? viewModel.getSelectedElement().type
+                : ""
+            }}{{
+              viewModel.getSelectedElement().parentContainer ? "" : "root"
+            }})
+            <i
+              class="material-icons {{ expandableGroups.typography ? 'expand-less' : 'expand-more' }}"
+            >
+              {{
+                expandableGroups.typography ? "expand_more" : "chevron_right"
+              }}
+            </i>
+          </p>
+
+          <div v-if="expandableGroups.typography">
+            <div class="prop-section">
+              <div
+                class="status-text"
+                v-if="viewModel.getSelectedElement().parentContainer"
+              >
+                <div
+                  v-if="viewModel.getSelectedElement().parentContainer"
+                  :class="
+                    viewModel.getSelectedElement().fontSize
+                      ? 'status-text-selected-color'
+                      : 'status-text-inherited-color'
+                  "
+                >
+                  <p v-if="viewModel.getSelectedElement().fontSize">
+                    Custom font size
+                  </p>
+
+                  <div
+                    class="status-text"
+                    v-if="!viewModel.getSelectedElement().fontSize"
+                  >
+                    Inheriting from
+                    <p class="link-text" @click.stop="handleSelectParent">
+                      {{ viewModel.getSelectedElement().parentContainer.name }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="viewModel.getSelectedElement().fontSize"
+                  @click.stop="resetStyle('fontSize')"
+                  class="reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+              <label for="fontSize">Font size:</label>
+              <input
+                id="fontSize"
+                type="number"
+                min="1"
+                step="1"
+                v-model="fontSize"
+              />
+            </div>
+            <div class="section-divider" />
+
+            <div class="prop-section">
+              <div
+                class="status-text"
+                v-if="viewModel.getSelectedElement().parentContainer"
+              >
+                <div
+                  v-if="viewModel.getSelectedElement().parentContainer"
+                  :class="
+                    viewModel.getSelectedElement().fontWeight
+                      ? 'status-text-selected-color'
+                      : 'status-text-inherited-color'
+                  "
+                >
+                  <p v-if="viewModel.getSelectedElement().fontWeight">
+                    Custom font weight
+                  </p>
+
+                  <div
+                    class="status-text"
+                    v-if="!viewModel.getSelectedElement().fontWeight"
+                  >
+                    Inheriting from
+                    <p class="link-text" @click.stop="handleSelectParent">
+                      {{ viewModel.getSelectedElement().parentContainer.name }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="viewModel.getSelectedElement().fontWeight"
+                  @click.stop="resetStyle('fontWeight')"
+                  class="reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+              <label for="fontWeight">Font weight:</label>
+              <input
+                id="fontWeight"
+                type="number"
+                min="1"
+                step="1"
+                v-model="fontWeight"
+              />
+            </div>
+            <div class="section-divider" />
+
+            <div class="prop-section">
+              <div
+                class="status-text"
+                v-if="viewModel.getSelectedElement().parentContainer"
+              >
+                <div
+                  v-if="viewModel.getSelectedElement().parentContainer"
+                  :class="
+                    viewModel.getSelectedElement().fontFamily
+                      ? 'status-text-selected-color'
+                      : 'status-text-inherited-color'
+                  "
+                >
+                  <p v-if="viewModel.getSelectedElement().fontFamily">
+                    Custom font family
+                  </p>
+
+                  <div
+                    class="status-text"
+                    v-if="!viewModel.getSelectedElement().fontFamily"
+                  >
+                    Inheriting from
+                    <p class="link-text" @click.stop="handleSelectParent">
+                      {{ viewModel.getSelectedElement().parentContainer.name }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="viewModel.getSelectedElement().fontFamily"
+                  @click.stop="resetStyle('fontFamily')"
+                  class="reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+              <label for="text-font-family">Font Family:</label>
+              <select
+                id="text-font-family"
+                v-model="fontFamily"
+                @change="updateTypographyFontfamily"
+              >
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Roboto">Roboto</option>
+              </select>
+            </div>
+            <div class="section-divider" />
+
+            <div class="prop-section">
+              <div
+                class="status-text"
+                v-if="viewModel.getSelectedElement().parentContainer"
+              >
+                <div
+                  v-if="viewModel.getSelectedElement().parentContainer"
+                  :class="
+                    viewModel.getSelectedElement().color
+                      ? 'status-text-selected-color'
+                      : 'status-text-inherited-color'
+                  "
+                >
+                  <p v-if="viewModel.getSelectedElement().color">
+                    Custom color
+                  </p>
+
+                  <div
+                    class="status-text"
+                    v-if="!viewModel.getSelectedElement().color"
+                  >
+                    Inheriting from
+                    <p class="link-text" @click.stop="handleSelectParent">
+                      {{ viewModel.getSelectedElement().parentContainer.name }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="viewModel.getSelectedElement().color"
+                  @click.stop="resetStyle('color')"
+                  class="reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+              <div class="color-display-container">
+                <label for="color-picker">Color:</label>
+                <div
+                  class="color-square"
+                  @click.stop="editBackground(background)"
+                  :class="{
+                    'transparent-pattern':
+                      background &&
+                      background.type === 'color' &&
+                      background.value.includes('hsla'),
+                  }"
+                  :style="
+                    background && background.type === 'image'
+                      ? { backgroundImage: `url(${background.value})` }
+                      : { backgroundColor: background && background.value }
+                  "
+                ></div>
+                <span class="hex-code">{{ selectedItemColor }}</span>
+              </div>
+              <ColorPicker
+                default-format="hex"
+                v-if="showColorPicker"
+                v-model="selectedItemColor"
+                @color-change="updateTypographyColor"
+              />
+            </div>
           </div>
         </div>
-
-        <!-- ! link settings -->
-      </div>
-      <!-- ! hybrid settings -->
-      <div
-        class="prop-section-wrapper"
-        v-if="
-          viewModel.getSelectedElement() &&
-          viewModel.getSelectedElement().type != 'link' &&
-          viewModel.getSelectedElement().type != 'image'
-        "
-      >
-        <p
-          class="prop-section-title"
-          @click="expandableGroups.typography = !expandableGroups.typography"
-        >
-          Typography({{
-            viewModel.getSelectedElement().parentContainer
-              ? viewModel.getSelectedElement().type
-              : ""
-          }}{{ viewModel.getSelectedElement().parentContainer ? "" : "root" }})
-          <i
-            class="material-icons {{ expandableGroups.typography ? 'expand-less' : 'expand-more' }}"
-          >
-            {{ expandableGroups.typography ? "expand_more" : "chevron_right" }}
-          </i>
-        </p>
-
-        <div v-if="expandableGroups.typography">
-          <div class="prop-section">
-            <div
-              class="status-text"
-              v-if="viewModel.getSelectedElement().parentContainer"
-            >
-              <div
-                v-if="viewModel.getSelectedElement().parentContainer"
-                :class="
-                  viewModel.getSelectedElement().fontSize
-                    ? 'status-text-selected-color'
-                    : 'status-text-inherited-color'
-                "
-              >
-                <p v-if="viewModel.getSelectedElement().fontSize">
-                  Custom font size
-                </p>
-
-                <div
-                  class="status-text"
-                  v-if="!viewModel.getSelectedElement().fontSize"
-                >
-                  Inheriting from
-                  <p class="link-text" @click.stop="handleSelectParent">
-                    {{ viewModel.getSelectedElement().parentContainer.name }}
-                  </p>
-                </div>
-              </div>
-              <button
-                v-if="viewModel.getSelectedElement().fontSize"
-                @click.stop="resetStyle('fontSize')"
-                class="reset-button"
-              >
-                Reset
-              </button>
-            </div>
-            <label for="fontSize">Font size:</label>
-            <input
-              id="fontSize"
-              type="number"
-              min="1"
-              step="1"
-              v-model="fontSize"
-            />
-          </div>
-          <div class="section-divider" />
-
-          <div class="prop-section">
-            <div
-              class="status-text"
-              v-if="viewModel.getSelectedElement().parentContainer"
-            >
-              <div
-                v-if="viewModel.getSelectedElement().parentContainer"
-                :class="
-                  viewModel.getSelectedElement().fontWeight
-                    ? 'status-text-selected-color'
-                    : 'status-text-inherited-color'
-                "
-              >
-                <p v-if="viewModel.getSelectedElement().fontWeight">
-                  Custom font weight
-                </p>
-
-                <div
-                  class="status-text"
-                  v-if="!viewModel.getSelectedElement().fontWeight"
-                >
-                  Inheriting from
-                  <p class="link-text" @click.stop="handleSelectParent">
-                    {{ viewModel.getSelectedElement().parentContainer.name }}
-                  </p>
-                </div>
-              </div>
-              <button
-                v-if="viewModel.getSelectedElement().fontWeight"
-                @click.stop="resetStyle('fontWeight')"
-                class="reset-button"
-              >
-                Reset
-              </button>
-            </div>
-            <label for="fontWeight">Font weight:</label>
-            <input
-              id="fontWeight"
-              type="number"
-              min="1"
-              step="1"
-              v-model="fontWeight"
-            />
-          </div>
-          <div class="section-divider" />
-
-          <div class="prop-section">
-            <div
-              class="status-text"
-              v-if="viewModel.getSelectedElement().parentContainer"
-            >
-              <div
-                v-if="viewModel.getSelectedElement().parentContainer"
-                :class="
-                  viewModel.getSelectedElement().fontFamily
-                    ? 'status-text-selected-color'
-                    : 'status-text-inherited-color'
-                "
-              >
-                <p v-if="viewModel.getSelectedElement().fontFamily">
-                  Custom font family
-                </p>
-
-                <div
-                  class="status-text"
-                  v-if="!viewModel.getSelectedElement().fontFamily"
-                >
-                  Inheriting from
-                  <p class="link-text" @click.stop="handleSelectParent">
-                    {{ viewModel.getSelectedElement().parentContainer.name }}
-                  </p>
-                </div>
-              </div>
-              <button
-                v-if="viewModel.getSelectedElement().fontFamily"
-                @click.stop="resetStyle('fontFamily')"
-                class="reset-button"
-              >
-                Reset
-              </button>
-            </div>
-            <label for="text-font-family">Font Family:</label>
-            <select
-              id="text-font-family"
-              v-model="fontFamily"
-              @change="updateTypographyFontfamily"
-            >
-              <option value="Arial">Arial</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Helvetica">Helvetica</option>
-              <option value="Roboto">Roboto</option>
-            </select>
-          </div>
-          <div class="section-divider" />
-
-          <div class="prop-section">
-            <div
-              class="status-text"
-              v-if="viewModel.getSelectedElement().parentContainer"
-            >
-              <div
-                v-if="viewModel.getSelectedElement().parentContainer"
-                :class="
-                  viewModel.getSelectedElement().color
-                    ? 'status-text-selected-color'
-                    : 'status-text-inherited-color'
-                "
-              >
-                <p v-if="viewModel.getSelectedElement().color">Custom color</p>
-
-                <div
-                  class="status-text"
-                  v-if="!viewModel.getSelectedElement().color"
-                >
-                  Inheriting from
-                  <p class="link-text" @click.stop="handleSelectParent">
-                    {{ viewModel.getSelectedElement().parentContainer.name }}
-                  </p>
-                </div>
-              </div>
-              <button
-                v-if="viewModel.getSelectedElement().color"
-                @click.stop="resetStyle('color')"
-                class="reset-button"
-              >
-                Reset
-              </button>
-            </div>
-            <div class="color-display-container">
-              <label for="color-picker">Color:</label>
-              <div
-                class="color-square"
-                :style="{ backgroundColor: selectedItemColor }"
-                @click="showColorPicker = !showColorPicker"
-              ></div>
-              <span class="hex-code">{{ selectedItemColor }}</span>
-            </div>
-            <ColorPicker
-              default-format="hex"
-              v-if="showColorPicker"
-              v-model="selectedItemColor"
-              @color-change="updateTypographyColor"
-            />
-          </div>
-        </div>
-      </div>
-      <!--         <div class="popup-content" v-if="selectedChild">
+        <!--         <div class="popup-content" v-if="selectedChild">
           <h3>Typography color (child)</h3>
           <ColorPicker
             :color="selectedChild.color"
@@ -336,91 +353,124 @@
           />
         </div> -->
 
-      <!-- ! container settings -->
+        <!-- ! container settings -->
 
-      <div
-        class="prop-section-wrapper"
-        v-if="
-          viewModel.getSelectedElement() &&
-          viewModel.getSelectedElement().type === 'container'
-        "
-      >
-        <p
-          class="prop-section-title"
-          @click="expandableGroups.background = !expandableGroups.background"
+        <div
+          v-if="
+            viewModel.getSelectedElement() &&
+            viewModel.getSelectedElement().type === 'container'
+          "
         >
-          Backgrounds
-          <i
-            class="material-icons {{ expandableGroups.background ? 'expand-less' : 'expand-more' }}"
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.background = !expandableGroups.background"
           >
-            {{ expandableGroups.background ? "expand_more" : "chevron_right" }}
-          </i>
-        </p>
-        <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
-        <div v-if="expandableGroups.background">
-          <div class="prop-section">
-            <div>
-              Image or gradient
-              <button @click.stop="showBackgroundSelector(background)">
-                add
-              </button>
-
-              <i class="material-icons">add</i>
-            </div>
-            <draggable
-              class="background-list"
-              v-model="viewModel.getSelectedElement().background"
-              tag="div"
-              handle=".background-drag-handle"
-              @end="onEnd"
-              cursor="grabbing"
+            Backgrounds
+            <i
+              class="material-icons {{ expandableGroups.background ? 'expand-less' : 'expand-more' }}"
             >
-              <div
-                class="background-selector"
-                v-if="isBackgroundSelectorVisible"
-                ref="backgroundSelector"
-                @click.stop
-              >
-                <FIleUploader :view-model="viewModel" />
-                test
-                <button @click="addColorBackground()">add color</button>
-              </div>
-              <div
-                v-for="(background, index) in viewModel.getSelectedElement()
-                  .background"
-                :key="index"
-                @mouseover="setBackgroundListHoverIndex(index)"
-                @mouseout="clearBackgroundListHoverIndex"
-              >
-                <div class="background-list-item">
-                  <div class="background-drag-handle">☰</div>
-                  <div
-                    class="color-square"
-                    :style="
-                      background.type === 'image'
-                        ? { backgroundImage: `url(${background.value})` }
-                        : { backgroundColor: background.value }
-                    "
-                  />
+              {{
+                expandableGroups.background ? "expand_more" : "chevron_right"
+              }}
+            </i>
+          </p>
+          <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
+          <div v-if="expandableGroups.background">
+            <div class="prop-section">
+              <div>
+                Image or gradient
+                <button @click.stop="addBackground()">add</button>
 
-                  <div class="background-list-type">
-                    {{ background.type
-                    }}<!-- ({{ background.value }}) -->
-                  </div>
-                  <button @click="removeBackground(background)">del</button>
-                  <div
-                    class="delete-icon"
-                    v-if="this.backgroundListHoverIndex === index"
-                    @click="removeBackground(background)"
-                  >
-                    <i class="material-icons">delete</i>
-                  </div>
-                </div>
-                <div
-                  class="section-divider"
-                  v-if="viewModel.getSelectedElement().background.length > 1"
+                <!-- <i class="material-icons">add</i> -->
+              </div>
+              <draggable
+                class="background-list"
+                v-model="viewModel.getSelectedElement().background"
+                tag="div"
+                handle=".background-drag-handle"
+                @end="onEnd"
+                cursor="grabbing"
+              >
+                <BackgroundSelector
+                  ref="backgroundSelector"
+                  :selectedBackground="selectedBackground"
+                  :view-model="viewModel"
+                  :isBackgroundSelectorVisible="isBackgroundSelectorVisible"
                 />
-                <!-- <div
+                <div
+                  v-for="(background, index) in viewModel.getSelectedElement()
+                    .background"
+                  :key="index"
+                  @mouseover="setBackgroundListHoverIndex(index)"
+                  @mouseout="clearBackgroundListHoverIndex"
+                >
+                  <div class="background-list-item">
+                    <div class="background-drag-handle">☰</div>
+                    <div
+                      class="color-square"
+                      @click.stop="editBackground(background)"
+                      :class="{
+                        'transparent-pattern':
+                          background &&
+                          background.type === 'color' &&
+                          background.value.includes('hsl'),
+                      }"
+                      :style="{
+                        backgroundImage:
+                          background && background.type === 'image'
+                            ? `url(${background.value})`
+                            : '',
+                        backgroundColor:
+                          background && background.type === 'color'
+                            ? background.value
+                            : '',
+                        backgroundBlendMode:
+                          background &&
+                          background.type === 'color' &&
+                          background.value.includes('hsl')
+                            ? 'overlay'
+                            : '',
+                      }"
+                    />
+
+                    <div class="background-list-content">
+                      <div class="background-list-type">
+                        {{
+                          background.type === "image" && background.fileName
+                            ? background.fileName.length > 20
+                              ? background.fileName.slice(0, 20) +
+                                "..." +
+                                background.fileName.slice(
+                                  background.fileName.lastIndexOf(".")
+                                )
+                              : background.fileName
+                            : background.value
+                        }}
+                      </div>
+                      <div class="background-list-buttons">
+                        <button @click.stop="toggleVisibility(background)">
+                          {{ background.isVisible ? "Hide" : "Show" }}
+                        </button>
+
+                        <button @click="removeBackground(background)">
+                          del
+                        </button>
+                        <!-- <div
+                        class="delete-icon"
+                        v-if="this.backgroundListHoverIndex === index"
+                        @click="removeBackground(background)"
+                      >
+                        <i class="material-icons">delete</i>
+                      </div> -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="section-divider"
+                    v-if="viewModel.getSelectedElement().background.length > 1"
+                  />
+                  <!-- <div
                     class="background-list-color-square"
                     v-if="background.type === 'color'"
                     :style="{ backgroundColor: background.value }"
@@ -437,98 +487,99 @@
                     v-if="background.type === 'image'"
                     :style="{ backgroundImage: `url(${background.value})` }"
                   ></div> -->
-              </div>
-            </draggable>
-          </div>
-
-          <div class="section-divider" />
-
-          <div class="prop-section">
-            <div
-              class="status-text"
-              v-if="viewModel.getSelectedElement().parentContainer"
-            >
-              <div
-                v-if="viewModel.getSelectedElement().parentContainer"
-                :class="
-                  viewModel.getSelectedElement().backgroundColor
-                    ? 'status-text-selected-color'
-                    : 'status-text-inherited-color'
-                "
-              >
-                <p v-if="viewModel.getSelectedElement().backgroundColor">
-                  Custom background color
-                </p>
-
-                <div
-                  class="status-text"
-                  v-if="!viewModel.getSelectedElement().backgroundColor"
-                >
-                  Inheriting from
-                  <p
-                    class="link-text"
-                    @click="
-                      this.viewModel.selectItem(
-                        viewModel.getSelectedElement().parentContainer
-                      )
-                    "
-                  >
-                    {{ viewModel.getSelectedElement().parentContainer.name }}
-                  </p>
                 </div>
-              </div>
-              <button
-                v-if="viewModel.getSelectedElement().backgroundColor"
-                @click.stop="resetStyle('backgroundColor')"
-                class="reset-button"
-              >
-                Reset
-              </button>
+              </draggable>
             </div>
 
-            <div class="color-display-container">
-              <label for="color-picker">Color:</label>
+            <div class="section-divider" />
+
+            <div class="prop-section">
               <div
-                class="color-square"
-                :style="{
-                  backgroundColor:
-                    viewModel.getSelectedElement().backgroundColor,
-                }"
-                @click="showBGColorPicker = !showBGColorPicker"
-              ></div>
-              <span class="hex-code">{{
-                viewModel.getSelectedElement().backgroundColor
-              }}</span>
-            </div>
+                class="status-text"
+                v-if="viewModel.getSelectedElement().parentContainer"
+              >
+                <div
+                  v-if="viewModel.getSelectedElement().parentContainer"
+                  :class="
+                    viewModel.getSelectedElement().backgroundColor
+                      ? 'status-text-selected-color'
+                      : 'status-text-inherited-color'
+                  "
+                >
+                  <p v-if="viewModel.getSelectedElement().backgroundColor">
+                    Custom background color
+                  </p>
 
-            <ColorPicker
-              default-format="hex"
-              v-if="showBGColorPicker"
-              v-model="selectedItemBackgroundColor"
-              @color-change="updateColor"
-            />
+                  <div
+                    class="status-text"
+                    v-if="!viewModel.getSelectedElement().backgroundColor"
+                  >
+                    Inheriting from
+                    <p
+                      class="link-text"
+                      @click="
+                        this.viewModel.selectItem(
+                          viewModel.getSelectedElement().parentContainer
+                        )
+                      "
+                    >
+                      {{ viewModel.getSelectedElement().parentContainer.name }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  v-if="viewModel.getSelectedElement().backgroundColor"
+                  @click.stop="resetStyle('backgroundColor')"
+                  class="reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+
+              <div class="color-display-container">
+                <label for="color-picker">Color:</label>
+                <div
+                  class="color-square"
+                  :style="{
+                    backgroundColor:
+                      viewModel.getSelectedElement().backgroundColor,
+                  }"
+                  @click="showBGColorPicker = !showBGColorPicker"
+                ></div>
+                <span class="hex-code">{{
+                  viewModel.getSelectedElement().backgroundColor
+                }}</span>
+              </div>
+
+              <ColorPicker
+                default-format="hex"
+                v-if="showBGColorPicker"
+                v-model="selectedItemBackgroundColor"
+                @color-change="updateColor"
+              />
+            </div>
           </div>
         </div>
+        <div
+          class="sidebar-overlay"
+          v-if="isBackgroundSelectorVisible"
+          @click="dismissBackgroundSelector"
+        />
       </div>
-      <div
-        class="sidebar-overlay"
-        v-if="isBackgroundSelectorVisible"
-        @click="dismissBackgroundSelector"
-      />
     </aside>
   </div>
 </template>
 
 <script>
 import { ColorPicker } from "vue-accessible-color-picker";
-import FIleUploader from "./FIleUploader.vue";
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 import { VueDraggableNext } from "vue-draggable-next";
+import BackgroundSelector from "./BackgroundSelector.vue";
 
 export default {
   components: {
     ColorPicker,
-    FIleUploader,
+    BackgroundSelector,
     draggable: VueDraggableNext,
   },
   props: {
@@ -563,6 +614,7 @@ export default {
 
       backgroundListHoverIndex: null,
       isBackgroundSelectorVisible: false,
+      selectedBackground: null,
     };
   },
 
@@ -731,12 +783,6 @@ export default {
       this.viewModel.getSelectedElement().fontfamily = this.selectedTextFont;
     },
 
-    updateColor(eventData) {
-      (this.viewModel.getSelectedElement().backgroundColor =
-        eventData.cssColor),
-        console.log(this.viewModel.getSelectedElement().backgroundColor);
-    },
-
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     resetStyle(type) {
       this.$emit("reset-style", {
@@ -788,14 +834,42 @@ export default {
       }
     },
 
-    showBackgroundSelector() {
+    addBackground() {
+      this.$nextTick(() => {
+        this.$refs.backgroundSelector.activeTab = "color";
+      });
+      const newColorBackground = {
+        type: "color",
+        //get random color
+        value: "hsla(0, 0%, 0%, 25%)",
+        layerIndex: this.viewModel.currentSelectedElement.background.length,
+      };
+      this.viewModel.currentSelectedElement.addBackgroundLayer(
+        newColorBackground
+      );
+      this.selectedBackground = newColorBackground;
+
       this.isBackgroundSelectorVisible = true;
     },
-    hideBackgroundSelector() {
-      this.isBackgroundSelectorVisible = false;
+    editBackground(background) {
+      this.isBackgroundSelectorVisible = true;
+      this.selectedBackground = background;
+      this.$nextTick(() => {
+        this.$refs.backgroundSelector.activeTab =
+          this.selectedBackground.type === "color" ? "color" : "image";
+      });
     },
 
-    addColorBackground() {
+    hideBackgroundSelector() {
+      this.isBackgroundSelectorVisible = false;
+      this.selectedBackground = null;
+    },
+
+    toggleVisibility(background) {
+      background.isVisible = !background.isVisible;
+    },
+
+    /*     addColorBackground() {
       const backgroundColorLayer = {
         type: "color",
         //get random color
@@ -805,7 +879,7 @@ export default {
       this.viewModel.currentSelectedElement.addBackgroundLayer(
         backgroundColorLayer
       );
-    },
+    }, */
   },
 };
 </script>
@@ -814,8 +888,9 @@ export default {
 .sidebar {
   color: black;
   background-color: #f5f5f5;
-  padding: 1rem;
+
   width: 20%;
+  height: 100vh;
   float: right;
   transition: all 0.2s ease-in-out;
   height: 100vh;
@@ -849,7 +924,6 @@ export default {
   padding-left: 4px;
   padding-right: 4px;
   border-radius: 4px;
-  display: flex;
 
   font-size: small;
   cursor: pointer;
@@ -887,15 +961,6 @@ i.material-icons {
   margin-right: 4px;
 }
 
-.prop-section {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-.prop-section-wrapper {
-  background-color: #edebeb;
-  padding: 2px;
-}
-
 .prop-section-title {
   border-top: 1px solid rgb(184, 183, 183);
   border-bottom: 1px solid rgb(184, 183, 183);
@@ -905,18 +970,31 @@ i.material-icons {
   cursor: default;
 }
 
-.section-divider {
-  background-color: lightgray;
-  height: 1px;
-}
-
 .background-list {
-  background-color: #c7c7c7;
+  background-color: rgba(211, 211, 211, 0.6);
   margin: 8px;
 }
 .background-list-item {
   display: flex;
   padding: 4px;
+  font-size: small;
+}
+
+.background-list-content {
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.background-list-type {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.background-list-buttons {
+  display: flex;
 }
 
 .draggable-dragging {
@@ -943,22 +1021,13 @@ i.material-icons {
   display: block;
 }
 
-.background-selector {
-  position: absolute;
-  width: 100%;
-  left: 0;
-  top: 0;
-  background-color: white;
-  z-index: 2;
-}
-
 .sidebar-overlay {
-  position: fixed;
+  position: absolute;
+  height: 100vh;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1;
 }
 </style>
