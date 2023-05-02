@@ -1,6 +1,6 @@
 <template>
   <div class="element-image">
-    <img :src="child.url" />
+    <img :src="child.value" />
   </div>
 </template>
 

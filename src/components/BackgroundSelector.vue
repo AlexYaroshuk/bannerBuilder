@@ -1,7 +1,7 @@
 <template>
   <div
     class="background-selector"
-    v-if="isBackgroundSelectorVisible"
+    v-if="viewModel.isBackgroundSelectorVisible"
     ref="backgroundSelector"
     @click.stop
   >
@@ -21,10 +21,7 @@
     <div v-if="activeTab === 'image'">
       <div class="prop-section">
         Image
-        <FIleUploader
-          :selectedBackground="selectedBackground"
-          :view-model="viewModel"
-        />
+        <FIleUploader :view-model="viewModel" />
       </div>
       <div class="section-divider" />
       <div class="prop-section">
@@ -33,12 +30,14 @@
           <button
             v-for="(option, index) in sizeOptions"
             :key="index"
-            :class="{ active: selectedBackground.size === option.value }"
+            :class="{
+              active: viewModel.selectedBackground.size === option.value,
+            }"
             @click="
-              selectedBackground.size = option.value;
+              viewModel.selectedBackground.size = option.value;
               if (option.value === 'contain' || option.value === 'cover') {
-                selectedBackground.width = 'auto';
-                selectedBackground.height = 'auto';
+                viewModel.selectedBackground.width = 'auto';
+                viewModel.selectedBackground.height = 'auto';
               }
             "
           >
@@ -53,14 +52,16 @@
               <input
                 type="text"
                 id="width"
-                v-model="selectedBackground.width"
-                :disabled="selectedBackground.size !== 'custom'"
-                :class="{ disabled: selectedBackground.size !== 'custom' }"
+                v-model="viewModel.selectedBackground.width"
+                :disabled="viewModel.selectedBackground.size !== 'custom'"
+                :class="{
+                  disabled: viewModel.selectedBackground.size !== 'custom',
+                }"
               />
               <span
                 v-if="
-                  selectedBackground.size === 'custom' &&
-                  selectedBackground.width !== 'auto'
+                  viewModel.selectedBackground.size === 'custom' &&
+                  viewModel.selectedBackground.width !== 'auto'
                 "
                 >PX</span
               >
@@ -72,14 +73,16 @@
               <input
                 type="text"
                 id="height"
-                v-model="selectedBackground.height"
-                :disabled="selectedBackground.size !== 'custom'"
-                :class="{ disabled: selectedBackground.size !== 'custom' }"
+                v-model="viewModel.selectedBackground.height"
+                :disabled="viewModel.selectedBackground.size !== 'custom'"
+                :class="{
+                  disabled: viewModel.selectedBackground.size !== 'custom',
+                }"
               />
               <span
                 v-if="
-                  selectedBackground.size === 'custom' &&
-                  selectedBackground.height !== 'auto'
+                  viewModel.selectedBackground.size === 'custom' &&
+                  viewModel.selectedBackground.height !== 'auto'
                 "
                 >PX</span
               >
@@ -103,54 +106,68 @@
             ></div>
             <div
               class="dot top-left"
-              :class="{ active: selectedBackground.position === 'top left' }"
+              :class="{
+                active: viewModel.selectedBackground.position === 'top left',
+              }"
               @click="updatePosition('top left')"
             ></div>
             <div
               class="dot top-center"
-              :class="{ active: selectedBackground.position === 'top center' }"
+              :class="{
+                active: viewModel.selectedBackground.position === 'top center',
+              }"
               @click="updatePosition('top center')"
             ></div>
             <div
               class="dot top-right"
-              :class="{ active: selectedBackground.position === 'top right' }"
+              :class="{
+                active: viewModel.selectedBackground.position === 'top right',
+              }"
               @click="updatePosition('top right')"
             ></div>
             <div
               class="dot center-left"
-              :class="{ active: selectedBackground.position === 'center left' }"
+              :class="{
+                active: viewModel.selectedBackground.position === 'center left',
+              }"
               @click="updatePosition('center left')"
             ></div>
             <div
               class="dot center-center"
               :class="{
-                active: selectedBackground.position === 'center center',
+                active:
+                  viewModel.selectedBackground.position === 'center center',
               }"
               @click="updatePosition('center center')"
             ></div>
             <div
               class="dot center-right"
               :class="{
-                active: selectedBackground.position === 'center right',
+                active:
+                  viewModel.selectedBackground.position === 'center right',
               }"
               @click="updatePosition('center right')"
             ></div>
             <div
               class="dot bottom-left"
-              :class="{ active: selectedBackground.position === 'bottom left' }"
+              :class="{
+                active: viewModel.selectedBackground.position === 'bottom left',
+              }"
               @click="updatePosition('bottom left')"
             ></div>
             <div
               class="dot bottom-center"
               :class="{
-                active: selectedBackground.position === 'bottom center',
+                active:
+                  viewModel.selectedBackground.position === 'bottom center',
               }"
               @click="updatePosition('bottom center')"
             ></div>
             <div
               class="dot bottom-right"
               :class="{
-                active: selectedBackground.position === 'bottom right',
+                active:
+                  viewModel.selectedBackground.position === 'bottom right',
               }"
               @click="updatePosition('bottom right')"
             ></div>
@@ -165,7 +182,7 @@
       <ColorPicker
         v-if="activeTab === 'color'"
         @color-change="updateColor"
-        :color="selectedBackground.value"
+        :color="viewModel.selectedBackground.value"
       />
     </div>
   </div>
@@ -210,8 +227,6 @@ export default {
       type: BannerBuilderViewModel,
       required: true,
     },
-    selectedBackground: null,
-    isBackgroundSelectorVisible: false,
   },
 
   watch: {
@@ -224,9 +239,9 @@ export default {
 
   computed: {
     activeDot() {
-      if (this.selectedBackground) {
+      if (this.viewModel.selectedBackground) {
         return document.querySelector(
-          `.dot-${this.selectedBackground.position}`
+          `.dot-${this.viewModel.selectedBackground.position}`
         );
       }
       return null;
@@ -266,11 +281,11 @@ export default {
     },
 
     updateColor(eventData) {
-      this.selectedBackground.value = eventData.cssColor;
+      this.viewModel.selectedBackground.value = eventData.cssColor;
     },
 
     updatePosition(position) {
-      this.selectedBackground.position = position;
+      this.viewModel.selectedBackground.position = position;
       const dots = document.querySelectorAll(".dot");
       dots.forEach((dot) => {
         dot.classList.remove("active");
@@ -286,22 +301,22 @@ export default {
     setSelectedTab(tab) {
       this.activeTab = tab.name;
       if (tab.name === "color") {
-        this.selectedBackground.type = "color";
-        this.selectedBackground.value = "hsla(0, 0%, 0%, 0.25)";
+        this.viewModel.selectedBackground.type = "color";
+        this.viewModel.selectedBackground.value = "hsla(0, 0%, 0%, 0.25)";
       } else if (tab.name === "image") {
         this.setDefaultImageAsBackground();
       }
     },
 
     setDefaultImageAsBackground() {
-      this.selectedBackground.type = "image";
-      this.selectedBackground.value = backgroundPlaceholder;
-      this.selectedBackground.fileName = backgroundPlaceholder;
-      this.selectedBackground.repeat = "repeat";
-      this.selectedBackground.size = "custom";
-      this.selectedBackground.width = "auto";
-      this.selectedBackground.height = "auto";
-      this.selectedBackground.position = "center top";
+      this.viewModel.selectedBackground.type = "image";
+      this.viewModel.selectedBackground.value = backgroundPlaceholder;
+      this.viewModel.selectedBackground.fileName = backgroundPlaceholder;
+      this.viewModel.selectedBackground.repeat = "repeat";
+      this.viewModel.selectedBackground.size = "custom";
+      this.viewModel.selectedBackground.width = "auto";
+      this.viewModel.selectedBackground.height = "auto";
+      this.viewModel.selectedBackground.position = "center center";
     },
 
     startRipple(event) {
@@ -367,7 +382,7 @@ export default {
   height: 16px;
 }
 
-.dot:hover {
+.dot:not(.active):hover {
   background-color: #999;
 }
 

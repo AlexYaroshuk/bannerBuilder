@@ -106,17 +106,10 @@
               class="prop-section"
               v-if="viewModel.getSelectedElement().type === 'image'"
             >
-              <label for="text-field">URL:</label>
-              <input
-                id="text-field"
-                type="text"
-                v-model="viewModel.getSelectedElement().url"
-              />
+              <!--            <label for="text-field">URL:</label>
+              <input id="text-field" type="text" /> -->
 
-              <FIleUploader
-                :is-background-mode="false"
-                :view-model="viewModel"
-              ></FIleUploader>
+              <FIleUploader :view-model="viewModel"></FIleUploader>
             </div>
 
             <div
@@ -407,9 +400,7 @@
               >
                 <BackgroundSelector
                   ref="backgroundSelector"
-                  :selectedBackground="selectedBackground"
                   :view-model="viewModel"
-                  :isBackgroundSelectorVisible="isBackgroundSelectorVisible"
                 />
                 <div
                   v-for="(background, index) in viewModel.getSelectedElement()
@@ -576,7 +567,7 @@
         </div>
         <div
           class="sidebar-overlay"
-          v-if="isBackgroundSelectorVisible"
+          v-if="viewModel.isBackgroundSelectorVisible"
           @click="dismissBackgroundSelector"
         />
       </div>
@@ -814,11 +805,7 @@ export default {
 
     //test
     test() {
-      console.log(
-        this.viewModel.getSelectedElement().background.length > 0
-          ? this.viewModel.getSelectedElement().background
-          : "Background not defined"
-      );
+      console.log(this.viewModel.getSelectedElement().parentContainer);
     },
 
     onEnd(evt) {
@@ -863,22 +850,24 @@ export default {
       this.viewModel.currentSelectedElement.addBackgroundLayer(
         newColorBackground
       );
-      this.selectedBackground = newColorBackground;
+      this.viewModel.selectedBackground = newColorBackground;
 
-      this.isBackgroundSelectorVisible = true;
+      this.viewModel.isBackgroundSelectorVisible = true;
     },
     editBackground(background) {
-      this.isBackgroundSelectorVisible = true;
-      this.selectedBackground = background;
+      this.viewModel.isBackgroundSelectorVisible = true;
+      this.viewModel.selectedBackground = background;
       this.$nextTick(() => {
         this.$refs.backgroundSelector.activeTab =
-          this.selectedBackground.type === "color" ? "color" : "image";
+          this.viewModel.selectedBackground.type === "color"
+            ? "color"
+            : "image";
       });
     },
 
     hideBackgroundSelector() {
-      this.isBackgroundSelectorVisible = false;
-      this.selectedBackground = null;
+      this.viewModel.isBackgroundSelectorVisible = false;
+      this.viewModel.selectedBackground = null;
     },
 
     toggleVisibility(background) {

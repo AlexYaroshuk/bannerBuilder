@@ -1,15 +1,22 @@
 <template>
-  <div>
+  <div
+    v-if="
+      (viewModel.selectedBackground &&
+        viewModel.selectedBackground.type === 'image' &&
+        viewModel.selectedBackground.value) ||
+      (viewModel.getSelectedElement() &&
+        viewModel.getSelectedElement().type === 'image' &&
+        viewModel.getSelectedElement().value)
+    "
+  >
     <input type="file" ref="fileInput" @change="handleFileUpload" />
 
     <img
-      v-if="backgroundImage"
       :src="
-        isBackgroundMode
-          ? selectedBackground.value
-          : viewModel.getSelectedElement().url
+        viewModel.selectedBackground
+          ? viewModel.selectedBackground.value
+          : viewModel.getSelectedElement().value
       "
-      :alt="backgroundImage"
     />
   </div>
 </template>
@@ -28,13 +35,9 @@ export default {
       type: BannerBuilderViewModel,
       required: true,
     },
-    selectedBackground: null,
-    isBackgroundMode: {
-      type: Boolean,
-      default: true,
-    },
+    isBackgroundMode: false,
   },
-  computed: {
+  /*   computed: {
     backgroundImage() {
       const currentElement = this.viewModel.currentSelectedElement;
       if (currentElement.background) {
@@ -45,11 +48,7 @@ export default {
       }
       return null;
     },
-
-    showImage() {
-      return !!this.viewModel.currentSelectedElement.backgroundImage;
-    },
-  },
+  }, */
 
   methods: {
     handleFileUpload(event) {
@@ -65,15 +64,13 @@ export default {
     },
 
     setImage(fileName) {
-      if (this.isBackgroundMode) {
-        this.selectedBackground.type = "image";
-        this.selectedBackground.fileName = fileName;
-        this.selectedBackground.value = this.imageSource;
+      if (this.viewModel.selectedBackground) {
+        this.viewModel.selectedBackground.type = "image";
+        this.viewModel.selectedBackground.fileName = fileName;
+        this.viewModel.selectedBackground.value = this.imageSource;
       } else {
-        this.viewModel.getSelectedElement().url = this.imageSource;
+        this.viewModel.getSelectedElement().value = this.imageSource;
       }
-
-      this.$refs.fileInput.value = null; // clear the input field
     },
   },
 };

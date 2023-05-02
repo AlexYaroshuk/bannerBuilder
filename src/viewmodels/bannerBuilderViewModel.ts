@@ -29,7 +29,7 @@ class BannerBuilderViewModel {
     //background selector
     isBackgroundSelectorVisible: boolean = false;
     selectedBackground = null
-    isBackGroundMode: boolean = true;
+    isBackgroundMode: boolean = true;
 
 
     emits = ["delete-container",];
@@ -70,7 +70,7 @@ class BannerBuilderViewModel {
                     children: [
                         new Text({ name: "Text 1-1", text: "das" }),
                         new Text({ name: "Text 1-2", text: "mor" }),
-                        new Image({ name: "Image 1-3", url: "https://picsum.photos/200/300" }),
+                        new Image({ name: "Image 1-3", value: "https://picsum.photos/200/300" }),
                         new Container({
                             name: 'Container 1-1',
                             background: [
@@ -144,6 +144,8 @@ class BannerBuilderViewModel {
 
     handleElementDeselected() {
         this.currentSelectedElement = this.rootContainer;
+        this.isBackgroundSelectorVisible = false;
+        this.selectedBackground = null;
     }
 
     handleDragStart(): void {
@@ -285,7 +287,7 @@ class BannerBuilderViewModel {
                 newElement = new Link({ name: "Link 3", label: "Link 3", url: "https://www.example.com" });
                 break;
             case "image":
-                newElement = new Image({ name: "Link 3", url: "https://picsum.photos/200/300" });
+                newElement = new Image({ name: "Link 3", value: "https://picsum.photos/200/300" });
                 break;
             default:
                 throw new Error(`Unsupported element type: ${type}`);
@@ -315,6 +317,7 @@ class BannerBuilderViewModel {
         const newContainer = new Container({
             name: newContainerName,
             children: [],
+            parentContainer: this.rootContainer,
         });
 
         const text1 = new Text({ name: "Text 3", text: "new" });

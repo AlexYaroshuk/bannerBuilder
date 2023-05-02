@@ -6,18 +6,18 @@ import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
 
 class Image extends Element {
-  url: string;
+  value: string;
   readonly type: string;
 
   constructor({
     name,
     color = null,
-    url,
+    value,
     borderColor = "transparent",
     parentContainer = null,
   }: {
     name: string;
-    url: string;
+    value: string;
     borderColor?: string;
     color?: string | null;
     parentContainer?: Container | null;
@@ -32,13 +32,13 @@ class Image extends Element {
 
     this.type = "image";
 
-    this.url = url;
+    this.value = value;
 
   }
 
 
   getUrl(): string {
-    return this.url;
+    return this.value;
   }
 
   addChild(child: Element): void {
