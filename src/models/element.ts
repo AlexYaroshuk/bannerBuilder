@@ -61,7 +61,7 @@ abstract class Element {
     this.parentContainer = parentContainer;
     this.background = background.map((bg) => ({
       ...bg,
-      position: bg.position || "center",
+      position: bg.position || "center center",
       size: bg.size || "custom",
       width: bg.width || "auto",
       height: bg.height || "auto",

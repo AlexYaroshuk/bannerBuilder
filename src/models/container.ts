@@ -16,7 +16,7 @@ type BackgroundLayer = {
 
 
 const DEFAULT_BACKGROUND_SIZE: BackgroundSize = "custom";
-const DEFAULT_BACKGROUND_POSITION = "centered";
+const DEFAULT_BACKGROUND_POSITION = "center center";
 
 interface ContainerStyles {
     background: BackgroundLayer[];

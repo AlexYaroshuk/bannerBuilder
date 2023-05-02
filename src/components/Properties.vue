@@ -65,6 +65,8 @@
             </i>
           </p>
 
+          <!-- ! text settings -->
+
           <div v-if="expandableGroups.content">
             <div
               class="prop-section"
@@ -78,6 +80,8 @@
               />
             </div>
 
+            <!-- ! link settings -->
+
             <div
               class="prop-section"
               v-if="viewModel.getSelectedElement().type === 'link'"
@@ -88,19 +92,6 @@
                 type="text"
                 v-model="viewModel.getSelectedElement().label"
               />
-            </div>
-            <div
-              class="section-divider"
-              v-if="viewModel.getSelectedElement().type === 'link'"
-            />
-            <div
-              class="prop-section"
-              v-if="
-                viewModel.getSelectedElement() &&
-                (viewModel.getSelectedElement().type === 'image' ||
-                  viewModel.getSelectedElement().type === 'link')
-              "
-            >
               <label for="text-field">URL:</label>
               <input
                 id="text-field"
@@ -108,11 +99,33 @@
                 v-model="viewModel.getSelectedElement().url"
               />
             </div>
-          </div>
 
-          <!-- ! link settings -->
+            <!-- ! image settings -->
+
+            <div
+              class="prop-section"
+              v-if="viewModel.getSelectedElement().type === 'image'"
+            >
+              <label for="text-field">URL:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().url"
+              />
+
+              <FIleUploader
+                :is-background-mode="false"
+                :view-model="viewModel"
+              ></FIleUploader>
+            </div>
+
+            <div
+              class="section-divider"
+              v-if="viewModel.getSelectedElement().type === 'link'"
+            />
+          </div>
         </div>
-        <!-- ! hybrid settings -->
+        <!-- ! typography settings -->
         <div
           v-if="
             viewModel.getSelectedElement() &&
@@ -378,7 +391,7 @@
           <div v-if="expandableGroups.background">
             <div class="prop-section">
               <div>
-                Image or gradient
+                Image or color overlay
                 <button @click.stop="addBackground()">add</button>
 
                 <!-- <i class="material-icons">add</i> -->
@@ -390,6 +403,7 @@
                 handle=".background-drag-handle"
                 @end="onEnd"
                 cursor="grabbing"
+                :dragging-class="'background-dragging'"
               >
                 <BackgroundSelector
                   ref="backgroundSelector"
@@ -448,12 +462,12 @@
                         }}
                       </div>
                       <div class="background-list-buttons">
-                        <button @click.stop="toggleVisibility(background)">
+                        <!--                         <button @click.stop="toggleVisibility(background)">
                           {{ background.isVisible ? "Hide" : "Show" }}
-                        </button>
+                        </button> -->
 
                         <button @click="removeBackground(background)">
-                          del
+                          Delete
                         </button>
                         <!-- <div
                         class="delete-icon"
@@ -575,11 +589,13 @@ import { ColorPicker } from "vue-accessible-color-picker";
 import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 import { VueDraggableNext } from "vue-draggable-next";
 import BackgroundSelector from "./BackgroundSelector.vue";
+import FIleUploader from "./FIleUploader.vue";
 
 export default {
   components: {
     ColorPicker,
     BackgroundSelector,
+    FIleUploader,
     draggable: VueDraggableNext,
   },
   props: {
@@ -999,6 +1015,14 @@ i.material-icons {
 
 .draggable-dragging {
   opacity: 0.5;
+}
+
+.background-drag-handle {
+  cursor: grab;
+}
+
+.background-dragging {
+  cursor: grabbing;
 }
 
 .draggable-ghost {

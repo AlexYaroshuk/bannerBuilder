@@ -227,7 +227,7 @@ export default {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
       const sortedBackgroundLayers = styles.background.sort(
-        (a, b) => a.layerIndex - b.layerIndex
+        (a, b) => b.layerIndex - a.layerIndex
       );
 
       const backgroundLayers = sortedBackgroundLayers.map((bg) => {

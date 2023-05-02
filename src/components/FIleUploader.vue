@@ -4,7 +4,11 @@
 
     <img
       v-if="backgroundImage"
-      :src="selectedBackground.value"
+      :src="
+        isBackgroundMode
+          ? selectedBackground.value
+          : viewModel.getSelectedElement().url
+      "
       :alt="backgroundImage"
     />
   </div>
@@ -25,6 +29,10 @@ export default {
       required: true,
     },
     selectedBackground: null,
+    isBackgroundMode: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     backgroundImage() {
@@ -57,11 +65,13 @@ export default {
     },
 
     setImage(fileName) {
-      this.selectedBackground.type = "image";
-      this.selectedBackground.fileName = fileName;
-      /*       this.selectedBackground.size = 'custom';
-      this.selectedBackground.fileName = fileName; */
-      this.selectedBackground.value = this.imageSource;
+      if (this.isBackgroundMode) {
+        this.selectedBackground.type = "image";
+        this.selectedBackground.fileName = fileName;
+        this.selectedBackground.value = this.imageSource;
+      } else {
+        this.viewModel.getSelectedElement().url = this.imageSource;
+      }
 
       this.$refs.fileInput.value = null; // clear the input field
     },
