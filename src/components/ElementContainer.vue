@@ -121,49 +121,68 @@ const ElementContainer = {
       this.viewModel.handleElementSelected(item);
       this.$emit("context-menu", event, type, item);
     },
+
+    getGradientCSS(gradient) {
+      const { type, degree, points } = gradient;
+      const stops = points
+        .map(
+          (point) =>
+            `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+        )
+        .join(", ");
+      return `${type}-gradient(${degree}deg, ${stops})`;
+    },
   },
 
   computed: {
     containerStyle() {
-      const styles = this.container.getEffectiveStyles();
-      const sortedBackgroundLayers = styles.background.sort(
-        (a, b) => a.layerIndex - b.layerIndex
-      );
+    const styles = this.container.getEffectiveStyles();
+    const sortedBackgroundLayers = styles.background.sort(
+      (a, b) => b.layerIndex - a.layerIndex
+    );
 
-      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
-        const layer = {
-          zIndex: bg.layerIndex,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-        };
+   
 
-        switch (bg.type) {
-          case "color":
-            layer.backgroundColor = bg.value;
-            break;
-          case "gradient":
-            layer.backgroundImage = `linear-gradient(${bg.value})`;
-            break;
-          case "image":
-            layer.backgroundImage = `url(${bg.value})`;
-            layer.backgroundRepeat = bg.repeat || "no-repeat";
-            layer.backgroundPosition = bg.position || "center";
-            layer.backgroundSize = bg.size || "cover";
-            break;
-          default:
-            throw new Error(`Unknown background type: ${bg.type}`);
-        }
-
-        return layer;
-      });
-
-      return {
-        backgroundLayers,
+    const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+      const layer = {
+        zIndex: bg.layerIndex,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
       };
-    },
+
+      switch (bg.type) {
+        case "color":
+          layer.backgroundColor = bg.value;
+          break;
+        case "gradient":
+          layer.backgroundImage = getGradientCSS(bg.value);
+          break;
+        case "image":
+          layer.backgroundImage = `url(${bg.value})`;
+          layer.backgroundRepeat = bg.repeat || "no-repeat";
+          layer.backgroundPosition = bg.position || "center";
+          layer.backgroundSize = bg.size || "cover";
+
+          if (bg.size === "custom" && bg.width && bg.height) {
+            layer.width = `${bg.width}px`;
+            layer.height = `${bg.height}px`;
+          }
+          break;
+        default:
+          throw new Error(`Unknown background type: ${bg.type}`);
+      }
+
+      return layer;
+    });
+
+    return {
+      backgroundLayers,
+    };
+  },
+
 
     borderColorStyle() {
       const isSelectedOrHovered =
@@ -222,53 +241,81 @@ export default {
       this.$emit("context-menu", event, type, item);
       this.$emit("select-item", item); // Add this line
     },
+
+        getGradientCSS(gradient) {
+      const { type, degree, points } = gradient;
+      const stops = points
+        .map(
+          (point) =>
+            `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+        )
+        .join(", ");
+      return `${type}-gradient(${degree}deg, ${stops})`;
+    },
+
+    
+
+     generateGradient(gradient) {
+    if (!gradient) {
+      return "";
+    }
+
+    const { type, degree, points } = gradient;
+    const pointStrings = points.map(
+      ({ left, red, green, blue, alpha }) =>
+        `rgba(${red},${green},${blue},${alpha}) ${left}%`
+    );
+    const startPoint = type === "linear" ? `${degree}deg` : "circle";
+
+    return `${type}-gradient(${startPoint}, ${pointStrings.join(", ")})`;
+  },
   },
   computed: {
     containerStyle() {
-      const styles = this.container.getEffectiveStyles();
-      const sortedBackgroundLayers = styles.background.sort(
-        (a, b) => b.layerIndex - a.layerIndex
-      );
+    const styles = this.container.getEffectiveStyles();
+    const sortedBackgroundLayers = styles.background.sort(
+      (a, b) => b.layerIndex - a.layerIndex
+    );
 
-      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
-        const layer = {
-          zIndex: bg.layerIndex,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-        };
-
-        switch (bg.type) {
-          case "color":
-            layer.backgroundColor = bg.value;
-            break;
-          case "gradient":
-            layer.backgroundImage = `linear-gradient(${bg.value})`;
-            break;
-          case "image":
-            layer.backgroundImage = `url(${bg.value})`;
-            layer.backgroundRepeat = bg.repeat || "no-repeat";
-            layer.backgroundPosition = bg.position || "center";
-            layer.backgroundSize = bg.size || "cover";
-
-            if (bg.size === "custom" && bg.width && bg.height) {
-              layer.width = `${bg.width}px`;
-              layer.height = `${bg.height}px`;
-            }
-            break;
-          default:
-            throw new Error(`Unknown background type: ${bg.type}`);
-        }
-
-        return layer;
-      });
-
-      return {
-        backgroundLayers,
+    const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+      const layer = {
+        zIndex: bg.layerIndex,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
       };
-    },
+
+      switch (bg.type) {
+        case "color":
+          layer.backgroundColor = bg.value;
+          break;
+        case "gradient":
+          layer.backgroundImage = this.getGradientCSS(bg.value);
+          break;
+        case "image":
+          layer.backgroundImage = `url(${bg.value})`;
+          layer.backgroundRepeat = bg.repeat || "no-repeat";
+          layer.backgroundPosition = bg.position || "center";
+          layer.backgroundSize = bg.size || "cover";
+
+          if (bg.size === "custom" && bg.width && bg.height) {
+            layer.width = `${bg.width}px`;
+            layer.height = `${bg.height}px`;
+          }
+          break;
+        default:
+          throw new Error(`Unknown background type: ${bg.type}`);
+      }
+
+      return layer;
+    });
+
+    return {
+      backgroundLayers,
+    };
+  },
 
     borderColorStyle() {
       const isSelectedOrHovered =

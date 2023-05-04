@@ -29,7 +29,6 @@ class BannerBuilderViewModel {
     //background selector
     isBackgroundSelectorVisible: boolean = false;
     selectedBackground = null
-    isBackgroundMode: boolean = true;
 
 
     emits = ["delete-container",];
@@ -103,6 +102,27 @@ class BannerBuilderViewModel {
                     name: 'Container 3',
                     background: [
                         { type: "image", value: "https://picsum.photos/200/300", fileName: 'random_picsum_mage', layerIndex: 0, size: 'custom', width: 'auto', height: 'auto', position: "center center" },
+
+                    ],
+                    children: [
+                        new Text({ name: "Text 3-1", text: "tex" }),
+                        new Text({ name: "Text 3-2", text: "text" }),
+                    ]
+
+                }),
+                new Container({
+                    name: 'Container 4',
+                    background: [
+                        {
+                            type: "gradient", layerIndex: 0, size: 'custom', width: 'auto', height: 'auto', position: "center center", value: {
+                                type: 'linear',
+                                degree: 0,
+                                points: [
+                                    { left: 0, red: 240, green: 80, blue: 80, alpha: 1 }, // White
+                                    { left: 80, red: 128, green: 128, blue: 200, alpha: 1 }, // Grey
+                                ],
+                            }
+                        },
 
                     ],
                     children: [

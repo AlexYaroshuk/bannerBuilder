@@ -184,6 +184,11 @@
         @color-change="updateColor"
         :color="viewModel.selectedBackground.value"
       />
+      <GradientColorPicker v-if="activeTab === 'gradient'" :gradient="viewModel.selectedBackground.value" @color-change="updateColor"  />
+
+
+
+   
     </div>
   </div>
 </template>
@@ -194,11 +199,19 @@ import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 import { ColorPicker } from "vue-accessible-color-picker";
 import backgroundPlaceholder from "@/assets/background_placeholder_texture.svg";
 
+import GradientColorPicker from "./GradientColorPicker.vue";
+
+
 export default {
   components: {
     FIleUploader,
     ColorPicker,
-  },
+
+    GradientColorPicker,
+    
+},
+
+  
 
   data() {
     return {
@@ -214,12 +227,18 @@ export default {
           label: "Image",
           icon: "image",
         },
+        {
+          name: "gradient",
+          label: "Gradient",
+          icon: "gradient",
+        },
       ],
       sizeOptions: [
         { label: "Custom", value: "custom" },
         { label: "Cover", value: "cover" },
         { label: "Contain", value: "contain" },
       ],
+
     };
   },
   props: {
@@ -249,6 +268,7 @@ export default {
   },
 
   methods: {
+
     setActiveDot(position) {
       const activeDot = document.querySelector(".dot.active");
       if (activeDot) {
@@ -298,15 +318,26 @@ export default {
       }
     },
 
-    setSelectedTab(tab) {
+     setSelectedTab(tab) {
       this.activeTab = tab.name;
-      if (tab.name === "color") {
-        this.viewModel.selectedBackground.type = "color";
-        this.viewModel.selectedBackground.value = "hsla(0, 0%, 0%, 0.25)";
-      } else if (tab.name === "image") {
+      if (tab.name === 'color') {
+        this.viewModel.selectedBackground.type = 'color';
+        this.viewModel.selectedBackground.value = 'hsla(0, 0%, 0%, 0.25)';
+      } else if (tab.name === 'image') {
         this.setDefaultImageAsBackground();
+      } else if (tab.name === 'gradient') {
+        this.viewModel.selectedBackground.type = 'gradient';
+        this.viewModel.selectedBackground.value = {
+          type: 'linear',
+          degree: 0,
+          points: [
+            { left: 0, red: 255, green: 255, blue: 255, alpha: 1 }, // White
+            { left: 100, red: 128, green: 128, blue: 128, alpha: 1 }, // Grey
+          ],
+        };
       }
     },
+
 
     setDefaultImageAsBackground() {
       this.viewModel.selectedBackground.type = "image";

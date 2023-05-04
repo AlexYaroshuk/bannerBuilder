@@ -417,8 +417,7 @@
                       :class="{
                         'transparent-pattern':
                           background &&
-                          background.type === 'color' &&
-                          background.value.includes('hsl'),
+                          background.type === 'color'
                       }"
                       :style="{
                         backgroundImage:
@@ -431,8 +430,7 @@
                             : '',
                         backgroundBlendMode:
                           background &&
-                          background.type === 'color' &&
-                          background.value.includes('hsl')
+                          background.type === 'color'
                             ? 'overlay'
                             : '',
                       }"
@@ -805,7 +803,7 @@ export default {
 
     //test
     test() {
-      console.log(this.viewModel.getSelectedElement().parentContainer);
+      console.log(this.viewModel.getSelectedElement().background);
     },
 
     onEnd(evt) {

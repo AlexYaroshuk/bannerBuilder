@@ -4,7 +4,7 @@ type BackgroundSize = "custom" | "contain" | "cover";
 
 type BackgroundLayer = {
     type: "color" | "gradient" | "image";
-    value: string;
+    value: string | GradientLayer;
     position?: string;
     size?: "custom" | "contain" | "cover";
     width?: number | "auto";
@@ -13,6 +13,22 @@ type BackgroundLayer = {
     layerIndex: number;
     fileName?: string;
 };
+
+interface GradientPoint {
+    left: number;
+    red: number;
+    green: number;
+    blue: number;
+    alpha: number;
+}
+
+
+
+interface GradientLayer {
+    type: 'linear' | 'radial';
+    degree?: number;
+    points: GradientPoint[];
+}
 
 
 const DEFAULT_BACKGROUND_SIZE: BackgroundSize = "custom";
@@ -103,9 +119,9 @@ class Container extends Element {
         }
 
         if (this.background.some((bg) => bg.type === "gradient")) {
-            styles.backgroundRepeat = undefined;
-            styles.backgroundPosition = undefined;
-            styles.backgroundSize = undefined;
+            styles.backgroundRepeat = 'no-repeat';
+            styles.backgroundPosition = DEFAULT_BACKGROUND_SIZE;
+            styles.backgroundSize = DEFAULT_BACKGROUND_SIZE;
         }
 
         return styles;

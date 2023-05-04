@@ -2,7 +2,7 @@ import { Container } from "@/models/container";
 
 type BackgroundLayer = {
   type: "color" | "gradient" | "image";
-  value: string;
+  value: string | GradientLayer;
   position?: string;
   size?: "custom" | "contain" | "cover";
   width?: number | "auto";
@@ -22,6 +22,21 @@ interface HybridStyles {
 interface ContainerStyles {
   background: BackgroundLayer[] | null;
 }
+
+interface GradientPoint {
+  left: number;
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
+}
+
+interface GradientLayer {
+  type: 'linear' | 'radial';
+  degree?: number;
+  points: GradientPoint[];
+}
+
 
 abstract class Element {
   name: string
