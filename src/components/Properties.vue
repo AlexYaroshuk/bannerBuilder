@@ -416,21 +416,21 @@
                       @click.stop="editBackground(background)"
                       :class="{
                         'transparent-pattern':
-                          background &&
-                          background.type === 'color'
+                          background && background.type !== 'gradient',
                       }"
                       :style="{
                         backgroundImage:
                           background && background.type === 'image'
                             ? `url(${background.value})`
+                            : background && background.type === 'gradient'
+                            ? getGradientString()
                             : '',
                         backgroundColor:
                           background && background.type === 'color'
                             ? background.value
                             : '',
                         backgroundBlendMode:
-                          background &&
-                          background.type === 'color'
+                          background && background.type === 'color'
                             ? 'overlay'
                             : '',
                       }"
@@ -447,9 +447,12 @@
                                   background.fileName.lastIndexOf(".")
                                 )
                               : background.fileName
+                            : background.type === "gradient"
+                            ? "Gradient"
                             : background.value
                         }}
                       </div>
+
                       <div class="background-list-buttons">
                         <!--                         <button @click.stop="toggleVisibility(background)">
                           {{ background.isVisible ? "Hide" : "Show" }}
@@ -764,6 +767,21 @@ export default {
     paragraphBgColor() {
       return this.viewModel.getSelectedElement().color ? "red" : "green";
     },
+
+    gradientString() {
+      if (this.background && this.background.type === "gradient") {
+        const gradient = this.background.value;
+        const points = gradient.points
+          .map(
+            (point) =>
+              `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+          )
+          .join(", ");
+
+        return `${gradient.type}-gradient(${gradient.degree}deg, ${points})`;
+      }
+      return "";
+    },
   },
 
   methods: {
@@ -856,10 +874,13 @@ export default {
       this.viewModel.isBackgroundSelectorVisible = true;
       this.viewModel.selectedBackground = background;
       this.$nextTick(() => {
-        this.$refs.backgroundSelector.activeTab =
-          this.viewModel.selectedBackground.type === "color"
-            ? "color"
-            : "image";
+        if (this.viewModel.selectedBackground.type === "color") {
+          this.$refs.backgroundSelector.activeTab = "color";
+        } else if (this.viewModel.selectedBackground.type === "image") {
+          this.$refs.backgroundSelector.activeTab = "image";
+        } else if (this.viewModel.selectedBackground.type === "gradient") {
+          this.$refs.backgroundSelector.activeTab = "gradient";
+        }
       });
     },
 
@@ -870,6 +891,21 @@ export default {
 
     toggleVisibility(background) {
       background.isVisible = !background.isVisible;
+    },
+
+    getGradientString() {
+      if (this.background && this.background.type === "gradient") {
+        const gradient = this.background.value;
+        const points = gradient.points
+          .map(
+            (point) =>
+              `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+          )
+          .join(", ");
+
+        return `${gradient.type}-gradient(${gradient.degree}deg, ${points})`;
+      }
+      return "";
     },
 
     /*     addColorBackground() {
@@ -917,11 +953,13 @@ export default {
   right: 0;
   z-index: 2;
 }
+
 .status-text {
   display: flex;
 
   font-size: small;
 }
+
 .link-text {
   margin-left: 4px;
   padding-left: 4px;
@@ -953,7 +991,8 @@ export default {
 
 i.material-icons {
   float: left;
-  margin-right: 4px; /* adjust the margin as needed */
+  margin-right: 4px;
+  /* adjust the margin as needed */
 }
 
 .material-icons.expand-more {
@@ -977,6 +1016,7 @@ i.material-icons {
   background-color: rgba(211, 211, 211, 0.6);
   margin: 8px;
 }
+
 .background-list-item {
   display: flex;
   padding: 4px;
@@ -1024,6 +1064,7 @@ i.material-icons {
   font-size: 24px;
   color: rgb(2, 1, 1);
 }
+
 .delete-icon:hover {
   color: red;
 }

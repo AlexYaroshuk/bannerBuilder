@@ -25,21 +25,17 @@ interface ContainerStyles {
 
 interface GradientPoint {
   left: number;
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
+  color: string;
 }
 
 interface GradientLayer {
-  type: 'linear' | 'radial';
+  type: "linear" | "radial";
   degree?: number;
   points: GradientPoint[];
 }
 
-
 abstract class Element {
-  name: string
+  name: string;
   color: string | null;
   fontFamily: string | null;
   fontWeight: number | null;
@@ -58,14 +54,14 @@ abstract class Element {
     borderColor = null,
     parentContainer = null,
   }: {
-    name: string,
-    color: string | null,
-    fontFamily?: string | null,
-    fontWeight?: number | null,
-    fontSize?: number | null,
+    name: string;
+    color: string | null;
+    fontFamily?: string | null;
+    fontWeight?: number | null;
+    fontSize?: number | null;
     background?: BackgroundLayer[];
-    borderColor?: string | null,
-    parentContainer?: Container | null
+    borderColor?: string | null;
+    parentContainer?: Container | null;
   }) {
     this.name = name;
     this.color = color;
@@ -108,10 +104,23 @@ abstract class Element {
     const root = this.getRootContainer();
 
     return {
-      color: this.color || (parent && parent.color) || (root && root.color) || null,
-      fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
-      fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
-      fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
+      color:
+        this.color || (parent && parent.color) || (root && root.color) || null,
+      fontFamily:
+        this.fontFamily ||
+        (parent && parent.fontFamily) ||
+        (root && root.fontFamily) ||
+        null,
+      fontWeight:
+        this.fontWeight ||
+        (parent && parent.fontWeight) ||
+        (root && root.fontWeight) ||
+        null,
+      fontSize:
+        this.fontSize ||
+        (parent && parent.fontSize) ||
+        (root && root.fontSize) ||
+        null,
     };
   }
 
