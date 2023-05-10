@@ -327,18 +327,8 @@
                 <label for="color-picker">Color:</label>
                 <div
                   class="color-square"
-                  @click.stop="editBackground(background)"
-                  :class="{
-                    'transparent-pattern':
-                      background &&
-                      background.type === 'color' &&
-                      background.value.includes('hsla'),
-                  }"
-                  :style="
-                    background && background.type === 'image'
-                      ? { backgroundImage: `url(${background.value})` }
-                      : { backgroundColor: background && background.value }
-                  "
+                  :style="{ backgroundColor: selectedItemColor }"
+                  @click="showColorPicker = !showColorPicker"
                 ></div>
                 <span class="hex-code">{{ selectedItemColor }}</span>
               </div>
@@ -516,7 +506,7 @@
               </draggable>
             </div>
 
-            <div class="section-divider" />
+            <!-- <div class="section-divider" />
 
             <div class="prop-section">
               <div
@@ -582,7 +572,7 @@
                 v-model="selectedItemBackgroundColor"
                 @color-change="updateColor"
               />
-            </div>
+            </div> -->
           </div>
         </div>
         <div
