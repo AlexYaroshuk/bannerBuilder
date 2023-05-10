@@ -259,7 +259,7 @@ export default {
 
       // Check if there's only one point and return a solid color
       if (points.length === 1) {
-        return points[0].color;
+        return `linear-gradient(${points[0].color}, ${points[0].color})`;
       }
 
       const sortedPoints = [...points].sort((a, b) => a.left - b.left);
@@ -290,10 +290,22 @@ export default {
       const { type, degree, points } = gradient;
       const sortedPoints = [...points].sort((a, b) => a.left - b.left);
 
-      const pointStrings = sortedPoints.map(
-        ({ left, red, green, blue, alpha }) =>
-          `rgba(${red},${green},${blue},${alpha}) ${left}%`
-      );
+      let pointStrings;
+      let startPoint;
+
+      if (sortedPoints.length === 1) {
+        pointStrings = [
+          `rgba(${sortedPoints[0].red},${sortedPoints[0].green},${sortedPoints[0].blue},${sortedPoints[0].alpha}) 0%`,
+          `rgba(${sortedPoints[0].red},${sortedPoints[0].green},${sortedPoints[0].blue},${sortedPoints[0].alpha}) 100%`,
+        ];
+        startPoint = `0deg`;
+      } else {
+        pointStrings = sortedPoints.map(
+          ({ left, red, green, blue, alpha }) =>
+            `rgba(${red},${green},${blue},${alpha}) ${left}%`
+        );
+        startPoint = `${degree}deg`;
+      }
 
       return `${type}-gradient(${startPoint}, ${pointStrings.join(", ")})`;
     },

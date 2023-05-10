@@ -39,20 +39,79 @@
         </div>
       </div>
     </div>
-    <div class="form-group">
-      <label for="degree">Degree:</label>
-      <input
-        id="degree"
-        type="number"
-        v-model="gradient.degree"
-        min="0"
-        max="360"
-      />
-    </div>
-
-    <button v-if="selectedPoint" @click="deleteSelectedPoint">
-      Delete Selected Point
+    <button
+      v-if="selectedPoint && gradient.points.length != 1"
+      @click="deleteSelectedPoint"
+    >
+      Delete point
     </button>
+
+    <div class="section-divider"></div>
+
+    <div class="prop-section">
+      Angle
+      <div class="option">
+        <div
+          class="row"
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <div class="degree-control">
+            <svg
+              @mousedown="startRotate"
+              @mousemove="rotate"
+              @mouseup="stopRotate"
+              @mouseleave="stopRotate"
+              viewBox="0 0 100 100"
+            >
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke="gray"
+                stroke-width="4"
+              />
+              <circle
+                :cx="
+                  50 +
+                  40 * Math.cos((gradient.degree * Math.PI) / 180 - Math.PI / 2)
+                "
+                :cy="
+                  50 +
+                  40 * Math.sin((gradient.degree * Math.PI) / 180 - Math.PI / 2)
+                "
+                r="8"
+                fill="blue"
+              />
+            </svg>
+          </div>
+
+          <!-- Turn buttons -->
+          <div class="turn-buttons">
+            <button @click="turnLeft">
+              <i class="material-icons">arrow_back</i>
+            </button>
+            <button @click="turnRight">
+              <i class="material-icons">arrow_forward</i>
+            </button>
+          </div>
+
+          <div class="form-group">
+            <input
+              id="degree"
+              type="number"
+              v-model="gradient.degree"
+              min="0"
+              max="360"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <ColorPicker
       v-if="selectedPoint"
@@ -241,7 +300,51 @@ const dragEnd = (event) => {
   const left = ((event.clientX - rect.left) / rect.width) * 100;
 
   selectedPoint.value.left = Math.max(0, Math.min(100, left));
-  selectedPoint.value = null;
+
+  // Check if the point is not being dragged before resetting the selectedPoint
+  if (!isDragging.value) {
+    selectedPoint.value = null;
+  }
+
+  // Always reset the isDragging flag when drag ends
+  isDragging.value = false;
+};
+
+// To track if the user is currently rotating the dot along the circle
+const rotating = ref(false);
+
+// Function to start rotating
+const startRotate = (event) => {
+  rotating.value = true;
+};
+
+// Function to stop rotating
+const stopRotate = (event) => {
+  rotating.value = false;
+};
+
+// Function to handle rotation
+const rotate = (event) => {
+  if (!rotating.value) return;
+
+  const rect = event.target.getBoundingClientRect();
+  const x = event.clientX - rect.left - rect.width / 2;
+  const y = event.clientY - rect.top - rect.height / 2;
+  const degree = Math.round(
+    ((Math.atan2(y, x) * 180) / Math.PI + 90 + 360) % 360
+  ); // Added rounding
+
+  gradient.degree = degree;
+};
+
+// Function to turn gradient left
+const turnLeft = () => {
+  gradient.degree = (gradient.degree - 90 + 360) % 360;
+};
+
+// Function to turn gradient right
+const turnRight = () => {
+  gradient.degree = (gradient.degree + 90) % 360;
 };
 </script>
 
@@ -295,6 +398,22 @@ const dragEnd = (event) => {
 
 .point-marker.active {
   box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(0, 123, 255);
+}
+
+.degree-control {
+  width: 64px;
+  height: 64px;
+}
+
+.degree-control svg {
+  width: 100%;
+  height: 100%;
+}
+
+.turn-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 /* .point-marker.hover {
   border: 8px solid rgba(0, 0, 0, 0.2);
