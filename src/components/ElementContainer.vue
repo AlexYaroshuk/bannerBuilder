@@ -124,13 +124,28 @@ const ElementContainer = {
 
     getGradientCSS(gradient) {
       const { type, degree, points } = gradient;
+
+      // Check if there's only one point and return a solid color
+      if (points.length === 1) {
+        return points[0].color;
+      }
+
       const stops = points
-        .map(
-          (point) =>
-            `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
-        )
+        .map((point) => `${point.color} ${point.left}%`)
         .join(", ");
-      return `${type}-gradient(${degree}deg, ${stops})`;
+
+      let startPoint = "";
+
+      if (type === "linear") {
+        startPoint = `${degree}deg`;
+      } else if (type === "radial") {
+        const center = points.find((point) => point.center);
+        const centerX = center ? center.left : 50;
+        const centerY = center ? center.top : 50;
+        startPoint = `${centerX}% ${centerY}%`;
+      }
+
+      return `${type}-gradient(${startPoint}, ${stops})`;
     },
   },
 
@@ -156,7 +171,7 @@ const ElementContainer = {
             layer.backgroundColor = bg.value;
             break;
           case "gradient":
-            layer.backgroundImage = getGradientCSS(bg.value);
+            layer.backgroundImage = this.getGradientCSS(bg.value);
             break;
           case "image":
             layer.backgroundImage = `url(${bg.value})`;
@@ -241,10 +256,30 @@ export default {
 
     getGradientCSS(gradient) {
       const { type, degree, points } = gradient;
-      const stops = points
+
+      // Check if there's only one point and return a solid color
+      if (points.length === 1) {
+        return points[0].color;
+      }
+
+      const sortedPoints = [...points].sort((a, b) => a.left - b.left);
+
+      const stops = sortedPoints
         .map((point) => `${point.color} ${point.left}%`)
         .join(", ");
-      return `${type}-gradient(${degree}deg, ${stops})`;
+
+      let startPoint = "";
+
+      if (type === "linear") {
+        startPoint = `${degree}deg`;
+      } else if (type === "radial") {
+        const center = points.find((point) => point.center);
+        const centerX = center ? center.left : 50;
+        const centerY = center ? center.top : 50;
+        startPoint = `${centerX}% ${centerY}%`;
+      }
+
+      return `${type}-gradient(${startPoint}, ${stops})`;
     },
 
     generateGradient(gradient) {
@@ -253,11 +288,12 @@ export default {
       }
 
       const { type, degree, points } = gradient;
-      const pointStrings = points.map(
+      const sortedPoints = [...points].sort((a, b) => a.left - b.left);
+
+      const pointStrings = sortedPoints.map(
         ({ left, red, green, blue, alpha }) =>
           `rgba(${red},${green},${blue},${alpha}) ${left}%`
       );
-      const startPoint = type === "linear" ? `${degree}deg` : "circle";
 
       return `${type}-gradient(${startPoint}, ${pointStrings.join(", ")})`;
     },

@@ -176,23 +176,29 @@
       </div>
     </div>
 
-    <div class="prop-section">
+    <div
+      class="prop-section"
+      v-if="
+        activeTab === 'color' && viewModel.selectedBackground.type === 'color'
+      "
+    >
       Color
 
       <ColorPicker
-        v-if="
-          activeTab === 'color' && viewModel.selectedBackground.type === 'color'
-        "
         @color-change="updateColor"
         :color="viewModel.selectedBackground.value"
       />
-      <GradientColorPicker
-        v-if="
-          activeTab === 'gradient' &&
-          viewModel.selectedBackground.type === 'gradient'
-        "
-        :viewModel="viewModel"
-      />
+    </div>
+    <div
+      class="prop-section"
+      v-if="
+        activeTab === 'gradient' &&
+        viewModel.selectedBackground.type === 'gradient'
+      "
+    >
+      Gradient
+
+      <GradientColorPicker :viewModel="viewModel" />
     </div>
   </div>
 </template>

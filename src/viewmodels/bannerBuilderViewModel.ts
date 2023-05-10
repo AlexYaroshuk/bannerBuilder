@@ -138,7 +138,7 @@ class BannerBuilderViewModel {
                 degree: 0,
                 points: [
                   { left: 0, color: "white" }, // White
-                  { left: 80, color: "grey" }, // Grey
+                  { left: 100, color: "grey" }, // Grey
                 ],
               },
             },
