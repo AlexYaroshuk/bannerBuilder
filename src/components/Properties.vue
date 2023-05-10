@@ -448,7 +448,10 @@
                     />
 
                     <div class="background-list-content">
-                      <div class="background-list-type">
+                      <div
+                        class="background-list-type"
+                        :class="{ 'background-hidden': !background.isVisible }"
+                      >
                         {{
                           background.type === "image" && background.fileName
                             ? background.fileName.length > 20
@@ -1135,14 +1138,21 @@ i.material-icons {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
   margin-right: 8px;
   color: #666;
 }
+.button-wrapper i {
+  font-size: large;
+}
 
 .button-wrapper:hover {
   background-color: #f5f5f5;
+}
+
+.background-hidden {
+  color: #999;
 }
 </style>
