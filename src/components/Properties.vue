@@ -423,11 +423,22 @@
                           background && background.type === 'image'
                             ? `url(${background.value})`
                             : background && background.type === 'gradient'
-                            ? getGradientString()
+                            ? `linear-gradient(${
+                                background.value.degree
+                              }deg, ${background.value.points
+                                .map(
+                                  (point) =>
+                                    point.color + ' ' + point.left + '%'
+                                )
+                                .join(', ')})`
                             : '',
                         backgroundColor:
                           background && background.type === 'color'
                             ? background.value
+                            : background &&
+                              background.type === 'gradient' &&
+                              background.value.points.length === 1
+                            ? background.value.points[0].color
                             : '',
                         backgroundBlendMode:
                           background && background.type === 'color'
@@ -785,6 +796,37 @@ export default {
   },
 
   methods: {
+    gradientStyle(background) {
+      if (!background) return null;
+
+      if (background.type !== "gradient") return null;
+
+      const square = this.$refs.colorSquare;
+      if (!square) return null;
+
+      const { width, height } = square.getBoundingClientRect();
+
+      if (background.points.length === 1) {
+        return {
+          background: background.points[0].color,
+        };
+      }
+
+      const sortedPoints = [...background.points].sort(
+        (a, b) => a.left - b.left
+      );
+      const points = sortedPoints
+        .map((point) => `${point.color} ${point.left}%`)
+        .join(", ");
+      const css = {
+        background: `linear-gradient(90deg, ${points})`,
+        width: `${width}px`,
+        height: `${height}px`,
+        display: "inline-block",
+      };
+      return css;
+    },
+
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
