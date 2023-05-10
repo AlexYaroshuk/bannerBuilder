@@ -61,8 +61,8 @@ class BannerBuilderViewModel {
         new Container({
           name: "Container 1",
           background: [
-            { type: "color", value: "red", layerIndex: 0 },
-            { type: "color", value: "white", layerIndex: 1 },
+            { type: "color", value: "red", layerIndex: 0, isVisible: true },
+            { type: "color", value: "white", layerIndex: 1, isVisible: true },
           ],
           children: [
             new Text({ name: "Text 1-1", text: "das" }),
@@ -74,11 +74,17 @@ class BannerBuilderViewModel {
             new Container({
               name: "Container 1-1",
               background: [
-                { type: "color", value: "pink", layerIndex: 1 },
+                {
+                  type: "color",
+                  value: "pink",
+                  layerIndex: 1,
+                  isVisible: true,
+                },
                 {
                   type: "color",
                   value: "hsla(0, 23%, 2%, 0.1)",
                   layerIndex: 0,
+                  isVisible: true,
                 },
               ],
               fontFamily: "Helvetica",
@@ -90,8 +96,13 @@ class BannerBuilderViewModel {
         new Container({
           name: "Container 2",
           background: [
-            { type: "color", value: "red", layerIndex: 0 },
-            { type: "color", value: "hsla(77, 23%, 2%, 0.5)", layerIndex: 1 },
+            { type: "color", value: "red", layerIndex: 0, isVisible: true },
+            {
+              type: "color",
+              value: "hsla(77, 23%, 2%, 0.5)",
+              layerIndex: 1,
+              isVisible: true,
+            },
           ],
           fontFamily: "Helvetica",
           fontSize: 24,
@@ -116,6 +127,7 @@ class BannerBuilderViewModel {
               width: "auto",
               height: "auto",
               position: "center center",
+              isVisible: true,
             },
           ],
           children: [
@@ -141,6 +153,7 @@ class BannerBuilderViewModel {
                   { left: 100, color: "grey" }, // Grey
                 ],
               },
+              isVisible: true,
             },
           ],
           children: [
@@ -340,6 +353,7 @@ class BannerBuilderViewModel {
       type: "color",
       value: "#" + Math.floor(Math.random() * 16777215).toString(16),
       layerIndex: 0,
+      isVisible: true,
     };
     newContainer.addBackgroundLayer(backgroundColorLayer);
     this.rootContainer.children.splice(this.hoverIndex!, 0, newContainer);

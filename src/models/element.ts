@@ -10,6 +10,7 @@ type BackgroundLayer = {
   repeat?: string;
   layerIndex: number;
   fileName?: string;
+  isVisible: boolean;
 };
 
 interface HybridStyles {
@@ -76,6 +77,7 @@ abstract class Element {
       size: bg.size || "custom",
       width: bg.width || "auto",
       height: bg.height || "auto",
+      isVisible: bg.isVisible || true,
     }));
   }
 

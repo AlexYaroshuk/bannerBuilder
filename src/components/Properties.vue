@@ -465,20 +465,25 @@
                       </div>
 
                       <div class="background-list-buttons">
-                        <!--                         <button @click.stop="toggleVisibility(background)">
-                          {{ background.isVisible ? "Hide" : "Show" }}
-                        </button> -->
-
-                        <button @click="removeBackground(background)">
-                          Delete
-                        </button>
-                        <!-- <div
-                        class="delete-icon"
-                        v-if="this.backgroundListHoverIndex === index"
-                        @click="removeBackground(background)"
-                      >
-                        <i class="material-icons">delete</i>
-                      </div> -->
+                        <div
+                          class="button-wrapper"
+                          @click.stop="toggleVisibility(background)"
+                          :style="wrapperStyle"
+                        >
+                          <i v-if="!background.isVisible" class="material-icons"
+                            >visibility_off</i
+                          >
+                          <i v-if="background.isVisible" class="material-icons"
+                            >visibility</i
+                          >
+                        </div>
+                        <div
+                          class="button-wrapper"
+                          @click="removeBackground(background)"
+                          :style="wrapperStyle"
+                        >
+                          <i class="material-icons">delete</i>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -904,6 +909,7 @@ export default {
         //get random color
         value: "hsla(0, 0%, 0%, 25%)",
         layerIndex: this.viewModel.currentSelectedElement.background.length,
+        isVisible: true,
       };
       this.viewModel.currentSelectedElement.addBackgroundLayer(
         newColorBackground
@@ -1123,5 +1129,20 @@ i.material-icons {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  margin-right: 8px;
+  color: #666;
+}
+
+.button-wrapper:hover {
+  background-color: #f5f5f5;
 }
 </style>

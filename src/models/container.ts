@@ -12,6 +12,7 @@ type BackgroundLayer = {
   repeat?: string;
   layerIndex: number;
   fileName?: string;
+  isVisible: boolean;
 };
 
 interface GradientPoint {

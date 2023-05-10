@@ -24,6 +24,7 @@
         class="background-layer"
         v-for="(backgroundLayer, layerIndex) in containerStyle.backgroundLayers"
         :key="'layer-' + layerIndex"
+        v-show="backgroundLayer.isVisible"
         :style="backgroundLayer"
       ></div>
     </div>
@@ -152,11 +153,9 @@ const ElementContainer = {
   computed: {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
-      const sortedBackgroundLayers = styles.background.sort(
-        (a, b) => b.layerIndex - a.layerIndex
-      );
+      const backgroundLayers = [];
 
-      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+      for (const bg of styles.background) {
         const layer = {
           zIndex: bg.layerIndex,
           position: "absolute",
@@ -164,32 +163,39 @@ const ElementContainer = {
           left: 0,
           right: 0,
           bottom: 0,
+          isVisible: bg.isVisible !== undefined ? bg.isVisible : true, // Add isVisible property
         };
 
-        switch (bg.type) {
-          case "color":
-            layer.backgroundColor = bg.value;
-            break;
-          case "gradient":
-            layer.backgroundImage = this.getGradientCSS(bg.value);
-            break;
-          case "image":
-            layer.backgroundImage = `url(${bg.value})`;
-            layer.backgroundRepeat = bg.repeat || "no-repeat";
-            layer.backgroundPosition = bg.position || "center";
-            layer.backgroundSize = bg.size || "cover";
+        console.log(
+          `Layer index: ${bg.layerIndex}, isVisible: ${bg.isVisible}`
+        ); // Add this line
 
-            if (bg.size === "custom" && bg.width && bg.height) {
-              layer.width = `${bg.width}px`;
-              layer.height = `${bg.height}px`;
-            }
-            break;
-          default:
-            throw new Error(`Unknown background type: ${bg.type}`);
+        if (bg.isVisible) {
+          switch (bg.type) {
+            case "color":
+              layer.backgroundColor = bg.value;
+              break;
+            case "gradient":
+              layer.backgroundImage = this.getGradientCSS(bg.value);
+              break;
+            case "image":
+              layer.backgroundImage = `url(${bg.value})`;
+              layer.backgroundRepeat = bg.repeat || "no-repeat";
+              layer.backgroundPosition = bg.position || "center";
+              layer.backgroundSize = bg.size || "cover";
+
+              if (bg.size === "custom" && bg.width && bg.height) {
+                layer.width = `${bg.width}px`;
+                layer.height = `${bg.height}px`;
+              }
+              break;
+            default:
+              throw new Error(`Unknown background type: ${bg.type}`);
+          }
         }
 
-        return layer;
-      });
+        backgroundLayers.push(layer);
+      }
 
       return {
         backgroundLayers,
@@ -325,6 +331,7 @@ export default {
           left: 0,
           right: 0,
           bottom: 0,
+          isVisible: bg.isVisible !== undefined ? bg.isVisible : true,
         };
 
         switch (bg.type) {
