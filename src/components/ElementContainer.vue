@@ -49,22 +49,26 @@
         >
           <ElementText
             v-if="child && child.type === 'text'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
           <ElementLink
             v-if="child && child.type === 'link'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
           <ElementImage
             v-if="child && child.type === 'image'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
 
           <ElementContainer
             v-if="child && child.type === 'container'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :container="child"
             :viewModel="viewModel"
@@ -476,5 +480,9 @@ export default {
 .widget-dropzone--hovered {
   min-height: 48px;
   background-color: #1280ff;
+}
+
+.hidden {
+  visibility: hidden;
 }
 </style>

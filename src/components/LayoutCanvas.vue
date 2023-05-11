@@ -70,6 +70,7 @@
           }
         "
         @widget-drop="handleWidgetDrop(container)"
+        :class="{ hidden: !container.isVisible }"
       />
     </div>
     <div
@@ -309,4 +310,8 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.hidden {
+  visibility: hidden;
+}
+</style>

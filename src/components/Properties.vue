@@ -1,14 +1,14 @@
 <template>
   <div>
     <aside :class="['sidebar-button', { hidden: !isVisible }]">
-      <button @click="toggleVisibility">&lt; Show sidebar</button>
+      <button @click="toggleSidebarVisibility">&lt; Show sidebar</button>
     </aside>
     <aside
       :class="['sidebar', { hidden: !isVisible }]"
       @click.stop="hideBackgroundSelector"
     >
       <div class="prop-section-wrapper">
-        <button @click="toggleVisibility">&gt; Hide</button>
+        <button @click="toggleSidebarVisibility">&gt; Hide</button>
         <div class="tab-bar">
           <header v-for="(tab, index) in tabs" :key="index">
             <i class="material-icons"> {{ tab.icon }}</i>
@@ -39,6 +39,43 @@
         >
           selected: rootContainer
         </h3>
+
+        <!-- ! visibility settings -->
+
+        <div v-if="viewModel.getSelectedElement()">
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.visibility = !expandableGroups.visibility"
+          >
+            Visibility
+            <i
+              class="material-icons {{ expandableGroups.visibility ? 'expand-less' : 'expand-more' }}"
+            >
+              {{
+                expandableGroups.visibility ? "expand_more" : "chevron_right"
+              }}
+            </i>
+          </p>
+
+          <!-- ! text settings -->
+
+          <div v-if="expandableGroups.visibility">
+            <div class="prop-section">
+              <div class="background-list-buttons">
+                <button @click.stop="toggleElementVisibility">
+                  {{
+                    viewModel.getSelectedElement().isVisible ? "Hide" : "Show"
+                  }}
+                </button>
+              </div>
+
+              <div
+                class="section-divider"
+                v-if="viewModel.getSelectedElement().type === 'link'"
+              />
+            </div>
+          </div>
+        </div>
 
         <!-- ! content settings -->
         <div
@@ -460,7 +497,9 @@
                       <div class="background-list-buttons">
                         <div
                           class="button-wrapper"
-                          @click.stop="toggleVisibility(background)"
+                          @click.stop="
+                            toggleBackgroundLayerVisibility(background)
+                          "
                           :style="wrapperStyle"
                         >
                           <i v-if="!background.isVisible" class="material-icons"
@@ -616,6 +655,7 @@ export default {
         },
       ],
       expandableGroups: {
+        visibility: true,
         content: true,
         typography: true,
         background: true,
@@ -825,7 +865,7 @@ export default {
       return css;
     },
 
-    toggleVisibility() {
+    toggleSidebarVisibility() {
       this.isVisible = !this.isVisible;
     },
 
@@ -930,8 +970,13 @@ export default {
       this.viewModel.selectedBackground = null;
     },
 
-    toggleVisibility(background) {
+    toggleBackgroundLayerVisibility(background) {
       background.isVisible = !background.isVisible;
+    },
+
+    toggleElementVisibility() {
+      this.viewModel.getSelectedElement().isVisible =
+        !this.viewModel.getSelectedElement().isVisible;
     },
 
     getGradientString() {

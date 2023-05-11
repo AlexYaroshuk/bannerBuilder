@@ -44,6 +44,7 @@ abstract class Element {
   background: BackgroundLayer[] | null;
   borderColor: string | null;
   parentContainer: Container | null;
+  isVisible: boolean;
 
   constructor({
     name,
@@ -54,6 +55,7 @@ abstract class Element {
     background = [],
     borderColor = null,
     parentContainer = null,
+    isVisible = true,
   }: {
     name: string;
     color: string | null;
@@ -63,6 +65,7 @@ abstract class Element {
     background?: BackgroundLayer[];
     borderColor?: string | null;
     parentContainer?: Container | null;
+    isVisible?: boolean;
   }) {
     this.name = name;
     this.color = color;
@@ -71,6 +74,7 @@ abstract class Element {
     this.fontSize = fontSize;
     this.borderColor = borderColor;
     this.parentContainer = parentContainer;
+    this.isVisible = isVisible;
     this.background = background.map((bg) => ({
       ...bg,
       position: bg.position || "center center",
