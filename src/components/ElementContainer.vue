@@ -65,6 +65,12 @@
             style="padding: 4px"
             :child="child"
           />
+          <ElementVideo
+            v-if="child && child.type === 'video'"
+            :class="{ hidden: !child.isVisible }"
+            style="padding: 4px"
+            :child="child"
+          />
 
           <ElementContainer
             v-if="child && child.type === 'container'"
@@ -90,6 +96,7 @@
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
 import ElementImage from "./ElementImage.vue";
+import ElementVideo from "./ElementVideo.vue";
 import { Container } from "@/models/container";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
@@ -225,6 +232,7 @@ export default {
     ElementLink: ElementLink,
     ElementContainer: ElementContainer,
     ElementImage: ElementImage,
+    ElementVideo: ElementVideo,
   },
 
   props: {

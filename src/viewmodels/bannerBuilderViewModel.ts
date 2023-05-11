@@ -3,6 +3,7 @@ import { Text } from "@/models/text";
 import { Container, BackgroundLayer } from "@/models/container";
 import { Link } from "@/models/link";
 import { Image } from "@/models/image";
+import { Video } from "@/models/video";
 
 class BannerBuilderViewModel {
   rootContainer: Container;
@@ -112,6 +113,11 @@ class BannerBuilderViewModel {
               name: "Link",
               label: "Link 1-1-2",
               url: "https://example.com",
+            }),
+            new Video({
+              name: "Video 1",
+              value:
+                "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
             }),
           ],
         }),
@@ -335,6 +341,13 @@ class BannerBuilderViewModel {
         newElement = new Image({
           name: "Link 3",
           value: "https://picsum.photos/200/300",
+        });
+        break;
+      case "video":
+        newElement = new Video({
+          name: "Video 1",
+          value:
+            "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
         });
         break;
       default:

@@ -148,6 +148,19 @@
 
               <FIleUploader :view-model="viewModel"></FIleUploader>
             </div>
+            <!-- ! video settings -->
+
+            <div
+              class="prop-section"
+              v-if="viewModel.getSelectedElement().type === 'video'"
+            >
+              <label for="text-field">URL:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().value"
+              />
+            </div>
 
             <div
               class="section-divider"
