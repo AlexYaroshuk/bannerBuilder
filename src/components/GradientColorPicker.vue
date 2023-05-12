@@ -35,6 +35,13 @@
               class="arrow"
               :class="{ active: point === selectedPoint }"
             ></div>
+            <div
+              class="delete-button-wrapper"
+              v-if="gradient.points.length != 1"
+              @click="deletePoint(point)"
+            >
+              <i class="material-icons">close</i>
+            </div>
           </div>
         </div>
       </div>
@@ -214,12 +221,12 @@ const selectPoint = (point) => {
   }
 };
 
-const deleteSelectedPoint = () => {
-  gradient.points = gradient.points.filter(
-    (point) => point !== selectedPoint.value
-  );
+const deletePoint = (point) => {
+  gradient.points = gradient.points.filter((p) => p !== point);
   gradient.points = [...gradient.points]; // Trigger reactivity
-  selectedPoint.value = null;
+  if (selectedPoint.value === point) {
+    selectedPoint.value = null;
+  }
 };
 
 watch(gradient, () => {
@@ -390,6 +397,20 @@ const turnRight = () => {
   border-right: 6px solid transparent;
   border-bottom: 6px solid currentColor; /* Use currentColor to inherit the color from the parent element */
   transform: translateX(-50%);
+}
+.delete-button-wrapper {
+  position: absolute;
+  top: 100%;
+  margin-top: 8px;
+
+  /* Use currentColor to inherit the color from the parent element */
+  transform: translateX(-50%);
+}
+.delete-button-wrapper:hover {
+  background-color: #f5f5f5;
+}
+.delete-button-wrapper i {
+  font-size: medium;
 }
 
 .arrow.active {

@@ -135,6 +135,18 @@ class BannerBuilderViewModel {
               position: "center center",
               isVisible: true,
             },
+            {
+              type: "video",
+              value:
+                "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+
+              layerIndex: 1,
+              size: "custom",
+              width: "auto",
+              height: "auto",
+              position: "center center",
+              isVisible: true,
+            },
           ],
           children: [
             new Text({ name: "Text 3-1", text: "tex" }),
@@ -143,6 +155,26 @@ class BannerBuilderViewModel {
         }),
         new Container({
           name: "Container 4",
+          background: [
+            {
+              type: "image",
+              value: "https://picsum.photos/200/300",
+              fileName: "random_picsum_mage",
+              layerIndex: 0,
+              size: "custom",
+              width: "auto",
+              height: "auto",
+              position: "center center",
+              isVisible: true,
+            },
+          ],
+          children: [
+            new Text({ name: "Text 3-1", text: "tex" }),
+            new Text({ name: "Text 3-2", text: "text" }),
+          ],
+        }),
+        new Container({
+          name: "Container 5",
           background: [
             {
               type: "gradient",
