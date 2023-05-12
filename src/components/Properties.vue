@@ -452,11 +452,13 @@
                   @mouseover="setBackgroundListHoverIndex(index)"
                   @mouseout="clearBackgroundListHoverIndex"
                 >
-                  <div class="background-list-item">
+                  <div
+                    class="background-list-item"
+                    @click.stop="editBackground(background)"
+                  >
                     <div class="background-drag-handle">☰</div>
                     <div
                       class="color-square"
-                      @click.stop="editBackground(background)"
                       :class="{
                         'transparent-pattern':
                           background && background.type !== 'gradient',
@@ -976,6 +978,7 @@ export default {
     },
 
     removeBackground(background) {
+      event.stopPropagation();
       const index =
         this.viewModel.currentSelectedElement?.background?.indexOf(background);
       if (index !== -1) {
@@ -1015,6 +1018,7 @@ export default {
     },
 
     toggleBackgroundLayerVisibility(background) {
+      event.stopPropagation();
       background.isVisible = !background.isVisible;
     },
 
@@ -1124,6 +1128,12 @@ i.material-icons {
 
   /* adjust the margin as needed */
 }
+i.material-icons-hidden {
+  float: left;
+  color: #666;
+
+  /* adjust the margin as needed */
+}
 
 .material-icons.expand-more {
   transform: rotate(90deg);
@@ -1151,6 +1161,10 @@ i.material-icons {
   display: flex;
   padding: 4px;
   font-size: small;
+}
+.background-list-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
 }
 
 .background-list-content {
