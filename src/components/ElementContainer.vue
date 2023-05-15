@@ -24,6 +24,7 @@
         class="background-layer"
         v-for="(backgroundLayer, layerIndex) in containerStyle.backgroundLayers"
         :key="'layer-' + layerIndex"
+        v-show="backgroundLayer.isVisible"
         :style="backgroundLayer"
       ></div>
     </div>
@@ -48,22 +49,32 @@
         >
           <ElementText
             v-if="child && child.type === 'text'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
           <ElementLink
             v-if="child && child.type === 'link'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
           <ElementImage
             v-if="child && child.type === 'image'"
+            :class="{ hidden: !child.isVisible }"
+            style="padding: 4px"
+            :child="child"
+          />
+          <ElementVideo
+            v-if="child && child.type === 'video'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
           />
 
           <ElementContainer
             v-if="child && child.type === 'container'"
+            :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :container="child"
             :viewModel="viewModel"
@@ -85,6 +96,7 @@
 import ElementText from "./ElementText.vue";
 import ElementLink from "./ElementLink.vue";
 import ElementImage from "./ElementImage.vue";
+import ElementVideo from "./ElementVideo.vue";
 import { Container } from "@/models/container";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
 
@@ -121,16 +133,40 @@ const ElementContainer = {
       this.viewModel.handleElementSelected(item);
       this.$emit("context-menu", event, type, item);
     },
+
+    getGradientCSS(gradient) {
+      const { type, degree, points } = gradient;
+
+      // Check if there's only one point and return a solid color
+      if (points.length === 1) {
+        return points[0].color;
+      }
+
+      const stops = points
+        .map((point) => `${point.color} ${point.left}%`)
+        .join(", ");
+
+      let startPoint = "";
+
+      if (type === "linear") {
+        startPoint = `${degree}deg`;
+      } else if (type === "radial") {
+        const center = points.find((point) => point.center);
+        const centerX = center ? center.left : 50;
+        const centerY = center ? center.top : 50;
+        startPoint = `${centerX}% ${centerY}%`;
+      }
+
+      return `${type}-gradient(${startPoint}, ${stops})`;
+    },
   },
 
   computed: {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
-      const sortedBackgroundLayers = styles.background.sort(
-        (a, b) => a.layerIndex - b.layerIndex
-      );
+      const backgroundLayers = [];
 
-      const backgroundLayers = sortedBackgroundLayers.map((bg) => {
+      for (const bg of styles.background) {
         const layer = {
           zIndex: bg.layerIndex,
           position: "absolute",
@@ -138,27 +174,39 @@ const ElementContainer = {
           left: 0,
           right: 0,
           bottom: 0,
+          isVisible: bg.isVisible !== undefined ? bg.isVisible : true, // Add isVisible property
         };
 
-        switch (bg.type) {
-          case "color":
-            layer.backgroundColor = bg.value;
-            break;
-          case "gradient":
-            layer.backgroundImage = `linear-gradient(${bg.value})`;
-            break;
-          case "image":
-            layer.backgroundImage = `url(${bg.value})`;
-            layer.backgroundRepeat = bg.repeat || "no-repeat";
-            layer.backgroundPosition = bg.position || "center";
-            layer.backgroundSize = bg.size || "cover";
-            break;
-          default:
-            throw new Error(`Unknown background type: ${bg.type}`);
+        console.log(
+          `Layer index: ${bg.layerIndex}, isVisible: ${bg.isVisible}`
+        ); // Add this line
+
+        if (bg.isVisible) {
+          switch (bg.type) {
+            case "color":
+              layer.backgroundColor = bg.value;
+              break;
+            case "gradient":
+              layer.backgroundImage = this.getGradientCSS(bg.value);
+              break;
+            case "image":
+              layer.backgroundImage = `url(${bg.value})`;
+              layer.backgroundRepeat = bg.repeat || "no-repeat";
+              layer.backgroundPosition = bg.position || "center";
+              layer.backgroundSize = bg.size || "cover";
+
+              if (bg.size === "custom" && bg.width && bg.height) {
+                layer.width = `${bg.width}px`;
+                layer.height = `${bg.height}px`;
+              }
+              break;
+            default:
+              throw new Error(`Unknown background type: ${bg.type}`);
+          }
         }
 
-        return layer;
-      });
+        backgroundLayers.push(layer);
+      }
 
       return {
         backgroundLayers,
@@ -184,6 +232,7 @@ export default {
     ElementLink: ElementLink,
     ElementContainer: ElementContainer,
     ElementImage: ElementImage,
+    ElementVideo: ElementVideo,
   },
 
   props: {
@@ -222,6 +271,62 @@ export default {
       this.$emit("context-menu", event, type, item);
       this.$emit("select-item", item); // Add this line
     },
+
+    getGradientCSS(gradient) {
+      const { type, degree, points } = gradient;
+
+      // Check if there's only one point and return a solid color
+      if (points.length === 1) {
+        return `linear-gradient(${points[0].color}, ${points[0].color})`;
+      }
+
+      const sortedPoints = [...points].sort((a, b) => a.left - b.left);
+
+      const stops = sortedPoints
+        .map((point) => `${point.color} ${point.left}%`)
+        .join(", ");
+
+      let startPoint = "";
+
+      if (type === "linear") {
+        startPoint = `${degree}deg`;
+      } else if (type === "radial") {
+        const center = points.find((point) => point.center);
+        const centerX = center ? center.left : 50;
+        const centerY = center ? center.top : 50;
+        startPoint = `${centerX}% ${centerY}%`;
+      }
+
+      return `${type}-gradient(${startPoint}, ${stops})`;
+    },
+
+    generateGradient(gradient) {
+      if (!gradient) {
+        return "";
+      }
+
+      const { type, degree, points } = gradient;
+      const sortedPoints = [...points].sort((a, b) => a.left - b.left);
+
+      let pointStrings;
+      let startPoint;
+
+      if (sortedPoints.length === 1) {
+        pointStrings = [
+          `rgba(${sortedPoints[0].red},${sortedPoints[0].green},${sortedPoints[0].blue},${sortedPoints[0].alpha}) 0%`,
+          `rgba(${sortedPoints[0].red},${sortedPoints[0].green},${sortedPoints[0].blue},${sortedPoints[0].alpha}) 100%`,
+        ];
+        startPoint = `0deg`;
+      } else {
+        pointStrings = sortedPoints.map(
+          ({ left, red, green, blue, alpha }) =>
+            `rgba(${red},${green},${blue},${alpha}) ${left}%`
+        );
+        startPoint = `${degree}deg`;
+      }
+
+      return `${type}-gradient(${startPoint}, ${pointStrings.join(", ")})`;
+    },
   },
   computed: {
     containerStyle() {
@@ -238,6 +343,7 @@ export default {
           left: 0,
           right: 0,
           bottom: 0,
+          isVisible: bg.isVisible !== undefined ? bg.isVisible : true,
         };
 
         switch (bg.type) {
@@ -245,7 +351,7 @@ export default {
             layer.backgroundColor = bg.value;
             break;
           case "gradient":
-            layer.backgroundImage = `linear-gradient(${bg.value})`;
+            layer.backgroundImage = this.getGradientCSS(bg.value);
             break;
           case "image":
             layer.backgroundImage = `url(${bg.value})`;
@@ -382,5 +488,9 @@ export default {
 .widget-dropzone--hovered {
   min-height: 48px;
   background-color: #1280ff;
+}
+
+.hidden {
+  visibility: hidden;
 }
 </style>

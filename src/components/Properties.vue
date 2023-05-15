@@ -1,14 +1,14 @@
 <template>
   <div>
     <aside :class="['sidebar-button', { hidden: !isVisible }]">
-      <button @click="toggleVisibility">&lt; Show sidebar</button>
+      <button @click="toggleSidebarVisibility">&lt; Show sidebar</button>
     </aside>
     <aside
       :class="['sidebar', { hidden: !isVisible }]"
       @click.stop="hideBackgroundSelector"
     >
       <div class="prop-section-wrapper">
-        <button @click="toggleVisibility">&gt; Hide</button>
+        <button @click="toggleSidebarVisibility">&gt; Hide</button>
         <div class="tab-bar">
           <header v-for="(tab, index) in tabs" :key="index">
             <i class="material-icons"> {{ tab.icon }}</i>
@@ -39,6 +39,43 @@
         >
           selected: rootContainer
         </h3>
+
+        <!-- ! visibility settings -->
+
+        <div v-if="viewModel.getSelectedElement()">
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.visibility = !expandableGroups.visibility"
+          >
+            Visibility
+            <i
+              class="material-icons {{ expandableGroups.visibility ? 'expand-less' : 'expand-more' }}"
+            >
+              {{
+                expandableGroups.visibility ? "expand_more" : "chevron_right"
+              }}
+            </i>
+          </p>
+
+          <!-- ! text settings -->
+
+          <div v-if="expandableGroups.visibility">
+            <div class="prop-section">
+              <div class="background-list-buttons">
+                <button @click.stop="toggleElementVisibility">
+                  {{
+                    viewModel.getSelectedElement().isVisible ? "Hide" : "Show"
+                  }}
+                </button>
+              </div>
+
+              <div
+                class="section-divider"
+                v-if="viewModel.getSelectedElement().type === 'link'"
+              />
+            </div>
+          </div>
+        </div>
 
         <!-- ! content settings -->
         <div
@@ -110,6 +147,19 @@
               <input id="text-field" type="text" /> -->
 
               <FIleUploader :view-model="viewModel"></FIleUploader>
+            </div>
+            <!-- ! video settings -->
+
+            <div
+              class="prop-section"
+              v-if="viewModel.getSelectedElement().type === 'video'"
+            >
+              <label for="text-field">URL:</label>
+              <input
+                id="text-field"
+                type="text"
+                v-model="viewModel.getSelectedElement().value"
+              />
             </div>
 
             <div
@@ -327,18 +377,8 @@
                 <label for="color-picker">Color:</label>
                 <div
                   class="color-square"
-                  @click.stop="editBackground(background)"
-                  :class="{
-                    'transparent-pattern':
-                      background &&
-                      background.type === 'color' &&
-                      background.value.includes('hsla'),
-                  }"
-                  :style="
-                    background && background.type === 'image'
-                      ? { backgroundImage: `url(${background.value})` }
-                      : { backgroundColor: background && background.value }
-                  "
+                  :style="{ backgroundColor: selectedItemColor }"
+                  @click="showColorPicker = !showColorPicker"
                 ></div>
                 <span class="hex-code">{{ selectedItemColor }}</span>
               </div>
@@ -416,30 +456,42 @@
                       @click.stop="editBackground(background)"
                       :class="{
                         'transparent-pattern':
-                          background &&
-                          background.type === 'color' &&
-                          background.value.includes('hsl'),
+                          background && background.type !== 'gradient',
                       }"
                       :style="{
                         backgroundImage:
                           background && background.type === 'image'
                             ? `url(${background.value})`
+                            : background && background.type === 'gradient'
+                            ? `linear-gradient(${
+                                background.value.degree
+                              }deg, ${background.value.points
+                                .map(
+                                  (point) =>
+                                    point.color + ' ' + point.left + '%'
+                                )
+                                .join(', ')})`
                             : '',
                         backgroundColor:
                           background && background.type === 'color'
                             ? background.value
+                            : background &&
+                              background.type === 'gradient' &&
+                              background.value.points.length === 1
+                            ? background.value.points[0].color
                             : '',
                         backgroundBlendMode:
-                          background &&
-                          background.type === 'color' &&
-                          background.value.includes('hsl')
+                          background && background.type === 'color'
                             ? 'overlay'
                             : '',
                       }"
                     />
 
                     <div class="background-list-content">
-                      <div class="background-list-type">
+                      <div
+                        class="background-list-type"
+                        :class="{ 'background-hidden': !background.isVisible }"
+                      >
                         {{
                           background.type === "image" && background.fileName
                             ? background.fileName.length > 20
@@ -449,24 +501,34 @@
                                   background.fileName.lastIndexOf(".")
                                 )
                               : background.fileName
+                            : background.type === "gradient"
+                            ? "Gradient"
                             : background.value
                         }}
                       </div>
-                      <div class="background-list-buttons">
-                        <!--                         <button @click.stop="toggleVisibility(background)">
-                          {{ background.isVisible ? "Hide" : "Show" }}
-                        </button> -->
 
-                        <button @click="removeBackground(background)">
-                          Delete
-                        </button>
-                        <!-- <div
-                        class="delete-icon"
-                        v-if="this.backgroundListHoverIndex === index"
-                        @click="removeBackground(background)"
-                      >
-                        <i class="material-icons">delete</i>
-                      </div> -->
+                      <div class="background-list-buttons">
+                        <div
+                          class="button-wrapper"
+                          @click.stop="
+                            toggleBackgroundLayerVisibility(background)
+                          "
+                          :style="wrapperStyle"
+                        >
+                          <i v-if="!background.isVisible" class="material-icons"
+                            >visibility_off</i
+                          >
+                          <i v-if="background.isVisible" class="material-icons"
+                            >visibility</i
+                          >
+                        </div>
+                        <div
+                          class="button-wrapper"
+                          @click="removeBackground(background)"
+                          :style="wrapperStyle"
+                        >
+                          <i class="material-icons">delete</i>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -496,7 +558,7 @@
               </draggable>
             </div>
 
-            <div class="section-divider" />
+            <!-- <div class="section-divider" />
 
             <div class="prop-section">
               <div
@@ -562,7 +624,7 @@
                 v-model="selectedItemBackgroundColor"
                 @color-change="updateColor"
               />
-            </div>
+            </div> -->
           </div>
         </div>
         <div
@@ -606,6 +668,7 @@ export default {
         },
       ],
       expandableGroups: {
+        visibility: true,
         content: true,
         typography: true,
         background: true,
@@ -766,10 +829,56 @@ export default {
     paragraphBgColor() {
       return this.viewModel.getSelectedElement().color ? "red" : "green";
     },
+
+    gradientString() {
+      if (this.background && this.background.type === "gradient") {
+        const gradient = this.background.value;
+        const points = gradient.points
+          .map(
+            (point) =>
+              `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+          )
+          .join(", ");
+
+        return `${gradient.type}-gradient(${gradient.degree}deg, ${points})`;
+      }
+      return "";
+    },
   },
 
   methods: {
-    toggleVisibility() {
+    gradientStyle(background) {
+      if (!background) return null;
+
+      if (background.type !== "gradient") return null;
+
+      const square = this.$refs.colorSquare;
+      if (!square) return null;
+
+      const { width, height } = square.getBoundingClientRect();
+
+      if (background.points.length === 1) {
+        return {
+          background: background.points[0].color,
+        };
+      }
+
+      const sortedPoints = [...background.points].sort(
+        (a, b) => a.left - b.left
+      );
+      const points = sortedPoints
+        .map((point) => `${point.color} ${point.left}%`)
+        .join(", ");
+      const css = {
+        background: `linear-gradient(90deg, ${points})`,
+        width: `${width}px`,
+        height: `${height}px`,
+        display: "inline-block",
+      };
+      return css;
+    },
+
+    toggleSidebarVisibility() {
       this.isVisible = !this.isVisible;
     },
 
@@ -805,7 +914,7 @@ export default {
 
     //test
     test() {
-      console.log(this.viewModel.getSelectedElement().parentContainer);
+      console.log(this.viewModel.getSelectedElement().background);
     },
 
     onEnd(evt) {
@@ -846,6 +955,7 @@ export default {
         //get random color
         value: "hsla(0, 0%, 0%, 25%)",
         layerIndex: this.viewModel.currentSelectedElement.background.length,
+        isVisible: true,
       };
       this.viewModel.currentSelectedElement.addBackgroundLayer(
         newColorBackground
@@ -858,10 +968,13 @@ export default {
       this.viewModel.isBackgroundSelectorVisible = true;
       this.viewModel.selectedBackground = background;
       this.$nextTick(() => {
-        this.$refs.backgroundSelector.activeTab =
-          this.viewModel.selectedBackground.type === "color"
-            ? "color"
-            : "image";
+        if (this.viewModel.selectedBackground.type === "color") {
+          this.$refs.backgroundSelector.activeTab = "color";
+        } else if (this.viewModel.selectedBackground.type === "image") {
+          this.$refs.backgroundSelector.activeTab = "image";
+        } else if (this.viewModel.selectedBackground.type === "gradient") {
+          this.$refs.backgroundSelector.activeTab = "gradient";
+        }
       });
     },
 
@@ -870,8 +983,28 @@ export default {
       this.viewModel.selectedBackground = null;
     },
 
-    toggleVisibility(background) {
+    toggleBackgroundLayerVisibility(background) {
       background.isVisible = !background.isVisible;
+    },
+
+    toggleElementVisibility() {
+      this.viewModel.getSelectedElement().isVisible =
+        !this.viewModel.getSelectedElement().isVisible;
+    },
+
+    getGradientString() {
+      if (this.background && this.background.type === "gradient") {
+        const gradient = this.background.value;
+        const points = gradient.points
+          .map(
+            (point) =>
+              `rgba(${point.red}, ${point.green}, ${point.blue}, ${point.alpha}) ${point.left}%`
+          )
+          .join(", ");
+
+        return `${gradient.type}-gradient(${gradient.degree}deg, ${points})`;
+      }
+      return "";
     },
 
     /*     addColorBackground() {
@@ -919,11 +1052,13 @@ export default {
   right: 0;
   z-index: 2;
 }
+
 .status-text {
   display: flex;
 
   font-size: small;
 }
+
 .link-text {
   margin-left: 4px;
   padding-left: 4px;
@@ -955,7 +1090,8 @@ export default {
 
 i.material-icons {
   float: left;
-  margin-right: 4px; /* adjust the margin as needed */
+  margin-right: 4px;
+  /* adjust the margin as needed */
 }
 
 .material-icons.expand-more {
@@ -979,6 +1115,7 @@ i.material-icons {
   background-color: rgba(211, 211, 211, 0.6);
   margin: 8px;
 }
+
 .background-list-item {
   display: flex;
   padding: 4px;
@@ -1026,6 +1163,7 @@ i.material-icons {
   font-size: 24px;
   color: rgb(2, 1, 1);
 }
+
 .delete-icon:hover {
   color: red;
 }
@@ -1042,5 +1180,27 @@ i.material-icons {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-right: 8px;
+  color: #666;
+}
+.button-wrapper i {
+  font-size: large;
+}
+
+.button-wrapper:hover {
+  background-color: #f5f5f5;
+}
+
+.background-hidden {
+  color: #999;
 }
 </style>

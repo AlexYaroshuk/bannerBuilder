@@ -2,7 +2,7 @@ import { Container } from "@/models/container";
 
 type BackgroundLayer = {
   type: "color" | "gradient" | "image";
-  value: string;
+  value: string | GradientLayer;
   position?: string;
   size?: "custom" | "contain" | "cover";
   width?: number | "auto";
@@ -10,6 +10,7 @@ type BackgroundLayer = {
   repeat?: string;
   layerIndex: number;
   fileName?: string;
+  isVisible: boolean;
 };
 
 interface HybridStyles {
@@ -23,8 +24,19 @@ interface ContainerStyles {
   background: BackgroundLayer[] | null;
 }
 
+interface GradientPoint {
+  left: number;
+  color: string;
+}
+
+interface GradientLayer {
+  type: "linear" | "radial";
+  degree?: number;
+  points: GradientPoint[];
+}
+
 abstract class Element {
-  name: string
+  name: string;
   color: string | null;
   fontFamily: string | null;
   fontWeight: number | null;
@@ -32,6 +44,7 @@ abstract class Element {
   background: BackgroundLayer[] | null;
   borderColor: string | null;
   parentContainer: Container | null;
+  isVisible: boolean;
 
   constructor({
     name,
@@ -42,15 +55,17 @@ abstract class Element {
     background = [],
     borderColor = null,
     parentContainer = null,
+    isVisible = true,
   }: {
-    name: string,
-    color: string | null,
-    fontFamily?: string | null,
-    fontWeight?: number | null,
-    fontSize?: number | null,
+    name: string;
+    color: string | null;
+    fontFamily?: string | null;
+    fontWeight?: number | null;
+    fontSize?: number | null;
     background?: BackgroundLayer[];
-    borderColor?: string | null,
-    parentContainer?: Container | null
+    borderColor?: string | null;
+    parentContainer?: Container | null;
+    isVisible?: boolean;
   }) {
     this.name = name;
     this.color = color;
@@ -59,12 +74,14 @@ abstract class Element {
     this.fontSize = fontSize;
     this.borderColor = borderColor;
     this.parentContainer = parentContainer;
+    this.isVisible = isVisible;
     this.background = background.map((bg) => ({
       ...bg,
       position: bg.position || "center center",
       size: bg.size || "custom",
       width: bg.width || "auto",
       height: bg.height || "auto",
+      isVisible: bg.isVisible || true,
     }));
   }
 
@@ -93,10 +110,23 @@ abstract class Element {
     const root = this.getRootContainer();
 
     return {
-      color: this.color || (parent && parent.color) || (root && root.color) || null,
-      fontFamily: this.fontFamily || (parent && parent.fontFamily) || (root && root.fontFamily) || null,
-      fontWeight: this.fontWeight || (parent && parent.fontWeight) || (root && root.fontWeight) || null,
-      fontSize: this.fontSize || (parent && parent.fontSize) || (root && root.fontSize) || null,
+      color:
+        this.color || (parent && parent.color) || (root && root.color) || null,
+      fontFamily:
+        this.fontFamily ||
+        (parent && parent.fontFamily) ||
+        (root && root.fontFamily) ||
+        null,
+      fontWeight:
+        this.fontWeight ||
+        (parent && parent.fontWeight) ||
+        (root && root.fontWeight) ||
+        null,
+      fontSize:
+        this.fontSize ||
+        (parent && parent.fontSize) ||
+        (root && root.fontSize) ||
+        null,
     };
   }
 

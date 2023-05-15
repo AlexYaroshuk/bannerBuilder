@@ -176,14 +176,29 @@
       </div>
     </div>
 
-    <div class="prop-section">
+    <div
+      class="prop-section"
+      v-if="
+        activeTab === 'color' && viewModel.selectedBackground.type === 'color'
+      "
+    >
       Color
 
       <ColorPicker
-        v-if="activeTab === 'color'"
         @color-change="updateColor"
         :color="viewModel.selectedBackground.value"
       />
+    </div>
+    <div
+      class="prop-section"
+      v-if="
+        activeTab === 'gradient' &&
+        viewModel.selectedBackground.type === 'gradient'
+      "
+    >
+      Gradient
+
+      <GradientColorPicker :viewModel="viewModel" />
     </div>
   </div>
 </template>
@@ -194,10 +209,14 @@ import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 import { ColorPicker } from "vue-accessible-color-picker";
 import backgroundPlaceholder from "@/assets/background_placeholder_texture.svg";
 
+import GradientColorPicker from "./GradientColorPicker.vue";
+
 export default {
   components: {
     FIleUploader,
     ColorPicker,
+
+    GradientColorPicker,
   },
 
   data() {
@@ -213,6 +232,11 @@ export default {
           name: "image",
           label: "Image",
           icon: "image",
+        },
+        {
+          name: "gradient",
+          label: "Gradient",
+          icon: "gradient",
         },
       ],
       sizeOptions: [
@@ -305,6 +329,16 @@ export default {
         this.viewModel.selectedBackground.value = "hsla(0, 0%, 0%, 0.25)";
       } else if (tab.name === "image") {
         this.setDefaultImageAsBackground();
+      } else if (tab.name === "gradient") {
+        this.viewModel.selectedBackground.type = "gradient";
+        this.viewModel.selectedBackground.value = {
+          type: "linear",
+          degree: 0,
+          points: [
+            { left: 0, color: "white" }, // White
+            { left: 100, color: "grey" }, // Grey
+          ],
+        };
       }
     },
 

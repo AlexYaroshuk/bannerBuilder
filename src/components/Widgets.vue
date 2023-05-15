@@ -26,6 +26,7 @@ export default {
         { type: "text", label: "Text", icon: "text_format" },
         { type: "link", label: "Link", icon: "link" },
         { type: "image", label: "Image", icon: "image" },
+        { type: "video", label: "Video", icon: "smart_display" },
       ],
     };
   },
