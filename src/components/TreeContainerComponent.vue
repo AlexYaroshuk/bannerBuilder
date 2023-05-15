@@ -30,11 +30,13 @@ import { Element } from '@/models/element';
 import { Container } from '@/models/container';
 import { Text } from '@/models/text';
 import { Link } from '@/models/link';
+import { Image } from '@/models/image';
 import { BannerBuilderViewModel } from '@/viewmodels/bannerBuilderViewModel';
 import { VueDraggableNext } from 'vue-draggable-next';
 
 import TreeTextComponent from './TreeTextComponent.vue';
 import TreeLinkComponent from './TreeLinkComponent.vue';
+import TreeImageComponent from './TreeImageComponent.vue';
 import TreeContainerComponent from './TreeContainerComponent.vue';
 
 export default {
@@ -63,6 +65,10 @@ export default {
 
             if (element instanceof Link) {
                 return TreeLinkComponent;
+            }
+
+            if (element instanceof Image) {
+                return TreeImageComponent;
             }
         },
     }
