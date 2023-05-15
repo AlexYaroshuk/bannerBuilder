@@ -1,7 +1,7 @@
 import { Container } from "@/models/container";
 
 type BackgroundLayer = {
-  type: "color" | "gradient" | "image";
+  type: "color" | "gradient" | "image" | "video";
   value: string | GradientLayer;
   position?: string;
   size?: "custom" | "contain" | "cover";

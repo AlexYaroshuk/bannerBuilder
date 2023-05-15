@@ -404,7 +404,8 @@
         <div
           v-if="
             viewModel.getSelectedElement() &&
-            viewModel.getSelectedElement().type === 'container'
+            viewModel.getSelectedElement().type === 'container' &&
+            viewModel.getSelectedElement().parentContainer != null
           "
         >
           <p
@@ -423,9 +424,11 @@
           <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
           <div v-if="expandableGroups.background">
             <div class="prop-section">
-              <div>
-                Image or color overlay
-                <button @click.stop="addBackground()">add</button>
+              <div class="row" style="display: flex">
+                Add a background layer
+                <div class="button-wrapper" @click.stop="addBackground()">
+                  <i class="material-icons">add</i>
+                </div>
 
                 <!-- <i class="material-icons">add</i> -->
               </div>
@@ -449,11 +452,13 @@
                   @mouseover="setBackgroundListHoverIndex(index)"
                   @mouseout="clearBackgroundListHoverIndex"
                 >
-                  <div class="background-list-item">
+                  <div
+                    class="background-list-item"
+                    @click.stop="editBackground(background)"
+                  >
                     <div class="background-drag-handle">☰</div>
                     <div
                       class="color-square"
-                      @click.stop="editBackground(background)"
                       :class="{
                         'transparent-pattern':
                           background && background.type !== 'gradient',
@@ -475,10 +480,6 @@
                         backgroundColor:
                           background && background.type === 'color'
                             ? background.value
-                            : background &&
-                              background.type === 'gradient' &&
-                              background.value.points.length === 1
-                            ? background.value.points[0].color
                             : '',
                         backgroundBlendMode:
                           background && background.type === 'color'
@@ -492,6 +493,28 @@
                         class="background-list-type"
                         :class="{ 'background-hidden': !background.isVisible }"
                       >
+                        <div class="icon-wrapper">
+                          <i
+                            v-if="background.type === 'color'"
+                            class="material-icons"
+                            >format_color_fill</i
+                          >
+                          <i
+                            v-if="background.type === 'image'"
+                            class="material-icons"
+                            >image</i
+                          >
+                          <i
+                            v-if="background.type === 'gradient'"
+                            class="material-icons"
+                            >gradient</i
+                          >
+                          <i
+                            v-if="background.type === 'video'"
+                            class="material-icons"
+                            >smart_display</i
+                          >
+                        </div>
                         {{
                           background.type === "image" && background.fileName
                             ? background.fileName.length > 20
@@ -503,6 +526,22 @@
                               : background.fileName
                             : background.type === "gradient"
                             ? "Gradient"
+                            : background.type === "image" && background.fileName
+                            ? background.fileName.length > 20
+                              ? background.fileName.slice(0, 20) +
+                                "..." +
+                                background.fileName.slice(
+                                  background.fileName.lastIndexOf(".")
+                                )
+                              : background.fileName
+                            : background.type === "video"
+                            ? background.value.length > 20
+                              ? background.value.slice(0, 20) +
+                                "..." +
+                                background.value.slice(
+                                  background.value.lastIndexOf(".")
+                                )
+                              : background.value
                             : background.value
                         }}
                       </div>
@@ -914,7 +953,7 @@ export default {
 
     //test
     test() {
-      console.log(this.viewModel.getSelectedElement().background);
+      console.log(this.viewModel.selectedBackground);
     },
 
     onEnd(evt) {
@@ -939,6 +978,7 @@ export default {
     },
 
     removeBackground(background) {
+      event.stopPropagation();
       const index =
         this.viewModel.currentSelectedElement?.background?.indexOf(background);
       if (index !== -1) {
@@ -968,13 +1008,7 @@ export default {
       this.viewModel.isBackgroundSelectorVisible = true;
       this.viewModel.selectedBackground = background;
       this.$nextTick(() => {
-        if (this.viewModel.selectedBackground.type === "color") {
-          this.$refs.backgroundSelector.activeTab = "color";
-        } else if (this.viewModel.selectedBackground.type === "image") {
-          this.$refs.backgroundSelector.activeTab = "image";
-        } else if (this.viewModel.selectedBackground.type === "gradient") {
-          this.$refs.backgroundSelector.activeTab = "gradient";
-        }
+        this.$refs.backgroundSelector.activeTab = background.type;
       });
     },
 
@@ -984,6 +1018,7 @@ export default {
     },
 
     toggleBackgroundLayerVisibility(background) {
+      event.stopPropagation();
       background.isVisible = !background.isVisible;
     },
 
@@ -1090,7 +1125,13 @@ export default {
 
 i.material-icons {
   float: left;
-  margin-right: 4px;
+
+  /* adjust the margin as needed */
+}
+i.material-icons-hidden {
+  float: left;
+  color: #666;
+
   /* adjust the margin as needed */
 }
 
@@ -1113,13 +1154,17 @@ i.material-icons {
 
 .background-list {
   background-color: rgba(211, 211, 211, 0.6);
-  margin: 8px;
+  margin-top: 8px;
 }
 
 .background-list-item {
   display: flex;
   padding: 4px;
   font-size: small;
+}
+.background-list-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
 }
 
 .background-list-content {
@@ -1184,12 +1229,14 @@ i.material-icons {
 
 .button-wrapper {
   display: flex;
+  padding: 4px;
   align-items: center;
   justify-content: center;
+  text-align: center;
   width: 24px;
   height: 24px;
   cursor: pointer;
-  margin-right: 8px;
+
   color: #666;
 }
 .button-wrapper i {
@@ -1202,5 +1249,9 @@ i.material-icons {
 
 .background-hidden {
   color: #999;
+}
+
+.icon-wrapper {
+  color: #666;
 }
 </style>

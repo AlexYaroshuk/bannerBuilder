@@ -26,7 +26,16 @@
         :key="'layer-' + layerIndex"
         v-show="backgroundLayer.isVisible"
         :style="backgroundLayer"
-      ></div>
+      >
+        <video
+          v-if="backgroundLayer.type === 'video'"
+          :src="backgroundLayer.value"
+          :style="backgroundLayer"
+          autoplay
+          muted
+          loop
+        ></video>
+      </div>
     </div>
 
     <div class="children-wrapper">
@@ -47,36 +56,11 @@
           @contextmenu.prevent="onContextMenu($event, 'child', child)"
           @mouseover.stop="hoverItem(child)"
         >
-          <ElementText
-            v-if="child && child.type === 'text'"
+          <component
+            :is="getComponent(child)"
             :class="{ hidden: !child.isVisible }"
             style="padding: 4px"
             :child="child"
-          />
-          <ElementLink
-            v-if="child && child.type === 'link'"
-            :class="{ hidden: !child.isVisible }"
-            style="padding: 4px"
-            :child="child"
-          />
-          <ElementImage
-            v-if="child && child.type === 'image'"
-            :class="{ hidden: !child.isVisible }"
-            style="padding: 4px"
-            :child="child"
-          />
-          <ElementVideo
-            v-if="child && child.type === 'video'"
-            :class="{ hidden: !child.isVisible }"
-            style="padding: 4px"
-            :child="child"
-          />
-
-          <ElementContainer
-            v-if="child && child.type === 'container'"
-            :class="{ hidden: !child.isVisible }"
-            style="padding: 4px"
-            :container="child"
             :viewModel="viewModel"
           />
         </div>
@@ -99,6 +83,10 @@ import ElementImage from "./ElementImage.vue";
 import ElementVideo from "./ElementVideo.vue";
 import { Container } from "@/models/container";
 import { BannerBuilderViewModel } from "@/viewmodels/bannerBuilderViewModel";
+import { Text } from "@/models/text";
+import { Link } from "@/models/link";
+import { Image } from "@/models/image";
+import { Video } from "@/models/video";
 
 const ElementContainer = {
   props: {
@@ -114,6 +102,28 @@ const ElementContainer = {
   emits: ["widget-drop", "select-item", "context-menu"],
 
   methods: {
+    getComponent(element) {
+      if (element instanceof Text) {
+        return ElementText;
+      }
+      if (element instanceof Link) {
+        return ElementLink;
+      }
+      if (element instanceof Image) {
+        return ElementImage;
+      }
+      if (element instanceof Video) {
+        return ElementVideo;
+      }
+      if (element instanceof Container) {
+        return ElementContainer;
+      }
+    },
+
+    handleContainerDehover() {
+      this.viewModel.handleElementDehovered();
+    },
+
     selectItem(item) {
       this.viewModel.handleElementSelected(item);
     },
@@ -175,6 +185,8 @@ const ElementContainer = {
           right: 0,
           bottom: 0,
           isVisible: bg.isVisible !== undefined ? bg.isVisible : true, // Add isVisible property
+          type: bg.type, // Add type property
+          value: bg.value, // Add value property
         };
 
         console.log(
@@ -199,6 +211,12 @@ const ElementContainer = {
                 layer.width = `${bg.width}px`;
                 layer.height = `${bg.height}px`;
               }
+              break;
+
+            case "video":
+              layer.backgroundRepeat = bg.repeat || "no-repeat";
+              layer.backgroundPosition = bg.position || "center";
+              layer.backgroundSize = bg.size || "cover";
               break;
             default:
               throw new Error(`Unknown background type: ${bg.type}`);
@@ -252,6 +270,24 @@ export default {
   },
 
   methods: {
+    getComponent(element) {
+      if (element instanceof Text) {
+        return ElementText;
+      }
+      if (element instanceof Link) {
+        return ElementLink;
+      }
+      if (element instanceof Image) {
+        return ElementImage;
+      }
+      if (element instanceof Video) {
+        return ElementVideo;
+      }
+      if (element instanceof Container) {
+        return ElementContainer;
+      }
+    },
+
     selectItem(item) {
       this.viewModel.handleElementSelected(item);
     },
@@ -344,6 +380,8 @@ export default {
           right: 0,
           bottom: 0,
           isVisible: bg.isVisible !== undefined ? bg.isVisible : true,
+          type: bg.type, // Add type property
+          value: bg.value, // Add value property
         };
 
         switch (bg.type) {
@@ -363,6 +401,18 @@ export default {
               layer.width = `${bg.width}px`;
               layer.height = `${bg.height}px`;
             }
+            break;
+
+          case "video":
+            layer.backgroundImage = `url(${bg.value})`;
+            layer.backgroundRepeat = bg.repeat || "no-repeat";
+            layer.backgroundPosition = bg.position || "center";
+            layer.backgroundSize = bg.size || "cover";
+            layer.backgroundAttachment = "fixed";
+            layer.backgroundColor = bg.overlayColor || "transparent";
+            layer.mixBlendMode = bg.blendMode || "normal";
+            layer.filter = bg.filter || "none";
+            layer.transition = "none";
             break;
           default:
             throw new Error(`Unknown background type: ${bg.type}`);

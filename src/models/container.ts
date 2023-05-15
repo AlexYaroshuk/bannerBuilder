@@ -3,7 +3,7 @@ import { Element, HybridStyles } from "@/models/element";
 type BackgroundSize = "custom" | "contain" | "cover";
 
 type BackgroundLayer = {
-  type: "color" | "gradient" | "image";
+  type: "color" | "gradient" | "image" | "video";
   value: string | GradientLayer;
   position?: string;
   size?: "custom" | "contain" | "cover";
@@ -123,6 +123,17 @@ class Container extends Element {
       styles.backgroundRepeat = "no-repeat";
       styles.backgroundPosition = DEFAULT_BACKGROUND_SIZE;
       styles.backgroundSize = DEFAULT_BACKGROUND_SIZE;
+    }
+    if (this.background.some((bg) => bg.type === "video")) {
+      styles.backgroundRepeat =
+        this.background.find((bg) => bg.type === "video")?.repeat ||
+        "no-repeat";
+      styles.backgroundPosition =
+        this.background.find((bg) => bg.type === "video")?.position ||
+        DEFAULT_BACKGROUND_POSITION;
+      styles.backgroundSize =
+        this.background.find((bg) => bg.type === "video")?.size ||
+        DEFAULT_BACKGROUND_SIZE;
     }
 
     return styles;

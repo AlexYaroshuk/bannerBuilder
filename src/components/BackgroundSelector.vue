@@ -14,7 +14,7 @@
         @mousedown="startRipple($event)"
       >
         <i class="material-icons">{{ tab.icon }}</i>
-        <span class="tab-text">{{ tab.label }}</span>
+        <!-- <span class="tab-text">{{ tab.label }}</span> -->
         <div class="ripple"></div>
       </button>
     </div>
@@ -200,6 +200,28 @@
 
       <GradientColorPicker :viewModel="viewModel" />
     </div>
+    <div
+      class="prop-section"
+      v-if="
+        activeTab === 'video' && viewModel.selectedBackground.type === 'video'
+      "
+    >
+      Video
+      <label for="text-field">URL:</label>
+      <input
+        id="text-field"
+        type="text"
+        v-model="viewModel.selectedBackground.value"
+      />
+
+      <video
+        ref="video"
+        :src="viewModel.selectedBackground.value"
+        @loadeddata="captureThumbnail"
+        style="display: flex; width: 100%; height: 100%"
+        preload="metadata"
+      ></video>
+    </div>
   </div>
 </template>
 
@@ -238,12 +260,18 @@ export default {
           label: "Gradient",
           icon: "gradient",
         },
+        {
+          name: "video",
+          label: "Video",
+          icon: "smart_display",
+        },
       ],
       sizeOptions: [
         { label: "Custom", value: "custom" },
         { label: "Cover", value: "cover" },
         { label: "Contain", value: "contain" },
       ],
+      thumbnail: null,
     };
   },
   props: {
@@ -308,6 +336,12 @@ export default {
       this.viewModel.selectedBackground.value = eventData.cssColor;
     },
 
+    mounted() {
+      if (this.viewModel.selectedBackground?.type === "video") {
+        this.generateThumbnail(this.viewModel.selectedBackground.value);
+      }
+    },
+
     updatePosition(position) {
       this.viewModel.selectedBackground.position = position;
       const dots = document.querySelectorAll(".dot");
@@ -329,6 +363,8 @@ export default {
         this.viewModel.selectedBackground.value = "hsla(0, 0%, 0%, 0.25)";
       } else if (tab.name === "image") {
         this.setDefaultImageAsBackground();
+      } else if (tab.name === "video") {
+        this.setDefaultVideoAsBackground();
       } else if (tab.name === "gradient") {
         this.viewModel.selectedBackground.type = "gradient";
         this.viewModel.selectedBackground.value = {
@@ -342,10 +378,33 @@ export default {
       }
     },
 
+    async captureThumbnail() {
+      // Wait for the video's metadata to load
+      await new Promise(
+        (resolve) => (this.$refs.video.onloadedmetadata = resolve)
+      );
+
+      // Get the Data URL of the canvas content, which is an image
+
+      // Set the thumbnail URL as the source of the image element
+      this.$refs.thumbnail.src = thumbnailUrl;
+    },
+
     setDefaultImageAsBackground() {
       this.viewModel.selectedBackground.type = "image";
       this.viewModel.selectedBackground.value = backgroundPlaceholder;
       this.viewModel.selectedBackground.fileName = backgroundPlaceholder;
+      this.viewModel.selectedBackground.repeat = "repeat";
+      this.viewModel.selectedBackground.size = "custom";
+      this.viewModel.selectedBackground.width = "auto";
+      this.viewModel.selectedBackground.height = "auto";
+      this.viewModel.selectedBackground.position = "center center";
+    },
+    setDefaultVideoAsBackground() {
+      this.viewModel.selectedBackground.type = "video";
+      this.viewModel.selectedBackground.value =
+        "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm";
+
       this.viewModel.selectedBackground.repeat = "repeat";
       this.viewModel.selectedBackground.size = "custom";
       this.viewModel.selectedBackground.width = "auto";
