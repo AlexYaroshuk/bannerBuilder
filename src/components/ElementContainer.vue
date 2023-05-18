@@ -16,7 +16,7 @@
     @click.stop="selectItem(container)"
     @mouseover="hoverItem(container)"
     @dragover.stop.prevent="hoverItem(container)"
-    @mouseleave="handleContainerDehover"
+    @mouseleave="viewModel.handleElementDehovered()"
     @drop="handleWidgetDrop(container)"
   >
     <div class="background-container">
@@ -58,7 +58,7 @@
         >
           <component
             :is="getComponent(child)"
-            :class="{ hidden: !child.isVisible }"
+            :class="{ hidden: !child.currentState.style.isVisible }"
             style="padding: 4px"
             :child="child"
             :viewModel="viewModel"
@@ -88,6 +88,7 @@ import { Link } from "@/models/link";
 import { Image } from "@/models/image";
 import { Video } from "@/models/video";
 
+// ! nested Container
 const ElementContainer = {
   props: {
     viewModel: {
@@ -171,6 +172,15 @@ const ElementContainer = {
     },
   },
 
+  watch: {
+    "viewModel.getSelectedElement().currentState.name": {
+      handler(newVal) {
+        this.selectedStateName = newVal;
+      },
+      immediate: true,
+    },
+  },
+
   computed: {
     containerStyle() {
       const styles = this.container.getEffectiveStyles();
@@ -243,6 +253,7 @@ const ElementContainer = {
     },
   },
 };
+// ! end nested Container
 
 export default {
   components: {

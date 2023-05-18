@@ -70,7 +70,7 @@
           }
         "
         @widget-drop="handleWidgetDrop(container)"
-        :class="{ hidden: !container.isVisible }"
+        :class="{ hidden: !container.currentState.style.isVisible }"
       />
     </div>
     <div

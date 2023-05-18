@@ -1,50 +1,30 @@
 import { Container } from "./container";
-import { Element, HybridStyles } from "./element";
+import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
-
-
 class Text extends Element {
-  getEffectiveStyles(): HybridStyles {
-    return super.getEffectiveStyles();
-  }
-
-
-  text: string;
   readonly type: string;
-
-
+  text: string;
 
   constructor({
     name,
     text,
-    color = null,
-    fontSize,
-    fontFamily,
-    borderColor = 'transparent',
-    parentContainer = null
-  }
-    : {
-      name: string,
-      text: string,
-      fontSize?: number,
-      fontFamily?: string,
-      color?: string | null;
-      borderColor?: string,
-      parentContainer?: Container | null
-    }) {
+    parentContainer = null,
+    initialState = null,
+  }: {
+    name: string;
+    text: string;
+    parentContainer?: Container | null;
+    initialState?: State | null;
+  }) {
     super({
       name: name,
-      color: color,
-      borderColor: borderColor,
       parentContainer: parentContainer,
-      fontFamily: fontFamily,
-      fontSize: fontSize
+      initialState: initialState,
     });
 
-    this.type = 'text';
+    this.type = "text";
     this.text = text;
-
   }
 
   getText(): string {
@@ -56,7 +36,9 @@ class Text extends Element {
   }
 
   removeChild(child: Element): void {
-    throw new InvalidOperationError("Cannot remove a child from a leaf element.");
+    throw new InvalidOperationError(
+      "Cannot remove a child from a leaf element."
+    );
   }
 
   get isLeaf(): boolean {
@@ -64,4 +46,4 @@ class Text extends Element {
   }
 }
 
-export { Text }
+export { Text };

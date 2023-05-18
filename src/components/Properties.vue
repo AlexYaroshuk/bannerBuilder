@@ -17,11 +17,6 @@
           </header>
           <button @click="test">test</button>
         </div>
-        <div v-if="!viewModel.getSelectedElement()">
-          <h3>Nothing selected</h3>
-          <br />
-          When you select an element, you'll see its properties here.
-        </div>
         <h3
           v-if="
             viewModel.getSelectedElement() &&
@@ -40,6 +35,45 @@
           selected: rootContainer
         </h3>
 
+        <!-- ! state settings -->
+
+        <div v-if="viewModel.getSelectedElement()">
+          <p
+            class="prop-section-title"
+            @click="expandableGroups.states = !expandableGroups.states"
+          >
+            States
+            <i
+              class="material-icons {{ expandableGroups.states ? 'expand-less' : 'expand-more' }}"
+            >
+              {{ expandableGroups.states ? "expand_more" : "chevron_right" }}
+            </i>
+          </p>
+
+          <div v-if="expandableGroups.states">
+            <div class="prop-section">
+              <div class="background-list-buttons">
+                <select
+                  v-model="selectedStateName"
+                  @change="changeCurrentState"
+                >
+                  <option
+                    v-for="state in viewModel.getSelectedElement().states"
+                    :key="state.name"
+                    :value="state.name"
+                  >
+                    {{ state.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div
+                class="section-divider"
+                v-if="viewModel.getSelectedElement().type === 'link'"
+              />
+            </div>
+          </div>
+        </div>
         <!-- ! visibility settings -->
 
         <div v-if="viewModel.getSelectedElement()">
@@ -57,14 +91,14 @@
             </i>
           </p>
 
-          <!-- ! text settings -->
-
           <div v-if="expandableGroups.visibility">
             <div class="prop-section">
               <div class="background-list-buttons">
                 <button @click.stop="toggleElementVisibility">
                   {{
-                    viewModel.getSelectedElement().isVisible ? "Hide" : "Show"
+                    viewModel.getSelectedElementCurrentState().style.isVisible
+                      ? "Hide"
+                      : "Show"
                   }}
                 </button>
               </div>
@@ -205,18 +239,24 @@
                 <div
                   v-if="viewModel.getSelectedElement().parentContainer"
                   :class="
-                    viewModel.getSelectedElement().fontSize
+                    viewModel.getSelectedElementCurrentState().style.fontSize
                       ? 'status-text-selected-color'
                       : 'status-text-inherited-color'
                   "
                 >
-                  <p v-if="viewModel.getSelectedElement().fontSize">
+                  <p
+                    v-if="
+                      viewModel.getSelectedElementCurrentState().style.fontSize
+                    "
+                  >
                     Custom font size
                   </p>
 
                   <div
                     class="status-text"
-                    v-if="!viewModel.getSelectedElement().fontSize"
+                    v-if="
+                      !viewModel.getSelectedElementCurrentState().style.fontSize
+                    "
                   >
                     Inheriting from
                     <p class="link-text" @click.stop="handleSelectParent">
@@ -225,7 +265,9 @@
                   </div>
                 </div>
                 <button
-                  v-if="viewModel.getSelectedElement().fontSize"
+                  v-if="
+                    viewModel.getSelectedElementCurrentState().style.fontSize
+                  "
                   @click.stop="resetStyle('fontSize')"
                   class="reset-button"
                 >
@@ -251,18 +293,26 @@
                 <div
                   v-if="viewModel.getSelectedElement().parentContainer"
                   :class="
-                    viewModel.getSelectedElement().fontWeight
+                    viewModel.getSelectedElementCurrentState().style.fontWeight
                       ? 'status-text-selected-color'
                       : 'status-text-inherited-color'
                   "
                 >
-                  <p v-if="viewModel.getSelectedElement().fontWeight">
+                  <p
+                    v-if="
+                      viewModel.getSelectedElementCurrentState().style
+                        .fontWeight
+                    "
+                  >
                     Custom font weight
                   </p>
 
                   <div
                     class="status-text"
-                    v-if="!viewModel.getSelectedElement().fontWeight"
+                    v-if="
+                      !viewModel.getSelectedElementCurrentState().style
+                        .fontWeight
+                    "
                   >
                     Inheriting from
                     <p class="link-text" @click.stop="handleSelectParent">
@@ -271,7 +321,9 @@
                   </div>
                 </div>
                 <button
-                  v-if="viewModel.getSelectedElement().fontWeight"
+                  v-if="
+                    viewModel.getSelectedElementCurrentState().style.fontWeight
+                  "
                   @click.stop="resetStyle('fontWeight')"
                   class="reset-button"
                 >
@@ -297,18 +349,26 @@
                 <div
                   v-if="viewModel.getSelectedElement().parentContainer"
                   :class="
-                    viewModel.getSelectedElement().fontFamily
+                    viewModel.getSelectedElementCurrentState().style.fontFamily
                       ? 'status-text-selected-color'
                       : 'status-text-inherited-color'
                   "
                 >
-                  <p v-if="viewModel.getSelectedElement().fontFamily">
+                  <p
+                    v-if="
+                      viewModel.getSelectedElementCurrentState().style
+                        .fontFamily
+                    "
+                  >
                     Custom font family
                   </p>
 
                   <div
                     class="status-text"
-                    v-if="!viewModel.getSelectedElement().fontFamily"
+                    v-if="
+                      !viewModel.getSelectedElementCurrentState().style
+                        .fontFamily
+                    "
                   >
                     Inheriting from
                     <p class="link-text" @click.stop="handleSelectParent">
@@ -317,7 +377,9 @@
                   </div>
                 </div>
                 <button
-                  v-if="viewModel.getSelectedElement().fontFamily"
+                  v-if="
+                    viewModel.getSelectedElementCurrentState().style.fontFamily
+                  "
                   @click.stop="resetStyle('fontFamily')"
                   class="reset-button"
                 >
@@ -346,18 +408,24 @@
                 <div
                   v-if="viewModel.getSelectedElement().parentContainer"
                   :class="
-                    viewModel.getSelectedElement().color
+                    viewModel.getSelectedElementCurrentState().style.color
                       ? 'status-text-selected-color'
                       : 'status-text-inherited-color'
                   "
                 >
-                  <p v-if="viewModel.getSelectedElement().color">
+                  <p
+                    v-if="
+                      viewModel.getSelectedElementCurrentState().style.color
+                    "
+                  >
                     Custom color
                   </p>
 
                   <div
                     class="status-text"
-                    v-if="!viewModel.getSelectedElement().color"
+                    v-if="
+                      !viewModel.getSelectedElementCurrentState().style.color
+                    "
                   >
                     Inheriting from
                     <p class="link-text" @click.stop="handleSelectParent">
@@ -366,7 +434,7 @@
                   </div>
                 </div>
                 <button
-                  v-if="viewModel.getSelectedElement().color"
+                  v-if="viewModel.getSelectedElementCurrentState().style.color"
                   @click.stop="resetStyle('color')"
                   class="reset-button"
                 >
@@ -434,7 +502,9 @@
               </div>
               <draggable
                 class="background-list"
-                v-model="viewModel.getSelectedElement().background"
+                v-model="
+                  viewModel.getSelectedElementCurrentState().style.background
+                "
                 tag="div"
                 handle=".background-drag-handle"
                 @end="onEnd"
@@ -446,7 +516,9 @@
                   :view-model="viewModel"
                 />
                 <div
-                  v-for="(background, index) in viewModel.getSelectedElement()
+                  v-for="(
+                    background, index
+                  ) in viewModel.getSelectedElementCurrentState().style
                     .background"
                   :key="index"
                   @mouseover="setBackgroundListHoverIndex(index)"
@@ -574,7 +646,10 @@
 
                   <div
                     class="section-divider"
-                    v-if="viewModel.getSelectedElement().background.length > 1"
+                    v-if="
+                      viewModel.getSelectedElementCurrentState().style
+                        .background.length > 1
+                    "
                   />
                   <!-- <div
                     class="background-list-color-square"
@@ -707,6 +782,7 @@ export default {
         },
       ],
       expandableGroups: {
+        states: true,
         visibility: true,
         content: true,
         typography: true,
@@ -724,7 +800,17 @@ export default {
       backgroundListHoverIndex: null,
       isBackgroundSelectorVisible: false,
       selectedBackground: null,
+      selectedStateName: "None",
     };
+  },
+
+  watch: {
+    "viewModel.getSelectedElement().currentState.name": {
+      handler(newVal) {
+        this.selectedStateName = newVal;
+      },
+      immediate: true,
+    },
   },
 
   computed: {
@@ -745,6 +831,7 @@ export default {
         }
       },
     },
+
     /* selectedItemFontSize: {
       get() {
         const selectedItem = this.viewModel.selectedItem;
@@ -805,51 +892,63 @@ export default {
 
     fontSize: {
       get() {
-        return this.viewModel.getSelectedElement().fontSize !== null
-          ? this.viewModel.getSelectedElement().fontSize
+        return this.viewModel.getSelectedElementCurrentState().style
+          .fontSize !== null
+          ? this.viewModel.getSelectedElementCurrentState().style.fontSize
           : this.viewModel.getSelectedElement().parentContainer
-          ? this.viewModel.getSelectedElement().parentContainer.fontSize
+          ? this.viewModel.getSelectedElement().parentContainer.currentState
+              .style.fontSize
           : null;
       },
       set(fontSize) {
-        this.viewModel.getSelectedElement().fontSize = fontSize;
+        this.viewModel.getSelectedElementCurrentState().style.fontSize =
+          fontSize;
       },
     },
     fontFamily: {
       get() {
-        return this.viewModel.getSelectedElement().fontFamily !== null
-          ? this.viewModel.getSelectedElement().fontFamily
+        return this.viewModel.getSelectedElementCurrentState().style
+          .fontFamily !== null
+          ? this.viewModel.getSelectedElementCurrentState().style.fontFamily
           : this.viewModel.getSelectedElement().parentContainer
-          ? this.viewModel.getSelectedElement().parentContainer.fontFamily
+          ? this.viewModel.getSelectedElement().parentContainer.currentState
+              .style.fontFamily
           : null;
       },
       set(fontFamily) {
-        this.viewModel.getSelectedElement().fontFamily = fontFamily;
+        this.viewModel.getSelectedElementCurrentState().style.fontFamily =
+          fontFamily;
       },
     },
     fontWeight: {
       get() {
-        return this.viewModel.getSelectedElement().fontWeight !== null
-          ? this.viewModel.getSelectedElement().fontWeight
+        return this.viewModel.getSelectedElementCurrentState().style
+          .fontWeight !== null
+          ? this.viewModel.getSelectedElementCurrentState().style.fontWeight
           : this.viewModel.getSelectedElement().parentContainer
-          ? this.viewModel.getSelectedElement().parentContainer.fontWeight
+          ? this.viewModel.getSelectedElement().parentContainer.currentState
+              .style.fontWeight
           : null;
       },
       set(fontWeight) {
-        this.viewModel.getSelectedElement().fontWeight = fontWeight;
+        this.viewModel.getSelectedElementCurrentState().style.fontWeight =
+          fontWeight;
       },
     },
 
     selectedItemColor: {
       get() {
-        return this.viewModel.getSelectedElement().color !== null
-          ? this.viewModel.getSelectedElement().color
+        return this.viewModel.getSelectedElementCurrentState().style.color !==
+          null
+          ? this.viewModel.getSelectedElementCurrentState().style.color
           : this.viewModel.getSelectedElement().parentContainer
-          ? this.viewModel.getSelectedElement().parentContainer.color
+          ? this.viewModel.getSelectedElement().parentContainer.currentState
+              .style.color
           : null;
       },
       set(selectedItemColor) {
-        this.viewModel.getSelectedElement().color = selectedItemColor;
+        this.viewModel.getSelectedElementCurrentState().style.color =
+          selectedItemColor;
       },
     },
     selectedItemBackgroundColor: {
@@ -882,6 +981,18 @@ export default {
         return `${gradient.type}-gradient(${gradient.degree}deg, ${points})`;
       }
       return "";
+    },
+    selectedElementCurrentStateName() {
+      return this.viewModel.getSelectedElement()?.currentState.name;
+    },
+  },
+
+  watch: {
+    selectedElementCurrentStateName: {
+      handler(newVal) {
+        this.selectedStateName = newVal;
+      },
+      immediate: true,
     },
   },
 
@@ -924,7 +1035,8 @@ export default {
     //hybrid settings
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
-      this.viewModel.getSelectedElement().color = eventData.cssColor;
+      this.viewModel.getSelectedElementCurrentState().style.color =
+        eventData.cssColor;
       console.log(this.viewModel.getSelectedElement().color);
     },
 
@@ -935,13 +1047,13 @@ export default {
       });
     }, */
     updateTypographyFontfamily() {
-      this.viewModel.getSelectedElement().fontfamily = this.selectedTextFont;
+      this.viewModel.getSelectedElementCurrentState().style.fontFamily =
+        this.selectedTextFont;
     },
 
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     resetStyle(type) {
       this.$emit("reset-style", {
-        item: this.viewModel.getSelectedElement(),
         type: type,
       });
     },
@@ -953,7 +1065,16 @@ export default {
 
     //test
     test() {
-      console.log(this.viewModel.selectedBackground);
+      console.log(this.viewModel.getSelectedElement());
+    },
+
+    changeCurrentState() {
+      const newState = this.viewModel
+        .getSelectedElement()
+        .states.find((state) => state.name === this.selectedStateName);
+      if (newState) {
+        this.viewModel.getSelectedElement().currentState = newState;
+      }
     },
 
     onEnd(evt) {
@@ -979,10 +1100,13 @@ export default {
 
     removeBackground(background) {
       event.stopPropagation();
-      const index =
-        this.viewModel.currentSelectedElement?.background?.indexOf(background);
+      const index = this.viewModel
+        .getSelectedElementCurrentState()
+        .style.background.indexOf(background);
       if (index !== -1) {
-        this.viewModel.currentSelectedElement?.background?.splice(index, 1);
+        this.viewModel
+          .getSelectedElementCurrentState()
+          .style.background.splice(index, 1);
       }
     },
 
@@ -994,7 +1118,9 @@ export default {
         type: "color",
         //get random color
         value: "hsla(0, 0%, 0%, 25%)",
-        layerIndex: this.viewModel.currentSelectedElement.background.length,
+        layerIndex:
+          this.viewModel.getSelectedElementCurrentState().style.background
+            .length,
         isVisible: true,
       };
       this.viewModel.currentSelectedElement.addBackgroundLayer(
@@ -1023,8 +1149,8 @@ export default {
     },
 
     toggleElementVisibility() {
-      this.viewModel.getSelectedElement().isVisible =
-        !this.viewModel.getSelectedElement().isVisible;
+      this.viewModel.getSelectedElementCurrentState().style.isVisible =
+        !this.viewModel.getSelectedElementCurrentState().style.isVisible;
     },
 
     getGradientString() {

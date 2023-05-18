@@ -1,47 +1,34 @@
 import { Container } from "./container";
-import { Element, HybridStyles } from "./element";
+import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
-
-
-
 class Link extends Element {
+  readonly type: string;
   label: string;
   url: string;
-  readonly type: string;
 
   constructor({
     name,
     label,
     url,
-    color = null,
-    fontSize,
-    fontFamily,
-    borderColor = "transparent",
     parentContainer = null,
+    initialState = null,
   }: {
     name: string;
     label: string;
     url: string;
-    fontSize?: number;
-    fontFamily?: string;
-    color?: string | null;
-    borderColor?: string;
     parentContainer?: Container | null;
+    initialState?: State | null;
   }) {
     super({
       name: name,
-      color: color,
-      borderColor: borderColor,
       parentContainer: parentContainer,
-      fontFamily: fontFamily,
-      fontSize: fontSize,
+      initialState: initialState,
     });
 
     this.type = "link";
     this.label = label;
     this.url = url;
-
   }
 
   getLabel(): string {
@@ -57,7 +44,9 @@ class Link extends Element {
   }
 
   removeChild(child: Element): void {
-    throw new InvalidOperationError("Cannot remove a child from a leaf element.");
+    throw new InvalidOperationError(
+      "Cannot remove a child from a leaf element."
+    );
   }
 
   get isLeaf(): boolean {

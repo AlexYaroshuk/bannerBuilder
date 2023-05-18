@@ -325,7 +325,9 @@ export default {
         type: "color",
         //get random color
         value: "#" + Math.floor(Math.random() * 16777215).toString(16),
-        layerIndex: this.viewModel.currentSelectedElement.background.length,
+        layerIndex:
+          this.viewModel.getSelectedElementCurrentState().style.background
+            .length,
       };
       this.viewModel.currentSelectedElement.addBackgroundLayer(
         backgroundColorLayer

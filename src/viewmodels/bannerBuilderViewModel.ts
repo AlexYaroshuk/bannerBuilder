@@ -1,6 +1,6 @@
-import { Element } from "@/models/element";
+import { Element, BackgroundLayer, State, Style } from "@/models/element";
 import { Text } from "@/models/text";
-import { Container, BackgroundLayer } from "@/models/container";
+import { Container } from "@/models/container";
 import { Link } from "@/models/link";
 import { Image } from "@/models/image";
 import { Video } from "@/models/video";
@@ -48,158 +48,209 @@ class BannerBuilderViewModel {
     this.hoverIndex = null;
     this.draggedContainerIndex = null;
 
-    //////////*
     //* SETUP
-    //////////*
 
-    ///////////*
-    //* SETUP
-    ///////////*/
+    // Initialize states for the containers
+    const container1BaseState: State = {
+      name: "None",
+      style: {
+        color: "Black",
+        fontFamily: "Arial",
+        fontWeight: 400,
+        fontSize: 16,
+        background: [
+          {
+            type: "color",
+            value: "#f9d7d7ff",
+            isVisible: true,
+            layerIndex: 1,
+          },
+        ],
+        borderColor: null,
+        isVisible: true,
+      },
+    };
+    const container2BaseState: State = {
+      name: "None",
+      style: {
+        color: "Black",
+        fontFamily: "Arial",
+        fontWeight: 400,
+        fontSize: 16,
+        background: [
+          {
+            type: "image",
+            value: "https://picsum.photos/200/300",
+            fileName: "random_picsum_mage",
+            layerIndex: 1,
+            size: "custom",
+            width: "auto",
+            height: "auto",
+            position: "center center",
+            isVisible: true,
+          },
+          {
+            type: "gradient",
+            layerIndex: 0,
+            size: "custom",
+            width: "auto",
+            height: "auto",
+            position: "center center",
+            value: {
+              type: "linear",
+              degree: 0,
+              points: [
+                { left: 0, color: "white" }, // White
+                { left: 100, color: "grey" }, // Grey
+              ],
+            },
+            isVisible: true,
+          },
+        ],
+        borderColor: null,
+        isVisible: true,
+      },
+    };
+    const container3BaseState: State = {
+      name: "None",
+      style: {
+        color: "Black",
+        fontFamily: "Arial",
+        fontWeight: 400,
+        fontSize: 16,
+        background: [
+          {
+            type: "video",
+            value:
+              "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+
+            layerIndex: 1,
+            size: "custom",
+            width: "auto",
+            height: "auto",
+            position: "center center",
+            isVisible: true,
+          },
+        ],
+        borderColor: null,
+        isVisible: true,
+      },
+    };
+    const container4BaseState: State = {
+      name: "None",
+      style: {
+        color: "Black",
+        fontFamily: "Arial",
+        fontWeight: 400,
+        fontSize: 16,
+        background: [
+          {
+            type: "color",
+            value: "#255a32ff",
+            isVisible: true,
+            layerIndex: 1,
+          },
+        ],
+        borderColor: null,
+        isVisible: true,
+      },
+    };
+
+    const container1_1State: State = {
+      name: "None",
+      style: {
+        color: "Black",
+        fontFamily: "Arial",
+        fontWeight: 400,
+        fontSize: 16,
+        background: [
+          {
+            type: "color",
+            value: "blue",
+            isVisible: true,
+            layerIndex: 1,
+          },
+        ],
+        borderColor: null,
+        isVisible: true,
+      },
+    };
+
+    // Initialize Container 1 with the base state
+    const container1 = new Container({
+      name: "Container 1 with hover style",
+      initialState: container1BaseState,
+      children: [
+        new Text({
+          name: "Text 1-1",
+          text: "Hover this to change bg color",
+        }),
+        new Container({
+          name: "Nested container",
+          initialState: container1_1State,
+          children: [new Text({ name: "Text 1-1-1", text: "Example text" })],
+        }),
+      ],
+    });
+    const container2 = new Container({
+      name: "Container 2",
+      initialState: container2BaseState,
+      children: [
+        new Text({
+          name: "Text 1-1",
+          text: "Example text 2",
+        }),
+      ],
+    });
+    const container3 = new Container({
+      name: "Container 3",
+      initialState: container3BaseState,
+      children: [
+        new Text({
+          name: "Text 1-1",
+          text: "Example text 3",
+        }),
+        new Video({
+          name: "Example video",
+          value:
+            "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+        }),
+      ],
+    });
+    const container4 = new Container({
+      name: "Container 4",
+      initialState: container4BaseState,
+      children: [
+        new Link({
+          name: "Link",
+          label: "Example link",
+          url: "https://example.com",
+        }),
+        new Image({
+          name: "Example image",
+          value: "https://picsum.photos/200/300",
+        }),
+      ],
+    });
+
+    // Modify the Hover state
+    const hoverState = container1.states.find(
+      (state) => state.name === "Hover"
+    );
+    if (hoverState) {
+      hoverState.style.background = [
+        {
+          type: "color",
+          value: "#fff38aff",
+          isVisible: true,
+          layerIndex: 1,
+        },
+      ];
+    }
 
     this.rootContainer = new Container({
       name: "Root",
-      children: [
-        new Container({
-          name: "Container 1",
-          background: [
-            { type: "color", value: "red", layerIndex: 0, isVisible: true },
-            { type: "color", value: "white", layerIndex: 1, isVisible: true },
-          ],
-          children: [
-            new Text({ name: "Text 1-1", text: "das" }),
-            new Text({ name: "Text 1-2", text: "mor" }),
-            new Image({
-              name: "Image 1-3",
-              value: "https://picsum.photos/200/300",
-            }),
-            new Container({
-              name: "Container 1-1",
-              background: [
-                {
-                  type: "color",
-                  value: "pink",
-                  layerIndex: 1,
-                  isVisible: true,
-                },
-                {
-                  type: "color",
-                  value: "hsla(0, 23%, 2%, 0.1)",
-                  layerIndex: 0,
-                  isVisible: true,
-                },
-              ],
-              fontFamily: "Helvetica",
-              fontSize: 24,
-              children: [new Text({ name: "Text 1-1-1", text: "baz" })],
-            }),
-          ],
-        }),
-        new Container({
-          name: "Container 2",
-          background: [
-            { type: "color", value: "red", layerIndex: 0, isVisible: true },
-            {
-              type: "color",
-              value: "hsla(77, 23%, 2%, 0.5)",
-              layerIndex: 1,
-              isVisible: true,
-            },
-          ],
-          fontFamily: "Helvetica",
-          fontSize: 24,
-          children: [
-            new Text({ name: "Text 1-1-1", text: "baz" }),
-            new Link({
-              name: "Link",
-              label: "Link 1-1-2",
-              url: "https://example.com",
-            }),
-            new Video({
-              name: "Video 1",
-              value:
-                "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
-            }),
-          ],
-        }),
-        new Container({
-          name: "Container 3",
-          background: [
-            {
-              type: "image",
-              value: "https://picsum.photos/200/300",
-              fileName: "random_picsum_mage",
-              layerIndex: 0,
-              size: "custom",
-              width: "auto",
-              height: "auto",
-              position: "center center",
-              isVisible: true,
-            },
-            {
-              type: "video",
-              value:
-                "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
-
-              layerIndex: 1,
-              size: "custom",
-              width: "auto",
-              height: "auto",
-              position: "center center",
-              isVisible: true,
-            },
-          ],
-          children: [
-            new Text({ name: "Text 3-1", text: "tex" }),
-            new Text({ name: "Text 3-2", text: "text" }),
-          ],
-        }),
-        new Container({
-          name: "Container 4",
-          background: [
-            {
-              type: "image",
-              value: "https://picsum.photos/200/300",
-              fileName: "random_picsum_mage",
-              layerIndex: 0,
-              size: "custom",
-              width: "auto",
-              height: "auto",
-              position: "center center",
-              isVisible: true,
-            },
-          ],
-          children: [
-            new Text({ name: "Text 3-1", text: "tex" }),
-            new Text({ name: "Text 3-2", text: "text" }),
-          ],
-        }),
-        new Container({
-          name: "Container 5",
-          background: [
-            {
-              type: "gradient",
-              layerIndex: 0,
-              size: "custom",
-              width: "auto",
-              height: "auto",
-              position: "center center",
-              value: {
-                type: "linear",
-                degree: 0,
-                points: [
-                  { left: 0, color: "white" }, // White
-                  { left: 100, color: "grey" }, // Grey
-                ],
-              },
-              isVisible: true,
-            },
-          ],
-          children: [
-            new Text({ name: "Text 3-1", text: "tex" }),
-            new Text({ name: "Text 3-2", text: "text" }),
-          ],
-        }),
-      ],
+      children: [container1, container2, container3, container4],
     });
   }
 
@@ -215,14 +266,21 @@ class BannerBuilderViewModel {
     return this.currentHoveredElement;
   }
 
+  //property getters
+  getSelectedElementCurrentState(): State | null {
+    return this.currentSelectedElement
+      ? this.currentSelectedElement.currentState
+      : null;
+  }
+
   handleElementSelected(element: Element): void {
     this.currentSelectedElement = element;
     this.isBackgroundSelectorVisible = false;
-    console.log(element.background);
   }
 
   handleElementHovered(element: Element): void {
     this.currentHoveredElement = element;
+    element.changeState("Hover");
   }
 
   handleElementDeselected() {
@@ -236,6 +294,8 @@ class BannerBuilderViewModel {
   }
 
   handleElementDehovered(): void {
+    if (!this.currentHoveredElement) return;
+    this.currentHoveredElement.changeState("None");
     this.currentHoveredElement = null;
   }
 
@@ -280,14 +340,22 @@ class BannerBuilderViewModel {
 
   //mutate element
   removeBackground(background: BackgroundLayer) {
-    const index = this.currentSelectedElement?.background?.indexOf(background);
+    const index =
+      this.currentSelectedElement?.currentState.style.background?.indexOf(
+        background
+      );
     if (index !== -1) {
-      this.currentSelectedElement?.background?.splice(background.layerIndex, 1);
+      this.currentSelectedElement?.currentState.style.background?.splice(
+        background.layerIndex,
+        1
+      );
 
       // Update layerIndex values of remaining backgrounds
-      this.currentSelectedElement?.background?.forEach((bg, i) => {
-        bg.layerIndex = i;
-      });
+      this.currentSelectedElement?.currentState.style.background?.forEach(
+        (bg, i) => {
+          bg.layerIndex = i;
+        }
+      );
     }
   }
 

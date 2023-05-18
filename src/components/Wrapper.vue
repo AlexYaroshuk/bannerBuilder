@@ -425,8 +425,8 @@ export default {
       }
     },
 
-    onResetStyle({ item, type }) {
-      item[type] = null;
+    onResetStyle({ type }) {
+      this.viewModel.getSelectedElementCurrentState().style[type] = null;
     },
 
     /// modify container object
