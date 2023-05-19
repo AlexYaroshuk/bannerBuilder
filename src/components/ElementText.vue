@@ -23,6 +23,7 @@ export default {
       return {
         fontFamily: styles.fontFamily || "inherit",
         fontSize: styles.fontSize ? `${styles.fontSize}px` : "inherit",
+        fontWeight: styles.fontWeight,
         color: styles.color || "inherit",
       };
     },

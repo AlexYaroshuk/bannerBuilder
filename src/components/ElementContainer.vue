@@ -55,6 +55,7 @@
           @click.stop="selectItem(child)"
           @contextmenu.prevent="onContextMenu($event, 'child', child)"
           @mouseover.stop="hoverItem(child)"
+          @mouseleave.stop="viewModel.handleElementDehovered()"
         >
           <component
             :is="getComponent(child)"

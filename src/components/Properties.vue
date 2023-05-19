@@ -206,7 +206,7 @@
         <div
           v-if="
             viewModel.getSelectedElement() &&
-            viewModel.getSelectedElement().type != 'link' &&
+            viewModel.getSelectedElement().type != 'video' &&
             viewModel.getSelectedElement().type != 'image'
           "
         >

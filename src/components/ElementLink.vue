@@ -1,9 +1,7 @@
 <template>
-  <div class="element-link">
-    <a :href="child.url" target="_blank">
-      {{ child.label }}
-    </a>
-  </div>
+  <a :href="child.url" target="_blank" :style="typographyStyle">
+    {{ child.label }}
+  </a>
 </template>
 
 <script>
@@ -15,22 +13,21 @@ export default {
       type: Link,
       required: true,
     },
+    key: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     typographyStyle() {
       const styles = this.child.getEffectiveStyles();
       return {
         color: styles.color,
-        /*        fontFamily: styles.fontFamily,
+        fontFamily: styles.fontFamily,
         fontWeight: styles.fontWeight,
-        fontSize: `${styles.fontSize}px`, */
+        fontSize: `${styles.fontSize}px`,
       };
     },
   },
 };
 </script>
-
-<style scoped>
-.element-link a {
-}
-</style>
