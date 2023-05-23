@@ -39,7 +39,7 @@ class Container extends Element {
 
   // backgrounds
 
-  getBackground(): BackgroundLayer[] | null {
+  /*   getBackground(): BackgroundLayer[] | null {
     return this.currentState.style.background;
   }
 
@@ -48,9 +48,10 @@ class Container extends Element {
   }
 
   addBackgroundLayer(layer: BackgroundLayer): void {
+    console.log(this.currentState.style.background);
     this.currentState.style.background?.push(layer);
   }
-
+ */
   // * children
 
   getChildren(): Element[] {

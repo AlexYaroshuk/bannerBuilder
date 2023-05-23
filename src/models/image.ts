@@ -1,21 +1,29 @@
+import { Element, State } from "./element";
 import { Container } from "./container";
-import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
+
+interface ImageContent {
+  value: string;
+}
+
+interface ImageState extends State {
+  content: ImageContent;
+}
 
 class Image extends Element {
   readonly type: string;
-  value: string;
+  content: ImageContent;
 
   constructor({
     name,
-    value,
+    content,
     parentContainer = null,
     initialState = null,
   }: {
     name: string;
-    value: string;
+    content: ImageContent;
     parentContainer?: Container | null;
-    initialState?: State | null;
+    initialState?: ImageState | null;
   }) {
     super({
       name: name,
@@ -24,11 +32,22 @@ class Image extends Element {
     });
 
     this.type = "image";
-    this.value = value;
+    this.content = content;
+    if (initialState) {
+      (initialState as ImageState).content = content;
+    } else {
+      this.states.forEach((state) => {
+        (state as ImageState).content = { ...content };
+      });
+    }
   }
 
-  getUrl(): string {
-    return this.value;
+  getContent(): ImageContent {
+    return this.currentState.content as ImageContent;
+  }
+
+  setContent(content: ImageContent): void {
+    this.currentState.content = content;
   }
 
   addChild(child: Element): void {
@@ -46,4 +65,4 @@ class Image extends Element {
   }
 }
 
-export { Image };
+export { Image, ImageContent, ImageState };

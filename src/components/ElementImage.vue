@@ -1,16 +1,18 @@
 <template>
   <div class="element-image">
-    <img :src="child.value" />
+    <img :src="child.currentState?.content?.value" />
   </div>
 </template>
 
 <script>
-import { Image } from "@/models/image";
-
 export default {
   props: {
     child: {
       type: Image,
+      required: true,
+    },
+    key: {
+      type: String,
       required: true,
     },
   },

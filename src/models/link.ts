@@ -2,23 +2,29 @@ import { Container } from "./container";
 import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
 
-class Link extends Element {
-  readonly type: string;
+interface LinkContent {
   label: string;
   url: string;
+}
+
+interface LinkState extends State {
+  content: LinkContent;
+}
+
+class Link extends Element {
+  readonly type: string;
+  content: LinkContent;
 
   constructor({
     name,
-    label,
-    url,
+    content,
     parentContainer = null,
     initialState = null,
   }: {
     name: string;
-    label: string;
-    url: string;
+    content: LinkContent;
     parentContainer?: Container | null;
-    initialState?: State | null;
+    initialState?: LinkState | null;
   }) {
     super({
       name: name,
@@ -27,16 +33,39 @@ class Link extends Element {
     });
 
     this.type = "link";
-    this.label = label;
-    this.url = url;
+    this.content = content;
+
+    if (initialState) {
+      (initialState as LinkState).content = content;
+    } else {
+      this.states.forEach((state) => {
+        (state as LinkState).content = { ...content };
+      });
+    }
+  }
+
+  getContent(): LinkContent {
+    return this.currentState.content as LinkContent;
+  }
+
+  setContent(content: LinkContent): void {
+    this.currentState.content = content;
   }
 
   getLabel(): string {
-    return this.label;
+    return this.content.label;
+  }
+
+  setLabel(label: string): void {
+    this.content.label = label;
   }
 
   getUrl(): string {
-    return this.url;
+    return this.content.url;
+  }
+
+  setUrl(url: string): void {
+    this.content.url = url;
   }
 
   addChild(child: Element): void {
@@ -54,4 +83,4 @@ class Link extends Element {
   }
 }
 
-export { Link };
+export { Link, LinkContent, LinkState };

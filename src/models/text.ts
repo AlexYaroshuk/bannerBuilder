@@ -1,21 +1,29 @@
+import { Element, State } from "./element";
 import { Container } from "./container";
-import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
+
+interface TextContent {
+  text: string;
+}
+
+interface TextState extends State {
+  content: TextContent;
+}
 
 class Text extends Element {
   readonly type: string;
-  text: string;
+  content: TextContent;
 
   constructor({
     name,
-    text,
+    content,
     parentContainer = null,
     initialState = null,
   }: {
     name: string;
-    text: string;
+    content: TextContent;
     parentContainer?: Container | null;
-    initialState?: State | null;
+    initialState?: TextState | null;
   }) {
     super({
       name: name,
@@ -24,11 +32,22 @@ class Text extends Element {
     });
 
     this.type = "text";
-    this.text = text;
+    this.content = content;
+    if (initialState) {
+      (initialState as TextState).content = content;
+    } else {
+      this.states.forEach((state) => {
+        (state as TextState).content = { ...content };
+      });
+    }
   }
 
-  getText(): string {
-    return this.text;
+  getContent(): TextContent {
+    return this.currentState.content as TextContent;
+  }
+
+  setContent(content: TextContent): void {
+    this.currentState.content = content;
   }
 
   addChild(child: Element): void {
@@ -46,4 +65,4 @@ class Text extends Element {
   }
 }
 
-export { Text };
+export { Text, TextContent, TextState };

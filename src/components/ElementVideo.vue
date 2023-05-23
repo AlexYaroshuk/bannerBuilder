@@ -1,6 +1,12 @@
 <template>
   <div class="element-video">
-    <video controls autoplay loop muted :src="child.value"></video>
+    <video
+      controls
+      autoplay
+      loop
+      muted
+      :src="child.currentState?.content?.value"
+    ></video>
   </div>
 </template>
 
@@ -11,6 +17,10 @@ export default {
   props: {
     child: {
       type: Video,
+      required: true,
+    },
+    key: {
+      type: String,
       required: true,
     },
   },

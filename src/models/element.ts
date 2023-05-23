@@ -9,9 +9,25 @@ interface Style {
   borderColor: string | null;
   isVisible: boolean;
 }
+interface TextContent {
+  text: string;
+}
+
+interface ImageContent {
+  value: string;
+}
+interface VideoContent {
+  value: string;
+}
+interface LinkContent {
+  label: string;
+  url: string;
+}
+
 interface State {
   name: string;
   style: Style;
+  content?: TextContent | ImageContent | VideoContent | LinkContent;
 }
 
 type BackgroundSize = "custom" | "contain" | "cover";
@@ -75,7 +91,7 @@ abstract class Element {
 
     this.states = this.createDefaultStates(initialState);
     this.currentState =
-      this.states.find((s) => s.name === "None") || this.states[0]; // default to "None" state, or the first state if "None" does not exist
+      this.states.find((s) => s.name === "None") || this.states[0];
   }
 
   createDefaultStates(initialState: State | null): State[] {
@@ -201,7 +217,10 @@ abstract class Element {
   }
 
   addBackgroundLayer(layer: BackgroundLayer): void {
-    this.currentState.style.background?.push(layer);
+    this.currentState.style.background = [
+      ...(this.currentState.style.background || []),
+      layer,
+    ];
   }
 
   moveBackgroundLayer(layerIndex: number, newIndex: number): void {

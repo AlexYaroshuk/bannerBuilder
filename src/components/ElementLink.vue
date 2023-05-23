@@ -1,6 +1,10 @@
 <template>
-  <a :href="child.url" target="_blank" :style="typographyStyle">
-    {{ child.label }}
+  <a
+    :href="child.currentState?.content?.url"
+    target="_blank"
+    :style="typographyStyle"
+  >
+    {{ child.currentState?.content?.label }}
   </a>
 </template>
 

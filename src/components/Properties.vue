@@ -137,7 +137,6 @@
           </p>
 
           <!-- ! text settings -->
-
           <div v-if="expandableGroups.content">
             <div
               class="prop-section"
@@ -147,7 +146,8 @@
               <input
                 id="text-field"
                 type="text"
-                v-model="viewModel.getSelectedElement().text"
+                v-model="textValue"
+                @input="updateText"
               />
             </div>
 
@@ -161,13 +161,15 @@
               <input
                 id="text-field"
                 type="text"
-                v-model="viewModel.getSelectedElement().label"
+                v-model="linkLabelValue"
+                @input="updateLinkLabelValue"
               />
               <label for="text-field">URL:</label>
               <input
                 id="text-field"
                 type="text"
-                v-model="viewModel.getSelectedElement().url"
+                v-model="linkURLValue"
+                @input="updateLinkURLValue"
               />
             </div>
 
@@ -186,13 +188,17 @@
 
             <div
               class="prop-section"
-              v-if="viewModel.getSelectedElement().type === 'video'"
+              v-if="
+                (viewModel.getSelectedElement().type === 'video') |
+                  (viewModel.getSelectedElement().type === 'image')
+              "
             >
               <label for="text-field">URL:</label>
               <input
                 id="text-field"
                 type="text"
-                v-model="viewModel.getSelectedElement().value"
+                v-model="URLValue"
+                @input="updateURLValue"
               />
             </div>
 
@@ -624,7 +630,6 @@
                           @click.stop="
                             toggleBackgroundLayerVisibility(background)
                           "
-                          :style="wrapperStyle"
                         >
                           <i v-if="!background.isVisible" class="material-icons"
                             >visibility_off</i
@@ -636,7 +641,6 @@
                         <div
                           class="button-wrapper"
                           @click="removeBackground(background)"
-                          :style="wrapperStyle"
                         >
                           <i class="material-icons">delete</i>
                         </div>
@@ -801,16 +805,13 @@ export default {
       isBackgroundSelectorVisible: false,
       selectedBackground: null,
       selectedStateName: "None",
-    };
-  },
 
-  watch: {
-    "viewModel.getSelectedElement().currentState.name": {
-      handler(newVal) {
-        this.selectedStateName = newVal;
-      },
-      immediate: true,
-    },
+      //!
+      textValue: "",
+      URLValue: "",
+      linkLabelValue: "",
+      linkURLValue: "",
+    };
   },
 
   computed: {
@@ -936,6 +937,104 @@ export default {
       },
     },
 
+    // !
+    textValue: {
+      get() {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          return selectedElement.currentState.content.text;
+        } else {
+          return "";
+        }
+      },
+      set(newValue) {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          selectedElement.currentState.content.text = newValue;
+        }
+      },
+    },
+    URLValue: {
+      get() {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          return selectedElement.currentState.content.value;
+        } else {
+          return "";
+        }
+      },
+      set(newValue) {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          selectedElement.currentState.content.value = newValue;
+        }
+      },
+    },
+    linkLabelValue: {
+      get() {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          return selectedElement.currentState.content.label;
+        } else {
+          return "";
+        }
+      },
+      set(newValue) {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          selectedElement.currentState.content.label = newValue;
+        }
+      },
+    },
+    linkURLValue: {
+      get() {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          return selectedElement.currentState.content.url;
+        } else {
+          return "";
+        }
+      },
+      set(newValue) {
+        const selectedElement = this.viewModel.getSelectedElement();
+        if (
+          selectedElement &&
+          selectedElement.currentState &&
+          selectedElement.currentState.content
+        ) {
+          selectedElement.currentState.content.url = newValue;
+        }
+      },
+    },
+
     selectedItemColor: {
       get() {
         return this.viewModel.getSelectedElementCurrentState().style.color !==
@@ -1032,6 +1131,21 @@ export default {
       this.isVisible = !this.isVisible;
     },
 
+    // !
+
+    updateTextValue(newValue) {
+      this.textValue = newValue;
+    },
+    updateURLValue(newValue) {
+      this.URLValue = newValue;
+    },
+    updateLinkLabelValue(newValue) {
+      this.linkLabelValue = newValue;
+    },
+    updateLinkURLValue(newValue) {
+      this.linkURLValue = newValue;
+    },
+
     //hybrid settings
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
@@ -1065,7 +1179,7 @@ export default {
 
     //test
     test() {
-      console.log(this.viewModel.getSelectedElement());
+      console.log(this.viewModel.getSelectedElementCurrentState());
     },
 
     changeCurrentState() {

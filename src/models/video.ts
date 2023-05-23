@@ -1,22 +1,29 @@
+import { Element, State } from "./element";
 import { Container } from "./container";
-import { Element, State, BackgroundLayer } from "./element";
 import { InvalidOperationError } from "./exceptions/invalidOperatorError";
+
+interface VideoContent {
+  value: string;
+}
+
+interface VideoState extends State {
+  content: VideoContent;
+}
 
 class Video extends Element {
   readonly type: string;
-
-  value: string;
+  content: VideoContent;
 
   constructor({
     name,
-    value,
+    content,
     parentContainer = null,
     initialState = null,
   }: {
     name: string;
-    value: string;
+    content: VideoContent;
     parentContainer?: Container | null;
-    initialState?: State | null;
+    initialState?: VideoState | null;
   }) {
     super({
       name: name,
@@ -25,11 +32,22 @@ class Video extends Element {
     });
 
     this.type = "video";
-    this.value = value;
+    this.content = content;
+    if (initialState) {
+      (initialState as VideoState).content = content;
+    } else {
+      this.states.forEach((state) => {
+        (state as VideoState).content = { ...content };
+      });
+    }
   }
 
-  getUrl(): string {
-    return this.value;
+  getContent(): VideoContent {
+    return this.currentState.content as VideoContent;
+  }
+
+  setContent(content: VideoContent): void {
+    this.currentState.content = content;
   }
 
   addChild(child: Element): void {
@@ -47,4 +65,4 @@ class Video extends Element {
   }
 }
 
-export { Video };
+export { Video, VideoContent, VideoState };

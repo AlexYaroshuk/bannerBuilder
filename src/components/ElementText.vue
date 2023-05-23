@@ -1,6 +1,6 @@
 <template>
   <div :style="textStyle">
-    <span>{{ child.text }}</span>
+    <span>{{ child.currentState?.content?.text }}</span>
   </div>
 </template>
 

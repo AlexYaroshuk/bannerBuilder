@@ -1,8 +1,8 @@
-import { Element, BackgroundLayer, State, Style } from "@/models/element";
+import { Element, BackgroundLayer, State } from "@/models/element";
 import { Text } from "@/models/text";
 import { Container } from "@/models/container";
 import { Link } from "@/models/link";
-import { Image } from "@/models/image";
+import { Image, ImageState } from "@/models/image";
 import { Video } from "@/models/video";
 
 class BannerBuilderViewModel {
@@ -120,16 +120,10 @@ class BannerBuilderViewModel {
         fontSize: 16,
         background: [
           {
-            type: "video",
-            value:
-              "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
-
-            layerIndex: 1,
-            size: "custom",
-            width: "auto",
-            height: "auto",
-            position: "center center",
+            type: "color",
+            value: "#f2a9ffff",
             isVisible: true,
+            layerIndex: 1,
           },
         ],
         borderColor: null,
@@ -145,10 +139,16 @@ class BannerBuilderViewModel {
         fontSize: 16,
         background: [
           {
-            type: "color",
-            value: "#255a32ff",
-            isVisible: true,
+            type: "video",
+            value:
+              "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+
             layerIndex: 1,
+            size: "custom",
+            width: "auto",
+            height: "auto",
+            position: "center center",
+            isVisible: true,
           },
         ],
         borderColor: null,
@@ -183,12 +183,21 @@ class BannerBuilderViewModel {
       children: [
         new Text({
           name: "Text 1-1",
-          text: "Hover this to change bg color",
+          content: {
+            text: "Hover this to change bg color",
+          },
         }),
         new Container({
           name: "Nested container",
           initialState: container1_1State,
-          children: [new Text({ name: "Text 1-1-1", text: "Example text" })],
+          children: [
+            new Text({
+              name: "Text 1-1-1",
+              content: {
+                text: "Example text",
+              },
+            }),
+          ],
         }),
       ],
     });
@@ -198,37 +207,74 @@ class BannerBuilderViewModel {
       children: [
         new Text({
           name: "Text 1-1",
-          text: "Example text 2",
+          content: {
+            text: "Example text 2",
+          },
         }),
       ],
     });
+    const container3image = new Image({
+      name: "Example image",
+      content: {
+        value:
+          "https://i.ytimg.com/vi/lbtzj2qmlbo/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLBIB5isuVvKZNb6CS1fcF_06rg0mw",
+      },
+    });
+
+    const container3video = new Video({
+      name: "Example video",
+      content: {
+        value:
+          "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+      },
+    });
+
+    // Modify the Hover state for the image
+    const hoverStateImage = container3image.states.find(
+      (state) => state.name === "Hover"
+    );
+    if (hoverStateImage) {
+      hoverStateImage.content = {
+        value:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiraZs4KG8Xc4rYWxL9lyrnI18rrvreSB5sQ&usqp=CAU",
+      };
+    }
+
+    // Modify the Hover state for the video
+    const hoverStateVideo = container3video.states.find(
+      (state) => state.name === "Hover"
+    );
+    if (hoverStateVideo) {
+      hoverStateVideo.content = {
+        value:
+          "https://www.shutterstock.com/shutterstock/videos/1007271829/preview/stock-footage-abstract-red-and-white-background-of-ink-blood-or-smoke-flows-is-kaleidoscope-or-rorschach-inkblot.webm",
+      };
+    }
     const container3 = new Container({
       name: "Container 3",
       initialState: container3BaseState,
       children: [
         new Text({
           name: "Text 1-1",
-          text: "Example text 3",
+          content: {
+            text: "Hover video or image to change content",
+          },
         }),
-        new Video({
-          name: "Example video",
-          value:
-            "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
-        }),
+        container3image,
+        container3video,
       ],
     });
+
     const container4 = new Container({
       name: "Container 4",
       initialState: container4BaseState,
       children: [
         new Link({
-          name: "Link",
-          label: "Example link",
-          url: "https://example.com",
-        }),
-        new Image({
-          name: "Example image",
-          value: "https://picsum.photos/200/300",
+          name: "Link 3",
+          content: {
+            label: "Example link",
+            url: "https://www.example.com",
+          },
         }),
       ],
     });
@@ -237,6 +283,17 @@ class BannerBuilderViewModel {
     const hoverState = container1.states.find(
       (state) => state.name === "Hover"
     );
+    if (hoverState) {
+      hoverState.style.background = [
+        {
+          type: "color",
+          value: "#fff38aff",
+          isVisible: true,
+          layerIndex: 1,
+        },
+      ];
+    }
+
     if (hoverState) {
       hoverState.style.background = [
         {
@@ -428,31 +485,39 @@ class BannerBuilderViewModel {
 
     switch (type) {
       case "text":
-        newElement = new Text({ name: "Text 3", text: "new" });
+        newElement = new Text({ name: "Text 3", content: { text: "new" } });
         break;
       case "link":
         newElement = new Link({
           name: "Link 3",
-          label: "Link 3",
-          url: "https://www.example.com",
+          content: {
+            label: "Link 3",
+            url: "https://www.example.com",
+          },
         });
         break;
+
       case "image":
         newElement = new Image({
           name: "Link 3",
-          value: "https://picsum.photos/200/300",
+          content: {
+            value: "https://picsum.photos/200/300",
+          },
         });
         break;
       case "video":
         newElement = new Video({
           name: "Video 1",
-          value:
-            "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+          content: {
+            value:
+              "https://www.shutterstock.com/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm",
+          },
         });
         break;
       default:
         throw new Error(`Unsupported element type: ${type}`);
     }
+
     console.log(container, newElement);
     container.addChild(newElement);
     return newElement;
@@ -481,8 +546,8 @@ class BannerBuilderViewModel {
       parentContainer: this.rootContainer,
     });
 
-    const text1 = new Text({ name: "Text 3", text: "new" });
-    const text2 = new Text({ name: "Text 4", text: "container" });
+    const text1 = new Text({ name: "Text 3", content: { text: "new" } });
+    const text2 = new Text({ name: "Text 4", content: { text: "container" } });
 
     newContainer.addChild(text1);
     newContainer.addChild(text2);
