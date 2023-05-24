@@ -147,7 +147,7 @@
                 id="text-field"
                 type="text"
                 v-model="textValue"
-                @input="updateText"
+                @input="updateTextValue"
               />
             </div>
 
@@ -959,6 +959,11 @@ export default {
           selectedElement.currentState.content
         ) {
           selectedElement.currentState.content.text = newValue;
+          if (selectedElement.currentState.name === "None") {
+            selectedElement.states.forEach((state) => {
+              state.content.text = newValue;
+            });
+          }
         }
       },
     },
@@ -983,6 +988,11 @@ export default {
           selectedElement.currentState.content
         ) {
           selectedElement.currentState.content.value = newValue;
+          if (selectedElement.currentState.name === "None") {
+            selectedElement.states.forEach((state) => {
+              state.content.value = newValue;
+            });
+          }
         }
       },
     },
@@ -1007,6 +1017,11 @@ export default {
           selectedElement.currentState.content
         ) {
           selectedElement.currentState.content.label = newValue;
+          if (selectedElement.currentState.name === "None") {
+            selectedElement.states.forEach((state) => {
+              state.content.label = newValue;
+            });
+          }
         }
       },
     },
@@ -1031,6 +1046,11 @@ export default {
           selectedElement.currentState.content
         ) {
           selectedElement.currentState.content.url = newValue;
+          if (selectedElement.currentState.name === "None") {
+            selectedElement.states.forEach((state) => {
+              state.content.url = newValue;
+            });
+          }
         }
       },
     },
