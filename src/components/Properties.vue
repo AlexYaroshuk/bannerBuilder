@@ -53,18 +53,29 @@
           <div v-if="expandableGroups.states">
             <div class="prop-section">
               <div class="background-list-buttons">
-                <select
-                  v-model="selectedStateName"
-                  @change="changeCurrentState"
-                >
-                  <option
+                <div class="state-chips">
+                  <div
                     v-for="state in viewModel.getSelectedElement().states"
                     :key="state.name"
-                    :value="state.name"
+                    :class="[
+                      'state-chip',
+                      {
+                        active:
+                          state.name ===
+                          viewModel.getSelectedElement().currentState.name,
+                      },
+                      { hover: state.name === 'Hover' },
+                      {
+                        inactive:
+                          state.name !==
+                          viewModel.getSelectedElement().currentState.name,
+                      },
+                    ]"
+                    @click="changeCurrentState(state.name)"
                   >
                     {{ state.name }}
-                  </option>
-                </select>
+                  </div>
+                </div>
               </div>
 
               <div
@@ -791,6 +802,9 @@ export default {
       URLValue: "",
       linkLabelValue: "",
       linkURLValue: "",
+
+      //!
+      stateJustChanged: false,
     };
   },
 
@@ -1114,12 +1128,10 @@ export default {
       }
     },
 
-    changeCurrentState() {
-      const newState = this.viewModel
-        .getSelectedElement()
-        .states.find((state) => state.name === this.selectedStateName);
-      if (newState) {
-        this.viewModel.getSelectedElement().currentState = newState;
+    changeCurrentState(newStateName) {
+      const selectedElement = this.viewModel.getSelectedElement();
+      if (selectedElement) {
+        selectedElement.changeState(newStateName);
       }
     },
 
@@ -1425,5 +1437,32 @@ i.material-icons-hidden {
 
 .icon-wrapper {
   color: #666;
+}
+
+.state-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.state-chip {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid rgb(2, 1, 1);
+  text-align: center;
+}
+
+.state-chip.active {
+  background-color: blue;
+  color: white;
+}
+
+.state-chip.active.hover {
+  background-color: green;
+  color: white;
+}
+
+.state-chip.inactive {
+  opacity: 0.5;
 }
 </style>
