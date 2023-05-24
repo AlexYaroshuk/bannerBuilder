@@ -42,7 +42,7 @@
             class="prop-section-title"
             @click="expandableGroups.states = !expandableGroups.states"
           >
-            States
+            State selector
             <i
               class="material-icons {{ expandableGroups.states ? 'expand-less' : 'expand-more' }}"
             >
