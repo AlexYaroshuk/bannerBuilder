@@ -143,12 +143,7 @@
               v-if="viewModel.getSelectedElement().type === 'text'"
             >
               <label for="text-field">Text:</label>
-              <input
-                id="text-field"
-                type="text"
-                v-model="textValue"
-                @input="updateTextValue"
-              />
+              <input id="text-field" type="text" v-model="textValue" />
             </div>
 
             <!-- ! link settings -->
@@ -158,19 +153,9 @@
               v-if="viewModel.getSelectedElement().type === 'link'"
             >
               <label for="text-field">Label:</label>
-              <input
-                id="text-field"
-                type="text"
-                v-model="linkLabelValue"
-                @input="updateLinkLabelValue"
-              />
+              <input id="text-field" type="text" v-model="linkLabelValue" />
               <label for="text-field">URL:</label>
-              <input
-                id="text-field"
-                type="text"
-                v-model="linkURLValue"
-                @input="updateLinkURLValue"
-              />
+              <input id="text-field" type="text" v-model="linkURLValue" />
             </div>
 
             <!-- ! image settings -->
@@ -194,12 +179,7 @@
               "
             >
               <label for="text-field">URL:</label>
-              <input
-                id="text-field"
-                type="text"
-                v-model="URLValue"
-                @input="updateURLValue"
-              />
+              <input id="text-field" type="text" v-model="URLValue" />
             </div>
 
             <div
@@ -940,118 +920,34 @@ export default {
     // !
     textValue: {
       get() {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          return selectedElement.currentState.content.text;
-        } else {
-          return "";
-        }
+        return this.getContentProperty("text");
       },
       set(newValue) {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          selectedElement.currentState.content.text = newValue;
-          if (selectedElement.currentState.name === "None") {
-            selectedElement.states.forEach((state) => {
-              state.content.text = newValue;
-            });
-          }
-        }
+        this.updateContentProperty("text", newValue);
       },
     },
     URLValue: {
       get() {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          return selectedElement.currentState.content.value;
-        } else {
-          return "";
-        }
+        return this.getContentProperty("value");
       },
       set(newValue) {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          selectedElement.currentState.content.value = newValue;
-          if (selectedElement.currentState.name === "None") {
-            selectedElement.states.forEach((state) => {
-              state.content.value = newValue;
-            });
-          }
-        }
+        this.updateContentProperty("value", newValue);
       },
     },
     linkLabelValue: {
       get() {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          return selectedElement.currentState.content.label;
-        } else {
-          return "";
-        }
+        return this.getContentProperty("label");
       },
       set(newValue) {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          selectedElement.currentState.content.label = newValue;
-          if (selectedElement.currentState.name === "None") {
-            selectedElement.states.forEach((state) => {
-              state.content.label = newValue;
-            });
-          }
-        }
+        this.updateContentProperty("label", newValue);
       },
     },
     linkURLValue: {
       get() {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          return selectedElement.currentState.content.url;
-        } else {
-          return "";
-        }
+        return this.getContentProperty("url");
       },
       set(newValue) {
-        const selectedElement = this.viewModel.getSelectedElement();
-        if (
-          selectedElement &&
-          selectedElement.currentState &&
-          selectedElement.currentState.content
-        ) {
-          selectedElement.currentState.content.url = newValue;
-          if (selectedElement.currentState.name === "None") {
-            selectedElement.states.forEach((state) => {
-              state.content.url = newValue;
-            });
-          }
-        }
+        this.updateContentProperty("url", newValue);
       },
     },
 
@@ -1153,19 +1049,6 @@ export default {
 
     // !
 
-    updateTextValue(newValue) {
-      this.textValue = newValue;
-    },
-    updateURLValue(newValue) {
-      this.URLValue = newValue;
-    },
-    updateLinkLabelValue(newValue) {
-      this.linkLabelValue = newValue;
-    },
-    updateLinkURLValue(newValue) {
-      this.linkURLValue = newValue;
-    },
-
     //hybrid settings
     // direct mutation, color reset needs to be invoked twice otherwise (todo: fix)
     updateTypographyColor(eventData) {
@@ -1200,6 +1083,35 @@ export default {
     //test
     test() {
       console.log(this.viewModel.getSelectedElementCurrentState());
+    },
+
+    // !
+    updateContentProperty(property, newValue) {
+      const selectedElement = this.viewModel.getSelectedElement();
+      if (
+        selectedElement &&
+        selectedElement.currentState &&
+        selectedElement.currentState.content
+      ) {
+        selectedElement.currentState.content[property] = newValue;
+        if (selectedElement.currentState.name === "None") {
+          selectedElement.states.forEach((state) => {
+            state.content[property] = newValue;
+          });
+        }
+      }
+    },
+    getContentProperty(property) {
+      const selectedElement = this.viewModel.getSelectedElement();
+      if (
+        selectedElement &&
+        selectedElement.currentState &&
+        selectedElement.currentState.content
+      ) {
+        return selectedElement.currentState.content[property];
+      } else {
+        return "";
+      }
     },
 
     changeCurrentState() {
