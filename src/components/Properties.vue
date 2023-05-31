@@ -36,89 +36,63 @@
         </h3>
 
         <!-- ! state settings -->
-
-        <div v-if="viewModel.getSelectedElement()">
-          <p
-            class="prop-section-title"
-            @click="expandableGroups.states = !expandableGroups.states"
-          >
-            State selector
-            <i
-              class="material-icons {{ expandableGroups.states ? 'expand-less' : 'expand-more' }}"
+        <div>
+          <div v-if="viewModel.getSelectedElement()">
+            <expandable-section
+              title="State selector"
+              :expanded="expandableGroups.states"
+              @toggleExpanded="
+                expandableGroups.states = !expandableGroups.states
+              "
             >
-              {{ expandableGroups.states ? "expand_more" : "chevron_right" }}
-            </i>
-          </p>
-
-          <div v-if="expandableGroups.states">
-            <div class="prop-section">
-              <div class="background-list-buttons">
-                <div class="state-chips">
-                  <div
-                    v-for="state in viewModel.getSelectedElement().states"
-                    :key="state.name"
-                    :class="[
-                      'state-chip',
-                      {
-                        active:
-                          state.name ===
-                          viewModel.getSelectedElement().currentState.name,
-                      },
-                      { hover: state.name === 'Hover' },
-                      {
-                        inactive:
-                          state.name !==
-                          viewModel.getSelectedElement().currentState.name,
-                      },
-                    ]"
-                    @click="changeCurrentState(state.name)"
-                  >
-                    {{ state.name }}
+              <div class="prop-section">
+                <div class="background-list-buttons">
+                  <div class="state-chips">
+                    <div
+                      v-for="state in viewModel.getSelectedElement().states"
+                      :key="state.name"
+                      :class="[
+                        'state-chip',
+                        {
+                          active:
+                            state.name ===
+                            viewModel.getSelectedElement().currentState.name,
+                        },
+                        { hover: state.name === 'Hover' },
+                        {
+                          inactive:
+                            state.name !==
+                            viewModel.getSelectedElement().currentState.name,
+                        },
+                      ]"
+                      @click="changeCurrentState(state.name)"
+                    >
+                      {{ state.name }}
+                    </div>
                   </div>
                 </div>
               </div>
+            </expandable-section>
 
-              <div
-                class="section-divider"
-                v-if="viewModel.getSelectedElement().type === 'link'"
-              />
-            </div>
-          </div>
-        </div>
-        <!-- ! visibility settings -->
-
-        <div v-if="viewModel.getSelectedElement()">
-          <p
-            class="prop-section-title"
-            @click="expandableGroups.visibility = !expandableGroups.visibility"
-          >
-            Visibility
-            <i
-              class="material-icons {{ expandableGroups.visibility ? 'expand-less' : 'expand-more' }}"
+            <expandable-section
+              title="Visibility"
+              :expanded="expandableGroups.visibility"
+              @toggleExpanded="
+                expandableGroups.visibility = !expandableGroups.visibility
+              "
             >
-              {{
-                expandableGroups.visibility ? "expand_more" : "chevron_right"
-              }}
-            </i>
-          </p>
-
-          <div v-if="expandableGroups.visibility">
-            <div class="prop-section">
-              <div class="background-list-buttons">
-                <button @click.stop="toggleElementVisibility">
-                  {{
-                    viewModel.getSelectedElementCurrentState().style.isVisible
-                      ? "Hide"
-                      : "Show"
-                  }}
-                </button>
+              <div class="prop-section">
+                <div class="background-list-buttons">
+                  <button @click.stop="toggleElementVisibility">
+                    {{
+                      viewModel.getSelectedElementCurrentState().style.isVisible
+                        ? "Hide"
+                        : "Show"
+                    }}
+                  </button>
+                </div>
               </div>
-
-              <div
-                class="section-divider"
-                v-if="viewModel.getSelectedElement().type === 'link'"
-              />
-            </div>
+            </expandable-section>
           </div>
         </div>
 
@@ -129,26 +103,15 @@
             viewModel.getSelectedElement().type != 'container'
           "
         >
-          <p
-            class="prop-section-title"
-            @click="expandableGroups.content = !expandableGroups.content"
-          >
-            Content({{
-              viewModel.getSelectedElement().parentContainer
-                ? viewModel.getSelectedElement().type
-                : ""
-            }}{{
-              viewModel.getSelectedElement().parentContainer ? "" : "root"
-            }})
-            <i
-              class="material-icons {{ expandableGroups.content ? 'expand-less' : 'expand-more' }}"
-            >
-              {{ expandableGroups.content ? "expand_more" : "chevron_right" }}
-            </i>
-          </p>
-
           <!-- ! text settings -->
-          <div v-if="expandableGroups.content">
+
+          <expandable-section
+            title="Content"
+            :expanded="expandableGroups.content"
+            @toggleExpanded="
+              expandableGroups.content = !expandableGroups.content
+            "
+          >
             <div
               class="prop-section"
               v-if="viewModel.getSelectedElement().type === 'text'"
@@ -175,9 +138,6 @@
               class="prop-section"
               v-if="viewModel.getSelectedElement().type === 'image'"
             >
-              <!--            <label for="text-field">URL:</label>
-              <input id="text-field" type="text" /> -->
-
               <FIleUploader :view-model="viewModel"></FIleUploader>
             </div>
             <!-- ! video settings -->
@@ -192,14 +152,16 @@
               <label for="text-field">URL:</label>
               <input id="text-field" type="text" v-model="URLValue" />
             </div>
+          </expandable-section>
 
-            <div
-              class="section-divider"
-              v-if="viewModel.getSelectedElement().type === 'link'"
-            />
-          </div>
+          <div
+            class="section-divider"
+            v-if="viewModel.getSelectedElement().type === 'link'"
+          />
         </div>
+
         <!-- ! typography settings -->
+
         <div
           v-if="
             viewModel.getSelectedElement() &&
@@ -207,27 +169,13 @@
             viewModel.getSelectedElement().type != 'image'
           "
         >
-          <p
-            class="prop-section-title"
-            @click="expandableGroups.typography = !expandableGroups.typography"
+          <expandable-section
+            title="Typography"
+            :expanded="expandableGroups.typography"
+            @toggleExpanded="
+              expandableGroups.typography = !expandableGroups.typography
+            "
           >
-            Typography({{
-              viewModel.getSelectedElement().parentContainer
-                ? viewModel.getSelectedElement().type
-                : ""
-            }}{{
-              viewModel.getSelectedElement().parentContainer ? "" : "root"
-            }})
-            <i
-              class="material-icons {{ expandableGroups.typography ? 'expand-less' : 'expand-more' }}"
-            >
-              {{
-                expandableGroups.typography ? "expand_more" : "chevron_right"
-              }}
-            </i>
-          </p>
-
-          <div v-if="expandableGroups.typography">
             <div class="prop-section">
               <div
                 class="status-text"
@@ -454,15 +402,8 @@
                 @color-change="updateTypographyColor"
               />
             </div>
-          </div>
+          </expandable-section>
         </div>
-        <!--         <div class="popup-content" v-if="selectedChild">
-          <h3>Typography color (child)</h3>
-          <ColorPicker
-            :color="selectedChild.color"
-            @color-change="updateTextColor"
-          />
-        </div> -->
 
         <!-- ! container settings -->
 
@@ -473,21 +414,15 @@
             viewModel.getSelectedElement().parentContainer != null
           "
         >
-          <p
-            class="prop-section-title"
-            @click="expandableGroups.background = !expandableGroups.background"
+          <expandable-section
+            title="Background"
+            :expanded="expandableGroups.background"
+            @toggleExpanded="
+              expandableGroups.background = !expandableGroups.background
+            "
           >
-            Backgrounds
-            <i
-              class="material-icons {{ expandableGroups.background ? 'expand-less' : 'expand-more' }}"
-            >
-              {{
-                expandableGroups.background ? "expand_more" : "chevron_right"
-              }}
-            </i>
-          </p>
-          <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
-          <div v-if="expandableGroups.background">
+            <!-- /*If that doesn't work, you can also try wrapping the entire div with class background-list-item inside a draggable element and setting group="background" and tag="div" on it. Then, you can remove the handle=".background-drag-handle" from the draggable element that surrounds the entire background-list.*/ -->
+
             <div class="prop-section">
               <div class="row" style="display: flex">
                 Add a background layer
@@ -734,7 +669,7 @@
                 @color-change="updateColor"
               />
             </div> -->
-          </div>
+          </expandable-section>
         </div>
         <div
           class="sidebar-overlay"
@@ -752,6 +687,7 @@ import { BannerBuilderViewModel } from "../viewmodels/bannerBuilderViewModel";
 import { VueDraggableNext } from "vue-draggable-next";
 import BackgroundSelector from "./BackgroundSelector.vue";
 import FIleUploader from "./FIleUploader.vue";
+import ExpandableSection from "./ExpandableSection.vue";
 
 export default {
   components: {
@@ -759,6 +695,7 @@ export default {
     BackgroundSelector,
     FIleUploader,
     draggable: VueDraggableNext,
+    ExpandableSection,
   },
   props: {
     viewModel: {
@@ -776,6 +713,7 @@ export default {
           icon: "tune",
         },
       ],
+
       expandableGroups: {
         states: true,
         visibility: true,
@@ -826,64 +764,6 @@ export default {
         }
       },
     },
-
-    /* selectedItemFontSize: {
-      get() {
-        const selectedItem = this.viewModel.selectedItem;
-        if (selectedItem) {
-          if (getSelectedElement().fontSize !== null) {
-            return getSelectedElement().fontSize;
-          } else if (
-            getSelectedElement().parentContainer &&
-            getSelectedElement().parentContainer.fontSize !== null
-          ) {
-            return getSelectedElement().parentContainer.fontSize;
-          }
-        }
-        return null;
-      },
-      set(fontSize) {
-        this.viewModel.getSelectedElement().fontSize = selectedItemFontSize;
-      },
-    },
-    selectedItemFontFamily: {
-      get() {
-        const selectedItem = this.viewModel.selectedItem;
-        if (selectedItem) {
-          if (getSelectedElement().fontFamily !== null) {
-            return getSelectedElement().fontFamily;
-          } else if (
-            getSelectedElement().parentContainer &&
-            getSelectedElement().parentContainer.fontFamily !== null
-          ) {
-            return getSelectedElement().parentContainer.fontFamily;
-          }
-        }
-        return null;
-      },
-      set(selectedItemFontFamily) {
-        this.viewModel.getSelectedElement().fontFamily = selectedItemFontFamily;
-      },
-    },
-    selectedItemFontWeight: {
-      get() {
-        const selectedItem = this.viewModel.selectedItem;
-        if (selectedItem) {
-          if (getSelectedElement().selectedItemFontWeight !== null) {
-            return getSelectedElement().selectedItemFontWeight;
-          } else if (
-            getSelectedElement().parentContainer &&
-            getSelectedElement().parentContainer.selectedItemFontWeight !== null
-          ) {
-            return getSelectedElement().parentContainer.selectedItemFontWeight;
-          }
-        }
-        return null;
-      },
-      set(selectedItemFontWeight) {
-        this.viewModel.getSelectedElement().fontWeight = selectedItemFontWeight;
-      },
-    }, */
 
     fontSize: {
       get() {
