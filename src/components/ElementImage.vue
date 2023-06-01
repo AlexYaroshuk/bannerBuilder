@@ -1,5 +1,5 @@
 <template>
-  <div class="element-image">
+  <div class="element-image" :style="imageStyle">
     <img :src="child.currentState?.content?.value" />
   </div>
 </template>
@@ -16,17 +16,25 @@ export default {
       required: true,
     },
   },
-  /*   computed: {
-    typographyStyle() {
-      const styles = this.child.getEffectiveStyles();
+  computed: {
+    imageStyle() {
+      const styles = this.child.currentState.style;
       return {
-        color: styles.color,
-             fontFamily: styles.fontFamily,
-        fontWeight: styles.fontWeight,
-        fontSize: `${styles.fontSize}px`,
+        margin: this.getMarginValue(styles),
+        padding: this.getPaddingValue(styles),
       };
     },
-  }, */
+  },
+  methods: {
+    getMarginValue(styles) {
+      const { leftMargin, rightMargin, topMargin, bottomMargin } = styles;
+      return `${topMargin}px ${rightMargin}px ${bottomMargin}px ${leftMargin}px`;
+    },
+    getPaddingValue(styles) {
+      const { leftPadding, rightPadding, topPadding, bottomPadding } = styles;
+      return `${topPadding}px ${rightPadding}px ${bottomPadding}px ${leftPadding}px`;
+    },
+  },
 };
 </script>
 

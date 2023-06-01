@@ -59,7 +59,6 @@
           <component
             :is="getComponent(child)"
             :class="{ hidden: !child.currentState.style.isVisible }"
-            style="padding: 4px"
             :child="child"
             :viewModel="viewModel"
             @mouseleave="viewModel.handleElementDehovered()"
@@ -348,6 +347,15 @@ export default {
       return `${type}-gradient(${startPoint}, ${stops})`;
     },
 
+    getMarginValue(styles) {
+      const { leftMargin, rightMargin, topMargin, bottomMargin } = styles;
+      return `${topMargin}px ${rightMargin}px ${bottomMargin}px ${leftMargin}px`;
+    },
+    getPaddingValue(styles) {
+      const { leftPadding, rightPadding, topPadding, bottomPadding } = styles;
+      return `${topPadding}px ${rightPadding}px ${bottomPadding}px ${leftPadding}px`;
+    },
+
     generateGradient(gradient) {
       if (!gradient) {
         return "";
@@ -435,6 +443,8 @@ export default {
 
       return {
         backgroundLayers,
+        margin: this.getMarginValue(styles),
+        padding: this.getPaddingValue(styles),
       };
     },
 

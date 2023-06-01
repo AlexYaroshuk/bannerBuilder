@@ -30,7 +30,19 @@ export default {
         fontFamily: styles.fontFamily,
         fontWeight: styles.fontWeight,
         fontSize: `${styles.fontSize}px`,
+        margin: this.getMarginValue(styles),
+        padding: this.getPaddingValue(styles),
       };
+    },
+  },
+  methods: {
+    getMarginValue(styles) {
+      const { leftMargin, rightMargin, topMargin, bottomMargin } = styles;
+      return `${topMargin}px ${rightMargin}px ${bottomMargin}px ${leftMargin}px`;
+    },
+    getPaddingValue(styles) {
+      const { leftPadding, rightPadding, topPadding, bottomPadding } = styles;
+      return `${topPadding}px ${rightPadding}px ${bottomPadding}px ${leftPadding}px`;
     },
   },
 };

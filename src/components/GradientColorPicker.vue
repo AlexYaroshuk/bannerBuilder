@@ -46,12 +46,6 @@
         </div>
       </div>
     </div>
-    <button
-      v-if="selectedPoint && gradient.points.length != 1"
-      @click="deleteSelectedPoint"
-    >
-      Delete point
-    </button>
 
     <div class="section-divider"></div>
 

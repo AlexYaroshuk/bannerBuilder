@@ -8,6 +8,16 @@ interface Style {
   background: BackgroundLayer[] | null;
   borderColor: string | null;
   isVisible: boolean;
+
+  //test
+  leftMargin?: number | null;
+  rightMargin?: number | null;
+  topMargin?: number | null;
+  bottomMargin?: number | null;
+  leftPadding?: number | null;
+  rightPadding?: number | null;
+  topPadding?: number | null;
+  bottomPadding?: number | null;
 }
 interface TextContent {
   text: string;
@@ -105,6 +115,16 @@ abstract class Element {
         background: [],
         borderColor: null,
         isVisible: true,
+
+        //test
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 0,
+        bottomMargin: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
 
@@ -118,6 +138,18 @@ abstract class Element {
         background: baseState.style.background,
         borderColor: baseState.style.borderColor,
         isVisible: baseState.style.isVisible,
+
+        //test
+        leftMargin: baseState.style.leftMargin,
+        rightMargin: baseState.style.rightMargin,
+        topMargin: baseState.style.topMargin,
+        bottomMargin: baseState.style.bottomMargin,
+        leftPadding: baseState.style.leftPadding,
+        rightPadding: baseState.style.rightPadding,
+        topPadding: baseState.style.topPadding,
+        bottomPadding: baseState.style.bottomPadding,
+
+        //test
       },
     };
 
@@ -130,8 +162,8 @@ abstract class Element {
     return this.name;
   }
 
-  getColor(): string | null {
-    return this.currentState.style.color;
+  getStyleProperty(property: keyof Style): any {
+    return this.currentState.style[property];
   }
 
   getRootContainer(): Container | null {
@@ -199,6 +231,22 @@ abstract class Element {
         this.currentState.style.isVisible !== undefined
           ? this.currentState.style.isVisible
           : true,
+
+      leftMargin: this.currentState.style.leftMargin,
+
+      rightMargin: this.currentState.style.rightMargin,
+
+      topMargin: this.currentState.style.topMargin,
+
+      bottomMargin: this.currentState.style.bottomMargin,
+
+      leftPadding: this.currentState.style.leftPadding,
+
+      rightPadding: this.currentState.style.rightPadding,
+
+      topPadding: this.currentState.style.topPadding,
+
+      bottomPadding: this.currentState.style.bottomPadding,
     };
 
     // If background layers exist

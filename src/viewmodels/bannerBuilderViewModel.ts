@@ -68,6 +68,14 @@ class BannerBuilderViewModel {
         ],
         borderColor: null,
         isVisible: true,
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 0,
+        bottomMargin: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
     const container2BaseState: State = {
@@ -109,6 +117,14 @@ class BannerBuilderViewModel {
         ],
         borderColor: null,
         isVisible: true,
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 40,
+        bottomMargin: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
     const container3BaseState: State = {
@@ -128,6 +144,14 @@ class BannerBuilderViewModel {
         ],
         borderColor: null,
         isVisible: true,
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 0,
+        bottomMargin: 0,
+        leftPadding: 80,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
     const container4BaseState: State = {
@@ -153,6 +177,14 @@ class BannerBuilderViewModel {
         ],
         borderColor: null,
         isVisible: true,
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 0,
+        bottomMargin: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
 
@@ -173,6 +205,14 @@ class BannerBuilderViewModel {
         ],
         borderColor: null,
         isVisible: true,
+        leftMargin: 0,
+        rightMargin: 0,
+        topMargin: 0,
+        bottomMargin: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        topPadding: 0,
+        bottomPadding: 0,
       },
     };
 
@@ -333,6 +373,7 @@ class BannerBuilderViewModel {
   handleElementSelected(element: Element): void {
     this.currentSelectedElement = element;
     this.isBackgroundSelectorVisible = false;
+    console.log(element.currentState.style);
   }
 
   handleElementHovered(element: Element): void {

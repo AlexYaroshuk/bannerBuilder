@@ -74,25 +74,75 @@
               </div>
             </expandable-section>
 
-            <expandable-section
-              title="Visibility"
-              :expanded="expandableGroups.visibility"
-              @toggleExpanded="
-                expandableGroups.visibility = !expandableGroups.visibility
-              "
-            >
-              <div class="prop-section">
-                <div class="background-list-buttons">
-                  <button @click.stop="toggleElementVisibility">
-                    {{
-                      viewModel.getSelectedElementCurrentState().style.isVisible
-                        ? "Hide"
-                        : "Show"
-                    }}
-                  </button>
+            <!-- ! visibility settings -->
+            <!-- disable for root -->
+            <div v-if="viewModel.getSelectedElement().parentContainer != null">
+              <expandable-section
+                title="Visibility"
+                :expanded="expandableGroups.visibility"
+                @toggleExpanded="
+                  expandableGroups.visibility = !expandableGroups.visibility
+                "
+              >
+                <div class="prop-section">
+                  <div class="background-list-buttons">
+                    <button @click.stop="toggleElementVisibility">
+                      {{
+                        viewModel.getSelectedElementCurrentState().style
+                          .isVisible
+                          ? "Hide"
+                          : "Show"
+                      }}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </expandable-section>
+              </expandable-section>
+            </div>
+
+            <!-- ! spacing settings -->
+            <!-- disable for root -->
+            <div v-if="viewModel.getSelectedElement().parentContainer != null">
+              <expandable-section
+                title="Spacing"
+                :expanded="expandableGroups.spacing"
+                @toggleExpanded="
+                  expandableGroups.spacing = !expandableGroups.spacing
+                "
+              >
+                <div class="prop-section">
+                  <div class="margin-box">
+                    <div class="margin-void">
+                      <div class="side top-margin">
+                        <input type="text" v-model="topMarginValue" />
+                      </div>
+                      <div class="side right-margin">
+                        <input type="text" v-model="rightMarginValue" />
+                      </div>
+                      <div class="side bottom-margin">
+                        <input type="text" v-model="bottomMarginValue" />
+                      </div>
+                      <div class="side left-margin">
+                        <input type="text" v-model="leftMarginValue" />
+                      </div>
+                    </div>
+                    <div class="padding-void">
+                      <div class="side top-padding">
+                        <input type="text" v-model="topPaddingValue" />
+                      </div>
+                      <div class="side right-padding">
+                        <input type="text" v-model="rightPaddingValue" />
+                      </div>
+                      <div class="side bottom-padding">
+                        <input type="text" v-model="bottomPaddingValue" />
+                      </div>
+                      <div class="side left-padding">
+                        <input type="text" v-model="leftPaddingValue" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </expandable-section>
+            </div>
           </div>
         </div>
 
@@ -717,6 +767,7 @@ export default {
       expandableGroups: {
         states: true,
         visibility: true,
+        spacing: true,
         content: true,
         typography: true,
         background: true,
@@ -740,6 +791,23 @@ export default {
       URLValue: "",
       linkLabelValue: "",
       linkURLValue: "",
+
+      //test
+
+      dragging: false,
+      dragProp: "",
+      initialMousePos: 0,
+      initialVal: 0,
+      draggedValue: 0,
+      //
+      leftMarginValue: 0,
+      topMarginValue: 0,
+      rightMarginValue: 0,
+      bottomMarginValue: 0,
+      leftPaddingValue: 0,
+      topPaddingValue: 0,
+      rightPaddingValue: 0,
+      bottomPaddingValue: 0,
 
       //!
       stateJustChanged: false,
@@ -845,6 +913,97 @@ export default {
       },
     },
 
+    // ! need to refactor this ///////////////////////
+
+    leftMarginValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("leftMargin");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.leftMargin =
+          newValue;
+      },
+    },
+    rightMarginValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("rightMargin");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.rightMargin =
+          newValue;
+      },
+    },
+    topMarginValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("topMargin");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.topMargin =
+          newValue;
+      },
+    },
+    bottomMarginValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("bottomMargin");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.bottomMargin =
+          newValue;
+      },
+    },
+    leftPaddingValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("leftPadding");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.leftPadding =
+          newValue;
+      },
+    },
+    rightPaddingValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("rightPadding");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.rightPadding =
+          newValue;
+      },
+    },
+    topPaddingValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("topPadding");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.topPadding =
+          newValue;
+      },
+    },
+    bottomPaddingValue: {
+      get() {
+        return this.viewModel
+          .getSelectedElement()
+          .getStyleProperty("bottomPadding");
+      },
+      set(newValue) {
+        this.viewModel.getSelectedElement().currentState.style.bottomPadding =
+          newValue;
+      },
+    },
+
     selectedItemColor: {
       get() {
         return this.viewModel.getSelectedElementCurrentState().style.color !==
@@ -905,7 +1064,38 @@ export default {
     },
   },
 
+  mounted() {
+    window.addEventListener("mouseup", this.stopDrag);
+    window.addEventListener("mousemove", (event) => {
+      if (this.dragging) {
+        let delta = this.initialMousePos - event.clientY; // or event.pageX for left/right
+        this.draggedValue = this.initialVal + delta;
+
+        // Use nextTick to force update before setting value
+        this.$nextTick(() => {
+          this[this.dragProp] = this.draggedValue;
+        });
+      }
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener("mouseup", this.stopDrag);
+    window.removeEventListener("mousemove", this.stopDrag);
+  },
+
   methods: {
+    //spacingBoxDrag
+    startDrag(prop) {
+      this.dragging = true;
+      this.dragProp = prop;
+      this.initialMousePos = event.clientY; // or event.pageX for left/right
+      this.initialVal = this[prop];
+    },
+    stopDrag() {
+      this.dragging = false;
+    },
+
+    ///
     gradientStyle(background) {
       if (!background) return null;
 
@@ -1344,5 +1534,92 @@ i.material-icons-hidden {
 
 .state-chip.inactive {
   opacity: 0.5;
+}
+
+.margin-box {
+  position: relative;
+  width: 70%;
+  height: 200px;
+  margin: 50px;
+  background-color: lightgray;
+}
+
+.margin-void,
+.padding-void {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  background-color: gray;
+}
+
+.side {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.side input {
+  width: 40px; /* Increased width */
+}
+
+.margin-void .side {
+  position: absolute;
+}
+
+.padding-void .side {
+  position: absolute;
+}
+
+.top-margin {
+  top: -40px; /* Increased position */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.right-margin {
+  top: 50%;
+  right: -40px; /* Increased position */
+  transform: translateY(-50%);
+}
+
+.bottom-margin {
+  bottom: -40px; /* Increased position */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.left-margin {
+  top: 50%;
+  left: -40px; /* Increased position */
+  transform: translateY(-50%);
+}
+
+.top-padding {
+  top: 40px; /* Increased position */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.right-padding {
+  top: 50%;
+  right: 40px; /* Increased position */
+  transform: translateY(-50%);
+}
+
+.bottom-padding {
+  bottom: 40px; /* Increased position */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.left-padding {
+  top: 50%;
+  left: 40px; /* Increased position */
+  transform: translateY(-50%);
 }
 </style>

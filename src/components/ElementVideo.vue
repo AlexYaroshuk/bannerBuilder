@@ -1,5 +1,5 @@
 <template>
-  <div class="element-video">
+  <div class="element-video" :style="videoStyle">
     <video
       controls
       autoplay
@@ -22,6 +22,25 @@ export default {
     key: {
       type: String,
       required: true,
+    },
+  },
+  computed: {
+    videoStyle() {
+      const styles = this.child.currentState.style;
+      return {
+        margin: this.getMarginValue(styles),
+        padding: this.getPaddingValue(styles),
+      };
+    },
+  },
+  methods: {
+    getMarginValue(styles) {
+      const { leftMargin, rightMargin, topMargin, bottomMargin } = styles;
+      return `${topMargin}px ${rightMargin}px ${bottomMargin}px ${leftMargin}px`;
+    },
+    getPaddingValue(styles) {
+      const { leftPadding, rightPadding, topPadding, bottomPadding } = styles;
+      return `${topPadding}px ${rightPadding}px ${bottomPadding}px ${leftPadding}px`;
     },
   },
 };
