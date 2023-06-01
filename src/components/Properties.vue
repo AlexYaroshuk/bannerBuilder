@@ -37,7 +37,12 @@
 
         <!-- ! state settings -->
         <div>
-          <div v-if="viewModel.getSelectedElement()">
+          <div
+            v-if="
+              viewModel.getSelectedElement() &&
+              viewModel.getSelectedElement().parentContainer != null
+            "
+          >
             <expandable-section
               title="State selector"
               :expanded="expandableGroups.states"
